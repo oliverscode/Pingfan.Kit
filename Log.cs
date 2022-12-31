@@ -1,0 +1,165 @@
+﻿using System;
+using System.IO;
+
+namespace Pingfan.Kit.Log
+{
+    /// <summary>
+    /// 日志级别
+    /// </summary>
+    public enum LogLevel
+    {
+        /// <summary>
+        /// 不记录日志
+        /// </summary>
+        Non = 0,
+
+        /// <summary>
+        /// 调试日志
+        /// </summary>
+        DBG = 1,
+
+        /// <summary>
+        /// 成功日志
+        /// </summary>
+        SUC = 2,
+
+        /// <summary>
+        /// 关键信息状态
+        /// </summary>
+        INF = 4,
+
+        /// <summary>
+        /// 警告日志
+        /// </summary>
+        WAR = 8,
+
+        /// <summary>
+        /// 错误日志
+        /// </summary>
+        ERR = 16,
+
+        /// <summary>
+        /// 宕机日志
+        /// </summary>
+        FAL = 32,
+    }
+
+    /// <summary>
+    /// 日志记录器
+    /// </summary>
+    public class Log
+    {
+        /// <summary>
+        /// 写入文件名
+        /// </summary>
+        public string Name { get; }
+
+        private static readonly string _RootPath = PathEx.CombineFromCurrentDirectory("log");
+
+        /// <summary>
+        /// 默认的日志记录对象
+        /// </summary>
+        public static Log Default { get; } = new Log("");
+
+        public Log(string name)
+        {
+            Name = name;
+        }
+
+        /// <summary>
+        /// 输出到控制台的级别
+        /// </summary>
+        public LogLevel ConsoleLevel { get; set; } =
+            LogLevel.DBG | LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL;
+
+        /// <summary>
+        /// 输出到磁盘的级别
+        /// </summary>
+        public LogLevel FileLevel { get; set; } =
+            LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL;
+
+        /// <summary>
+        /// 日志回调
+        /// </summary>
+        public event Action<LogLevel, string> OnHandler;
+
+
+        /// <summary>
+        /// 写一个调试日志
+        /// </summary>
+        public void Debug(string logString)
+        {
+            WriteLine(LogLevel.DBG, logString);
+        }
+
+        /// <summary>
+        /// 写一个错入日志
+        /// </summary>
+        public void Error(string logString)
+        {
+            WriteLine(LogLevel.ERR, logString);
+        }
+
+        /// <summary>
+        /// 写一个宕机日志
+        /// </summary>
+        public void Fatal(string logString)
+        {
+            WriteLine(LogLevel.FAL, logString);
+        }
+
+        /// <summary>
+        /// 写一个关键信息日志
+        /// </summary>
+        public void Info(string logString)
+        {
+            WriteLine(LogLevel.INF, logString);
+        }
+
+        /// <summary>
+        /// 写一个成功日志
+        /// </summary>
+        public void Success(string logString)
+        {
+            WriteLine(LogLevel.SUC, logString);
+        }
+
+        /// <summary>
+        /// 写一个警告日志
+        /// </summary>
+        public void Warning(string logString)
+        {
+            WriteLine(LogLevel.WAR, logString);
+        }
+
+        /// <summary>
+        /// 写一行日志
+        /// </summary>
+        /// <param name="logLevel">日志级别</param>
+        /// <param name="logString">日志内容</param>
+        public void WriteLine(LogLevel logLevel, string logString)
+        {
+            if (!string.IsNullOrWhiteSpace(logString))
+            {
+                // 先全局处理
+                this.OnHandler?.Invoke(logLevel, logString);
+                
+                var str = $"[{logLevel.ToString()}]{DateTime.Now:yyyy-MM-dd HH:mm:ss} {logString}\n";
+
+                // 判断是否要输出到控制台
+                if ((logLevel & this.ConsoleLevel) != 0)
+                {
+                    Console.Write(str);
+                }
+
+
+                // 判断是否要输出到磁盘
+                if ((logLevel & this.FileLevel) != 0)
+                {
+                    var logPath = PathEx.Combine(_RootPath, $"{DateTime.Now:yyyy-MM-dd}{Name}.log");
+                    FileEx.AppendAllText(logPath, str);
+                }
+            }
+        }
+    }
+}

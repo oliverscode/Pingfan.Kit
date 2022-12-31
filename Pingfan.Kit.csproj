@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <LangVersion>7.3</LangVersion>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>常用工具库, 大大提高工作效率</Description>
+        <PackageVersion>2.3.1</PackageVersion>
+        <Authors>Oliver</Authors>
+     
+        <TargetFramework>netstandard2.0</TargetFramework>
+     
+        <PackageProjectUrl>https://github.com/oliverscode/Pingfan.Kit</PackageProjectUrl>
+     
+        <PackageIcon>logo.png</PackageIcon>
+     
+        <RepositoryUrl>https://github.com/oliverscode/Pingfan.Kit</RepositoryUrl>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\Pingfan.Kit.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../logo.png">
+          <Pack>True</Pack>
+          <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
+
+
+
+</Project>
