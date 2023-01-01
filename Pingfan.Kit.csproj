@@ -4,7 +4,7 @@
         <LangVersion>7.3</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>常用工具库, 大大提高工作效率</Description>
-        <PackageVersion>2.3.1</PackageVersion>
+        <PackageVersion>2.3.2</PackageVersion>
         <Authors>Oliver</Authors>
      
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -14,6 +14,14 @@
         <PackageIcon>logo.png</PackageIcon>
      
         <RepositoryUrl>https://github.com/oliverscode/Pingfan.Kit</RepositoryUrl>
+     
+        <PackageLicenseUrl>https://github.com/oliverscode/Pingfan.Kit/blob/master/LICENSE</PackageLicenseUrl>
+     
+        <RepositoryType>git</RepositoryType>
+     
+        <Title>Pingfan.Kit</Title>
+     
+        <PackageTags>Util,Kit,Tools</PackageTags>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -24,6 +32,9 @@
         <None Include="../logo.png">
           <Pack>True</Pack>
           <PackagePath></PackagePath>
+        </None>
+        <None Update="README.md">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
