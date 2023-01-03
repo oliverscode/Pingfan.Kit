@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace Pingfan.Kit.Convert
+namespace Pingfan.Kit
 {
     public class ConvertEx
     {

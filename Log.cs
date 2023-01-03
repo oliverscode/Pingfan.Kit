@@ -1,7 +1,6 @@
 ﻿using System;
-using System.IO;
 
-namespace Pingfan.Kit.Log
+namespace Pingfan.Kit
 {
     /// <summary>
     /// 日志级别

@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using Pingfan.Kit.Caching;
 
 namespace Pingfan.Kit
 {

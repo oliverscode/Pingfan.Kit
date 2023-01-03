@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Pingfan.Kit.Caching
+namespace Pingfan.Kit
 {
     /// <summary>
     /// 内存缓存库

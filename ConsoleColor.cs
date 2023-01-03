@@ -62,7 +62,7 @@ namespace Pingfan.Kit
             {
                 try
                 {
-                    return (T) Pingfan.Kit.Convert.ConvertEx.ChangeType(ReadString(write, outColor, inColor), typeof(T));
+                    return (T) ConvertEx.ChangeType(ReadString(write, outColor, inColor), typeof(T));
                 }
                 catch
                 {
