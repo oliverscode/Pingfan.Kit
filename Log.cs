@@ -49,9 +49,9 @@ namespace Pingfan.Kit
     public class Log
     {
         /// <summary>
-        /// 写入文件名
+        /// 日志文件名
         /// </summary>
-        public string Name { get; }
+        public string LogFileName { get; }
 
         private static readonly string _RootPath = PathEx.CombineFromCurrentDirectory("log");
 
@@ -60,9 +60,14 @@ namespace Pingfan.Kit
         /// </summary>
         public static Log Default { get; } = new Log("");
 
-        public Log(string name)
+        public Log()
         {
-            Name = name;
+            
+        }
+        
+        public Log(string logFileName)
+        {
+            LogFileName = logFileName;
         }
 
         /// <summary>
@@ -155,10 +160,20 @@ namespace Pingfan.Kit
                 // 判断是否要输出到磁盘
                 if ((logLevel & this.FileLevel) != 0)
                 {
-                    var logPath = PathEx.Combine(_RootPath, $"{DateTime.Now:yyyy-MM-dd}{Name}.log");
+                    var logPath = PathEx.Combine(_RootPath, $"{DateTime.Now:yyyy-MM-dd}{LogFileName}.log");
                     FileEx.AppendAllText(logPath, str);
                 }
             }
         }
     }
+
+    public interface ILog
+    {
+        // string LogName { get; }
+    }
+    public static class LogInstance
+    {
+        private static Log _Log = new Log();
+        
+    } 
 }

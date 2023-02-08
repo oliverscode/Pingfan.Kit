@@ -64,12 +64,20 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static string Get(string key, string defaultValue = "")
         {
+            // 如果有环境变量, 则使用环境变量
+            var value = Environment.GetEnvironmentVariable(key);
+            if (value.IsNullOrEmpty() == false)
+            {
+                return value;
+            }
+            
+            // 没有配置文件, 默认写入有一个配置文件
             if (File.Exists(MainConfigFilePath) == false)
             {
                 Set(key, defaultValue);
                 return defaultValue;
             }
-
+            
             var configIni = File.ReadAllText(MainConfigFilePath, Encoding.UTF8);
             var m = Regex.Match(configIni, $"{key}=(.*?)\n");
             if (m.Success)
