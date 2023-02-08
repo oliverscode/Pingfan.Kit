@@ -51,7 +51,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 日志文件名
         /// </summary>
-        public string LogFileName { get; }
+        public string LogFileName { get; set; }
 
         private static readonly string _RootPath = PathEx.CombineFromCurrentDirectory("log");
 
@@ -166,14 +166,5 @@ namespace Pingfan.Kit
             }
         }
     }
-
-    public interface ILog
-    {
-        // string LogName { get; }
-    }
-    public static class LogInstance
-    {
-        private static Log _Log = new Log();
-        
-    } 
+    
 }
