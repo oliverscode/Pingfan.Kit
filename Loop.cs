@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pingfan.Kit
@@ -76,6 +77,25 @@ namespace Pingfan.Kit
                     }
                 }
             });
+        }
+
+        /// <summary>
+        /// 一直等待, 通常用于控制台程序等待执行完成, 又不需要从流中读取数据
+        /// </summary>
+        public static void Wait()
+        {
+            var thread = new Thread(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(1000);
+                }
+            })
+            {
+                IsBackground = true
+            };
+            thread.Start();
+            thread.Join();
         }
     }
 }
