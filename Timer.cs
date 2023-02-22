@@ -139,6 +139,34 @@ namespace Pingfan.Kit
         /// </summary>
         public static Task SetIntervalWithTry(int milliSecond,
             Func<Task> action,
+            Action<Exception> errAction = null,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.Factory.StartNew(async () =>
+            {
+                while (cancellationToken.IsCancellationRequested == false)
+                {
+                    try
+                    {
+                        await action();
+                    }
+                    catch (Exception e)
+                    {
+                        errAction?.Invoke(e);
+                    }
+
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    await Task.Delay(milliSecond, cancellationToken);
+                }
+            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        }
+        
+        /// <summary>
+        /// 创建一个定时器, 同时不抛出异常
+        /// </summary>
+        public static Task SetIntervalWithTry(int milliSecond,
+            Func<Task> action,
             Func<Exception, Task> errAction = null,
             CancellationToken cancellationToken = default)
         {
