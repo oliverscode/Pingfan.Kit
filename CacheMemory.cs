@@ -32,7 +32,7 @@ namespace Pingfan.Kit
         /// <param name="defaultValue"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static T Get(string key, T defaultValue = default(T))
+        public static T Get(string key, T defaultValue = default)
         {
             if (string.IsNullOrEmpty(key))
             {
@@ -63,7 +63,7 @@ namespace Pingfan.Kit
         /// <param name="defaultValue"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static bool TryGet(string key, out T result, T defaultValue = default(T))
+        public static bool TryGet(string key, out T result, T defaultValue = default)
         {
             if (string.IsNullOrEmpty(key))
             {

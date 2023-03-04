@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Pingfan.Kit
 {
@@ -54,22 +53,24 @@ namespace Pingfan.Kit
             // 其他系统分隔符
             var otherSeparator = separator == '/' ? '\\' : '/';
 
-            var ps = new List<string>(); 
+            var ps = new List<string>();
             foreach (var path in paths)
             {
                 var p = path.Split(new char[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
                 ps.AddRange(p);
             }
+
             var result = string.Join(separator.ToString(), ps);
-            
+
             // 不是windows系统, 路径必须是当前系统分隔符开头
+#if NETCOREAPP
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
             {
                 result = separator + result;
             }
+#endif
+
             return result;
         }
-        
-        
     }
 }

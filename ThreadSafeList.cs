@@ -20,89 +20,88 @@ namespace Pingfan.Kit
         public ThreadSafeList(IEnumerable<T> collection) : base(collection)
         {
         }
-        
-        public void AddRange(IEnumerable<T> collection)
+
+        public new void AddRange(IEnumerable<T> collection)
         {
             lock (this)
             {
                 base.AddRange(collection);
             }
         }
-        
-        public void AddRange(params T[] collection)
+
+        public new void AddRange(params T[] collection)
         {
             lock (this)
             {
                 base.AddRange(collection);
             }
         }
-        
-        public void Add(T item)
+
+        public new void Add(T item)
         {
             lock (this)
             {
                 base.Add(item);
             }
         }
-        
 
 
-        public void CopyTo(T[] array, int arrayIndex)
+        public new void CopyTo(T[] array, int arrayIndex)
         {
             lock (this)
             {
                 base.CopyTo(array, arrayIndex);
             }
         }
-        
-        public bool Remove(T item)
+
+        public new bool Remove(T item)
         {
             lock (this)
             {
                 return base.Remove(item);
             }
         }
-        
-        public int RemoveAll(Predicate<T> match)
+
+        public new int RemoveAll(Predicate<T> match)
         {
             lock (this)
             {
                 return base.RemoveAll(match);
             }
         }
-        
-        public void RemoveAt(int index)
+
+        public new void RemoveAt(int index)
         {
             lock (this)
             {
                 base.RemoveAt(index);
             }
         }
-        
-        public void RemoveRange(int index, int count)
+
+        public new void RemoveRange(int index, int count)
         {
             lock (this)
             {
                 base.RemoveRange(index, count);
             }
         }
-        
-        public void Insert(int index, T item)
+
+        public new void Insert(int index, T item)
         {
             lock (this)
             {
                 base.Insert(index, item);
             }
         }
-        
-        public void InsertRange(int index, IEnumerable<T> collection)
+
+        public new void InsertRange(int index, IEnumerable<T> collection)
         {
             lock (this)
             {
                 base.InsertRange(index, collection);
             }
         }
-        
+
         public void InsertRange(int index, params T[] collection)
         {
             lock (this)
@@ -110,64 +109,61 @@ namespace Pingfan.Kit
                 base.InsertRange(index, collection);
             }
         }
-        
-        public void Reverse()
+
+        public new void Reverse()
         {
             lock (this)
             {
                 base.Reverse();
             }
         }
-        
-        public void Reverse(int index, int count)
+
+        public new void Reverse(int index, int count)
         {
             lock (this)
             {
                 base.Reverse(index, count);
             }
         }
-        
-        public void Sort()
+
+        public new void Sort()
         {
             lock (this)
             {
                 base.Sort();
             }
         }
-        
-        public void Sort(Comparison<T> comparison)
+
+        public new void Sort(Comparison<T> comparison)
         {
             lock (this)
             {
                 base.Sort(comparison);
             }
         }
-        
-        public void Sort(IComparer<T> comparer)
+
+        public new void Sort(IComparer<T> comparer)
         {
             lock (this)
             {
                 base.Sort(comparer);
             }
         }
-        
-        public void Sort(int index, int count, IComparer<T> comparer)
+
+        public new void Sort(int index, int count, IComparer<T> comparer)
         {
             lock (this)
             {
                 base.Sort(index, count, comparer);
             }
         }
-        
-        public void TrimExcess()
+
+        public new void TrimExcess()
         {
             lock (this)
             {
                 base.TrimExcess();
             }
         }
-        
-
-            
     }
 }

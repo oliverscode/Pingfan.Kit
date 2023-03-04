@@ -35,7 +35,7 @@ namespace Pingfan.Kit
                     {
                         action();
                     }
-                    catch (Exception e)
+                    catch 
                     {
                     }
                 }
@@ -72,7 +72,7 @@ namespace Pingfan.Kit
                     {
                         await action();
                     }
-                    catch (Exception e)
+                    catch 
                     {
                     }
                 }

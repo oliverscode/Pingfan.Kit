@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <LangVersion>10</LangVersion>
+        <LangVersion>7.3</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>常用工具库, 大大提高工作效率</Description>
-        <PackageVersion>2.3.4</PackageVersion>
+        <PackageVersion>3.0.0</PackageVersion>
         <Authors>Oliver</Authors>
      
         <PackageProjectUrl>https://github.com/oliverscode/Pingfan.Kit</PackageProjectUrl>
@@ -21,7 +21,9 @@
      
         <PackageTags>Util,Kit,Tools</PackageTags>
      
-        <TargetFrameworks>net6.0;netcoreapp3.1;netstandard2.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net46;net48;net6.0;netcoreapp3.1;netstandard2.0;netstandard2.1</TargetFrameworks>
+     
+        <Nullable>disable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -53,6 +55,10 @@
     <PropertyGroup Condition="'$(TargetFramework)'=='net6.0'">
         <DefineConstants>NET6</DefineConstants>
     </PropertyGroup>
-
-
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net46'">
+		<DefineConstants>net46</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+		<DefineConstants>net48</DefineConstants>
+	</PropertyGroup>
 </Project>

@@ -15,8 +15,6 @@ namespace Pingfan.Kit
         private static readonly string MainConfigFilePath =
             Path.Combine(PathEx.CurrentDirectory, "app.ini");
 
-        // private static readonly string BakConfigFilePath =
-        //     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "application.ini");
 
         /// <summary>
         /// 写入配置
@@ -57,7 +55,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 读取配置
+        /// 读取配置, 环境变量->命令行->配置文件->默认值
         /// </summary>
         /// <param name="key"></param>
         /// <param name="defaultValue"></param>
@@ -66,6 +64,13 @@ namespace Pingfan.Kit
         {
             // 如果有环境变量, 则使用环境变量
             var value = Environment.GetEnvironmentVariable(key);
+            if (value?.IsNullOrEmpty() == false)
+            {
+                return value;
+            }
+
+            // 如果有命令行参数, 则使用命令行参数
+            value = GetByCmd(key);
             if (value.IsNullOrEmpty() == false)
             {
                 return value;
@@ -88,7 +93,7 @@ namespace Pingfan.Kit
                     configString = Regex.Unescape(configString);
                     return configString;
                 }
-                catch (Exception e)
+                catch
                 {
                     Set(key, defaultValue);
                     return defaultValue;
@@ -117,7 +122,7 @@ namespace Pingfan.Kit
                     // configString = Regex.Unescape(configString);
                     return configString;
                 }
-                catch (Exception e)
+                catch 
                 {
                     return defaultValue;
                 }

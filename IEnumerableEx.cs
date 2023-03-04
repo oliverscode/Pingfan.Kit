@@ -13,7 +13,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 多线程遍历
         /// </summary>
-        public static async Task Each<T>(this IEnumerable<T> list, Action<T> fn, int threadCount = 0)
+        public static async Task Each<T>(this IEnumerable<T> list, Action<T> callBack, int threadCount = 0)
         {
             var enumerable = new ConcurrentQueue<T>(list);
             if (threadCount <= 0)
@@ -32,7 +32,7 @@ namespace Pingfan.Kit
                 {
                     while (enumerable.TryDequeue(out T data))
                     {
-                        fn(data);
+                        callBack(data);
                     }
                 }, TaskCreationOptions.LongRunning);
                 tasks[i] = t;
@@ -44,7 +44,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 多线程遍历
         /// </summary>
-        public static async Task Each<T>(this IEnumerable<T> list, Func<T, Task> fn, int threadCount = 0)
+        public static async Task Each<T>(this IEnumerable<T> list, Func<T, Task> callBack, int threadCount = 0)
         {
             var enumerable = new ConcurrentQueue<T>(list);
             if (threadCount <= 0)
@@ -61,7 +61,7 @@ namespace Pingfan.Kit
                 {
                     while (enumerable.TryDequeue(out T data))
                     {
-                        fn(data).Wait();
+                        callBack(data).Wait();
                     }
                 }, TaskCreationOptions.LongRunning);
                 tasks[i] = t;
