@@ -7,7 +7,7 @@ namespace Pingfan.Kit
 {
     public class RandomEx
     {
-        private static Random _rd = new Random();
+        private static Random _Rd = new Random();
 
         /// <summary>
         /// 生成一个随机数
@@ -17,7 +17,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static int Next(int min, int max)
         {
-            return _rd.Next(min, max);
+            return _Rd.Next(min, max);
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Pingfan.Kit
             var sb = new StringBuilder();
             if (isNumber)
             {
-                sb.Append("3456789");
+                sb.Append("23456789");
             }
             if (isLower)
             {
@@ -44,13 +44,13 @@ namespace Pingfan.Kit
             }
             if (isSpecial)
             {
-                sb.Append("!@#$%^&*_+-=");
+                sb.Append("!@#$%^&*_+-=.");
             }
             var chars = sb.ToString().ToCharArray();
             var result = new char[length];
             for (int i = 0; i < length; i++)
             {
-                result[i] = chars[_rd.Next(0, chars.Length)];
+                result[i] = chars[_Rd.Next(0, chars.Length)];
             }
             return new string(result);
         }
@@ -81,8 +81,8 @@ namespace Pingfan.Kit
 
             while (true)
             {
-                u1 = _rd.NextDouble();
-                u2 = _rd.NextDouble();
+                u1 = _Rd.NextDouble();
+                u2 = _Rd.NextDouble();
 
                 z = Math.Sqrt(-2 * Math.Log(u1)) * Math.Sin(2 * Math.PI * u2);
                 x = miu + sigma * z;
@@ -99,7 +99,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static bool IsTrue(double probability)
         {
-            return _rd.NextDouble() < probability;
+            return _Rd.NextDouble() < probability;
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static bool IsTrue(float probability)
         {
-            return _rd.NextDouble() < probability;
+            return _Rd.NextDouble() < probability;
         }
 
 
@@ -120,7 +120,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static bool IsTrue(decimal probability)
         {
-            return (decimal)_rd.NextDouble() < probability;
+            return (decimal)_Rd.NextDouble() < probability;
         }
 
 
@@ -156,7 +156,7 @@ namespace Pingfan.Kit
     /// <typeparam name="T"></typeparam>
     public class RandomEx<T>
     {
-        private readonly List<KeyValuePair<T, int>> List = new List<KeyValuePair<T, int>>();
+        private readonly List<KeyValuePair<T, int>> _List = new List<KeyValuePair<T, int>>();
         private int MaxWeights = 0;
 
         /// <summary>
@@ -170,8 +170,8 @@ namespace Pingfan.Kit
             if (weights < 0)
                 throw new ArgumentException(nameof(weights));
 
-            List.Add(new KeyValuePair<T, int>(obj, weights));
-            MaxWeights = List.Sum(p => p.Value);
+            _List.Add(new KeyValuePair<T, int>(obj, weights));
+            MaxWeights = _List.Sum(p => p.Value);
         }
 
         /// <summary>
@@ -181,20 +181,20 @@ namespace Pingfan.Kit
         /// <exception cref="Exception"></exception>
         public T Next()
         {
-            if (List.Count <= 0)
+            if (_List.Count <= 0)
                 throw new Exception("获取不到随机对象");
 
             var index = RandomEx.Next(0, MaxWeights);
-            var currentMax = List[0].Value;
-            for (var i = 0; i < List.Count; i++)
+            var currentMax = _List[0].Value;
+            for (var i = 0; i < _List.Count; i++)
             {
-                var row = List[i];
+                var row = _List[i];
                 if (index < currentMax)
                 {
                     return row.Key;
                 }
 
-                currentMax += List[i + 1].Value;
+                currentMax += _List[i + 1].Value;
             }
 
             throw new Exception("获取不到权重");
