@@ -63,7 +63,7 @@ namespace Pingfan.Kit
         /// <param name="json"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T FromJsonString<T>(this string json)
+        public static T ToJson<T>(this string json)
         {
             return Json.FromString<T>(json);
         }

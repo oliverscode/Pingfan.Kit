@@ -10,18 +10,18 @@ namespace Pingfan.Kit
         /// 间隔1秒一直重试1个任务
         /// </summary>
         /// <param name="method"></param>
-        public static void Run(Action method, Action<Exception> ErrorCallback = null)
+        public static void Run(Action method, Action<Exception> errorCallback = null)
         {
-            Run(int.MaxValue, 1000, method, ErrorCallback);
+            Run(int.MaxValue, 1000, method, errorCallback);
         }
 
         /// <summary>
         /// 间隔1秒一直重试1个任务
         /// </summary>
         /// <param name="method"></param>
-        public static async Task Run(Func<Task> method, Action<Exception> ErrorCallback = null)
+        public static async Task Run(Func<Task> method, Action<Exception> errorCallback = null)
         {
-            await Run(int.MaxValue, 1000, method, ErrorCallback);
+            await Run(int.MaxValue, 1000, method, errorCallback);
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Pingfan.Kit
         /// <param name="delay">失败后等待毫秒数</param>
         /// <param name="method"></param>
         /// <exception cref="Exception"></exception>
-        public static void Run(int count, int delay, Action method, Action<Exception> ErrorCallback = null)
+        public static void Run(int count, int delay, Action method, Action<Exception> errorCallback = null)
         {
             Exception exception = null;
             for (var i = 0; i < count; i++)
@@ -44,7 +44,7 @@ namespace Pingfan.Kit
                 catch (Exception e)
                 {
                     exception = e;
-                    ErrorCallback?.Invoke(e);
+                    errorCallback?.Invoke(e);
                     if (delay > 0)
                         Thread.Sleep(delay);
                 }
@@ -62,7 +62,7 @@ namespace Pingfan.Kit
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static T Run<T>(int count, int delay, Func<T> method, Action<Exception> ErrorCallback = null)
+        public static T Run<T>(int count, int delay, Func<T> method, Action<Exception> errorCallback = null)
         {
             Exception exception = null;
             for (var i = 0; i < count; i++)
@@ -74,7 +74,7 @@ namespace Pingfan.Kit
                 catch (Exception e)
                 {
                     exception = e;
-                    ErrorCallback?.Invoke(e);
+                    errorCallback?.Invoke(e);
                     if (delay > 0)
                         Thread.Sleep(delay);
                 }
@@ -90,7 +90,7 @@ namespace Pingfan.Kit
         /// <param name="delay">失败后等待毫秒数</param>
         /// <param name="method"></param>
         /// <exception cref="Exception"></exception>
-        public static async Task Run(int count, int delay, Func<Task> method, Action<Exception> ErrorCallback = null)
+        public static async Task Run(int count, int delay, Func<Task> method, Action<Exception> errorCallback = null)
         {
             Exception exception = null;
             for (var i = 0; i < count; i++)
@@ -103,7 +103,7 @@ namespace Pingfan.Kit
                 catch (Exception e)
                 {
                     exception = e;
-                    ErrorCallback?.Invoke(e);
+                    errorCallback?.Invoke(e);
                     if (delay > 0)
                         await Task.Delay(delay);
                 }
@@ -122,7 +122,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         public static async Task<T> Run<T>(int count, int delay, Func<Task<T>> method,
-            Action<Exception> ErrorCallback = null)
+            Action<Exception> errorCallback = null)
         {
             Exception exception = null;
             for (var i = 0; i < count; i++)
@@ -134,7 +134,7 @@ namespace Pingfan.Kit
                 catch (Exception e)
                 {
                     exception = e;
-                    ErrorCallback?.Invoke(e);
+                    errorCallback?.Invoke(e);
                     if (delay > 0)
                         await Task.Delay(delay);
                 }

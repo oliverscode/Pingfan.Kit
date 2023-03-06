@@ -20,15 +20,16 @@ namespace Pingfan.Kit
         /// 写入配置
         /// </summary>
         /// <param name="key"></param>
-        /// <param name="configString"></param>
-        public static void Set(string key, string configString)
+        /// <param name="value"></param>
+        public static void Set(string key, string value)
         {
             lock (_Locker)
             {
+                /*
                 var configIni = String.Empty;
                 if (File.Exists(MainConfigFilePath))
                 {
-                    configIni = File.ReadAllText(MainConfigFilePath, Encoding.UTF8);
+                    configIni = FileEx.ReadAllText(MainConfigFilePath);
                 }
 
                 var rowData = $"{key}={Regex.Escape(configString)}";
@@ -50,7 +51,25 @@ namespace Pingfan.Kit
                     configIni += $"{key}={configString}\n";
                 }
 
-                File.WriteAllText(MainConfigFilePath, configIni, Encoding.UTF8);
+                FileEx.WriteAllText(MainConfigFilePath, configIni);
+                */
+
+                var lines = FileEx.ReadLines(MainConfigFilePath);
+                var sb = new StringBuilder();
+                foreach (var line in lines)
+                {
+                    if (line.StartsWith(key + "="))
+                    {
+                        sb.AppendLine($"{key}={value}");
+                    }
+                    else
+                    {
+                        sb.AppendLine(line);
+                    }
+                }
+
+                FileEx.WriteAllText(MainConfigFilePath, sb.ToString());
+
             }
         }
 
@@ -82,24 +101,17 @@ namespace Pingfan.Kit
                 Set(key, defaultValue);
                 return defaultValue;
             }
-            
-            var configIni = File.ReadAllText(MainConfigFilePath, Encoding.UTF8);
-            var m = Regex.Match(configIni, $"{key}=(.*?)\n");
-            if (m.Success)
+
+            var lines = FileEx.ReadAllLines(MainConfigFilePath);
+            foreach (var line in lines)
             {
-                try
+                if (line.StartsWith(key + "="))
                 {
-                    var configString = m.Groups[1].Value;
-                    configString = Regex.Unescape(configString);
-                    return configString;
-                }
-                catch
-                {
-                    Set(key, defaultValue);
-                    return defaultValue;
+                    value = line.Substring(key.Length + 1);
+                    value = Regex.Unescape(value);
+                    return value;
                 }
             }
-
             Set(key, defaultValue);
             return defaultValue;
         }
@@ -116,16 +128,9 @@ namespace Pingfan.Kit
             var m = Regex.Match(Environment.CommandLine, $@"{key}=(\S+)");
             if (m.Success)
             {
-                try
-                {
-                    var configString = m.Groups[1].Value;
-                    // configString = Regex.Unescape(configString);
-                    return configString;
-                }
-                catch 
-                {
-                    return defaultValue;
-                }
+                var value = m.Groups[1].Value;
+                value = Regex.Unescape(value);
+                return value;
             }
 
             return defaultValue;

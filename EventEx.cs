@@ -13,51 +13,67 @@ namespace Pingfan.Kit
     public class EventEx
     {
         private static object _EventLocker = new object();
+
         private static readonly ConcurrentDictionary<string, List<EventsAction>> _Actions =
             new ConcurrentDictionary<string, List<EventsAction>>();
 
 
         #region 监听事件
+
         public static void On(object obj, string eventName, Action action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         public static void On<T1>(object obj, string eventName, Action<T1> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         public static void On<T1, T2>(object obj, string eventName, Action<T1, T2> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         public static void On<T1, T2, T3>(object obj, string eventName, Action<T1, T2, T3> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         public static void On<T1, T2, T3, T4>(object obj, string eventName, Action<T1, T2, T3, T4> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         public static void On<T1, T2, T3, T4, T5>(object obj, string eventName, Action<T1, T2, T3, T4, T5> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
-        public static void On<T1, T2, T3, T4, T5, T6>(object obj, string eventName, Action<T1, T2, T3, T4, T5, T6> action)
+
+        public static void On<T1, T2, T3, T4, T5, T6>(object obj, string eventName,
+            Action<T1, T2, T3, T4, T5, T6> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
-        public static void On<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName, Action<T1, T2, T3, T4, T5, T6, T7> action)
+
+        public static void On<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName,
+            Action<T1, T2, T3, T4, T5, T6, T7> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
-        public static void On<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName, Action<T1, T2, T3, T4, T5, T6, T7, T8> action)
+
+        public static void On<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName,
+            Action<T1, T2, T3, T4, T5, T6, T7, T8> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
-        public static void On<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName, Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action)
+
+        public static void On<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName,
+            Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         #endregion
 
         #region 监听一次事件
@@ -66,87 +82,110 @@ namespace Pingfan.Kit
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         public static void Once<T1>(object obj, string eventName, Action<T1> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         public static void Once<T1, T2>(object obj, string eventName, Action<T1, T2> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         public static void Once<T1, T2, T3>(object obj, string eventName, Action<T1, T2, T3> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         public static void Once<T1, T2, T3, T4>(object obj, string eventName, Action<T1, T2, T3, T4> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         public static void Once<T1, T2, T3, T4, T5>(object obj, string eventName, Action<T1, T2, T3, T4, T5> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
-        public static void Once<T1, T2, T3, T4, T5, T6>(object obj, string eventName, Action<T1, T2, T3, T4, T5, T6> action)
-        {
-            AddAction(new EventsAction(obj, eventName, action, true));
-        }
-        public static void Once<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName, Action<T1, T2, T3, T4, T5, T6, T7> action)
-        {
-            AddAction(new EventsAction(obj, eventName, action, true));
-        }
-        public static void Once<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName, Action<T1, T2, T3, T4, T5, T6, T7, T8> action)
-        {
-            AddAction(new EventsAction(obj, eventName, action, true));
-        }
-        public static void Once<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName, Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action)
+
+        public static void Once<T1, T2, T3, T4, T5, T6>(object obj, string eventName,
+            Action<T1, T2, T3, T4, T5, T6> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
 
+        public static void Once<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName,
+            Action<T1, T2, T3, T4, T5, T6, T7> action)
+        {
+            AddAction(new EventsAction(obj, eventName, action, true));
+        }
 
+        public static void Once<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName,
+            Action<T1, T2, T3, T4, T5, T6, T7, T8> action)
+        {
+            AddAction(new EventsAction(obj, eventName, action, true));
+        }
 
-
+        public static void Once<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName,
+            Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action)
+        {
+            AddAction(new EventsAction(obj, eventName, action, true));
+        }
 
         #endregion
 
         #region 监听事件,支持异步方法
+
         public static void On(object obj, string eventName, Func<Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         public static void On<T1>(object obj, string eventName, Func<T1, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         public static void On<T1, T2>(object obj, string eventName, Func<T1, T2, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         public static void On<T1, T2, T3>(object obj, string eventName, Func<T1, T2, T3, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         public static void On<T1, T2, T3, T4>(object obj, string eventName, Func<T1, T2, T3, T4, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
+
         public static void On<T1, T2, T3, T4, T5>(object obj, string eventName, Func<T1, T2, T3, T4, T5, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
-        public static void On<T1, T2, T3, T4, T5, T6>(object obj, string eventName, Func<T1, T2, T3, T4, T5, T6, Task> action)
+
+        public static void On<T1, T2, T3, T4, T5, T6>(object obj, string eventName,
+            Func<T1, T2, T3, T4, T5, T6, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
-        public static void On<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName, Func<T1, T2, T3, T4, T5, T6, T7, Task> action)
+
+        public static void On<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName,
+            Func<T1, T2, T3, T4, T5, T6, T7, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
-        public static void On<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName, Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> action)
+
+        public static void On<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName,
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
-        public static void On<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> action)
+
+        public static void On<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName,
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, false));
         }
@@ -154,49 +193,65 @@ namespace Pingfan.Kit
         #endregion
 
         #region 监听事件,支持异步方法,单次执行
+
         public static void Once(object obj, string eventName, Func<Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         public static void Once<T1>(object obj, string eventName, Func<T1, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         public static void Once<T1, T2>(object obj, string eventName, Func<T1, T2, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         public static void Once<T1, T2, T3>(object obj, string eventName, Func<T1, T2, T3, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         public static void Once<T1, T2, T3, T4>(object obj, string eventName, Func<T1, T2, T3, T4, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         public static void Once<T1, T2, T3, T4, T5>(object obj, string eventName, Func<T1, T2, T3, T4, T5, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
-        public static void Once<T1, T2, T3, T4, T5, T6>(object obj, string eventName, Func<T1, T2, T3, T4, T5, T6, Task> action)
+
+        public static void Once<T1, T2, T3, T4, T5, T6>(object obj, string eventName,
+            Func<T1, T2, T3, T4, T5, T6, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
-        public static void Once<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName, Func<T1, T2, T3, T4, T5, T6, T7, Task> action)
+
+        public static void Once<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName,
+            Func<T1, T2, T3, T4, T5, T6, T7, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
-        public static void Once<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName, Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> action)
+
+        public static void Once<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName,
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
-        public static void Once<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName, Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> action)
+
+        public static void Once<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName,
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> action)
         {
             AddAction(new EventsAction(obj, eventName, action, true));
         }
+
         #endregion
 
         #region 派发事件
+
         public static void Emit(string eventName, params object[] args)
         {
             if (_Actions.TryGetValue(eventName, out List<EventsAction> actions) == false)
@@ -232,7 +287,9 @@ namespace Pingfan.Kit
                         var task = eventsAction.Action.DynamicInvoke(args) as Task;
                         task.Wait();
                     }
-                    catch { }
+                    catch
+                    {
+                    }
 
                     // 是否是单次执行, 如果是, 则移除
                     if (eventsAction.IsOnce)
@@ -271,9 +328,11 @@ namespace Pingfan.Kit
                         actions.Remove(eventsAction);
                     }
                 }
+
                 Task.WaitAll(tasks);
             }
         }
+
         public static void EmitAsyncWithTry(string eventName, params object[] args)
         {
             if (_Actions.TryGetValue(eventName, out List<EventsAction> actions) == false)
@@ -292,7 +351,9 @@ namespace Pingfan.Kit
                             var task = eventsAction.Action.DynamicInvoke(args) as Task;
                             task?.Wait();
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     });
 
                     // 是否是单次执行, 如果是, 则移除
@@ -301,14 +362,15 @@ namespace Pingfan.Kit
                         actions.Remove(eventsAction);
                     }
                 }
+
                 Task.WaitAll(tasks);
             }
         }
 
-
         #endregion
 
         #region 移除监听
+
         /// <summary>
         /// 移除监听事件
         /// </summary>
@@ -327,13 +389,15 @@ namespace Pingfan.Kit
         {
             RemoveAction(obj, null);
         }
+
         #endregion
 
         #region 静态处理方法
+
         private static void AddAction(EventsAction eventsAction)
         {
             lock (_EventLocker)
-        {
+            {
                 if (!_Actions.ContainsKey(eventsAction.EventName))
                 {
                     _Actions[eventsAction.EventName] = new List<EventsAction>();
@@ -354,7 +418,6 @@ namespace Pingfan.Kit
                     IsOnce = eventsAction.IsOnce,
                     Sign = eventsAction.Sign,
                 });
-
             }
         }
 
@@ -380,6 +443,7 @@ namespace Pingfan.Kit
                 }
             }
         }
+
         #endregion
 
         private class EventsAction
@@ -388,6 +452,7 @@ namespace Pingfan.Kit
             /// 绑定的对象,方便做识别
             /// </summary>
             public object Obj;
+
             public string EventName;
             public Delegate Action;
             public bool IsOnce;
@@ -395,8 +460,8 @@ namespace Pingfan.Kit
 
             public EventsAction()
             {
-
             }
+
             public EventsAction(object obj, string eventName, Delegate action, bool isOnce)
             {
                 Obj = obj;

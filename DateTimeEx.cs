@@ -31,17 +31,17 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="timestamp"></param>
         /// <returns></returns>
-        public static DateTime FromUnixTimeSeconds(this long timestamp)
+        public static DateTime ToUnixTimeSeconds(this long timestamp)
         {
             return DateTimeOffset.FromUnixTimeSeconds(timestamp).LocalDateTime;
         }
-        
+
         /// <summary>
         /// 当前时区unix时间戳转换成DateTime
         /// </summary>
         /// <param name="timestamp"></param>
         /// <returns></returns>
-        public static DateTime FromUnixTimeMilliseconds(this long timestamp)
+        public static DateTime ToUnixTimeMilliseconds(this long timestamp)
         {
             return DateTimeOffset.FromUnixTimeMilliseconds(timestamp).LocalDateTime;
         }

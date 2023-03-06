@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -12,10 +13,10 @@ namespace Pingfan.Kit
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T CreateInstance<T>() where T : class, new()
+        public static T CreateInstance<T>(params object[] parms) where T : class, new()
         {
             var type = typeof(T);
-            return (T) CreateInstance(type);
+            return (T)CreateInstance(type, parms);
         }
 
 
@@ -23,12 +24,11 @@ namespace Pingfan.Kit
         /// 高性能创建一个对象
         /// </summary>
         /// <returns></returns>
-        public static object CreateInstance(Type type)
+        public static object CreateInstance(Type type, params object[] parms)
         {
             var fn = CacheMemory<Func<object>>.GetOrSet(type.FullName, () =>
             {
-                var newExpression = Expression.New(type);
-                var lambda = Expression.Lambda<Func<object>>(newExpression);
+                Expression<Func<object>> lambda = () => Activator.CreateInstance(type, parms);
                 return lambda.Compile();
             }, 60 * 60 * 24);
             return fn();

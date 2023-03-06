@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Linq;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -13,6 +14,31 @@ namespace Pingfan.Kit
         public static bool EqualsIgnoreCase(this string s1, string s2)
         {
             return string.Equals(s1, s2, StringComparison.OrdinalIgnoreCase);
+        }
+
+       
+
+        /// <summary>
+        /// 判断2个字符串相似百分比, 乱序不影响, 返回结果为0-1之间
+        /// </summary>
+        /// <param name="s1"></param>
+        /// <param name="s2"></param>
+        public static double Similarity(this string s1, string s2)
+        {
+            var shortStr = s1.Length > s2.Length ? s2 : s1;
+            var longStr = s1.Length > s2.Length ? s1 : s2;
+            
+            double value = 1;
+            var per = 1.0 / shortStr.Length;
+            foreach (var c in shortStr)
+            {
+                if (!longStr.Contains(c))
+                {
+                    value -= per;
+                }
+            }
+
+            return value;
         }
 
         /// <summary>

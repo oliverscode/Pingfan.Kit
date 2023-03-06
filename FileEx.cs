@@ -14,52 +14,58 @@ namespace Pingfan.Kit
         /// <summary>
         /// 重试次数
         /// </summary>
-        public static int RetryCount { get; set; } = 100;
+        public static int RetryCount { get; set; } = 20;
 
         /// <summary>
         /// 重试间隔, 单位毫秒
         /// </summary>
-        public static int RetryInterval { get; set; } = 50;
+        public static int RetryInterval { get; set; } = 100;
 
         /// <summary>
         /// 读取一个文件, 如果文件不存在会返回null
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string ReadAllText(string path)
+        public static string ReadAllText(string path, Encoding encoding = null)
         {
+            if (encoding == null)
+                encoding = Encoding.UTF8;
             return Read(path, () => File.ReadAllText(path));
         }
 
         /// <summary>
-        /// 读取一个文件, 如果文件不存在会返回null
+        /// 读取一个文件, 如果文件不存在会返回byte[0]
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
         public static byte[] ReadAllBytes(string path)
         {
-            return Read(path, () => File.ReadAllBytes(path));
+            return Read(path, () => File.ReadAllBytes(path)) ?? Array.Empty<byte>();
         }
 
         /// <summary>
-        /// 读取一个文件, 如果文件不存在会返回null
+        /// 读取一个文件, 如果文件不存在会返回string[]
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static string[] ReadAllLines(string path)
+        public static string[] ReadAllLines(string path, Encoding encoding = null)
         {
-            return Read(path, () => File.ReadAllLines(path));
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+            return Read(path, () => File.ReadAllLines(path, encoding)) ?? Array.Empty<string>();
         }
 
 
         /// <summary>
-        /// 读取一个文件, 如果文件不存在会返回null
+        /// 读取一个文件, 如果文件不存在会返回string[]
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static IEnumerable<string> ReadLines(string path)
+        public static IEnumerable<string> ReadLines(string path, Encoding encoding = null)
         {
-            return Read(path, () => File.ReadLines(path));
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+            return Read(path, () => File.ReadLines(path, encoding)) ?? Array.Empty<string>();
         }
 
 
@@ -68,9 +74,11 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="path"></param>
         /// <param name="contents"></param>
-        public static void AppendAllText(string path, string contents)
+        public static void AppendAllText(string path, string contents, Encoding encoding = null)
         {
-            Write(path, () => { File.AppendAllText(path, contents, Encoding.UTF8); });
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+            Write(path, () => { File.AppendAllText(path, contents, encoding); });
         }
 
         /// <summary>
@@ -78,9 +86,11 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="path"></param>
         /// <param name="contents"></param>
-        public static void WriteAllText(string path, string contents)
+        public static void WriteAllText(string path, string contents, Encoding encoding = null)
         {
-            Write(path, () => { File.WriteAllText(path, contents, Encoding.UTF8); });
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+            Write(path, () => { File.WriteAllText(path, contents, encoding); });
         }
 
 
@@ -99,9 +109,9 @@ namespace Pingfan.Kit
             // 获取Path的目录
             lock (path)
             {
+                var dir = Path.GetDirectoryName(path);
                 Retry.Run(RetryCount, RetryInterval, () =>
                 {
-                    var dir = Path.GetDirectoryName(path);
                     if (Directory.Exists(dir) == false)
                     {
                         Directory.CreateDirectory(dir);
@@ -121,7 +131,7 @@ namespace Pingfan.Kit
 
             lock (path)
             {
-                return fn();
+                return Retry.Run(RetryCount, RetryInterval, fn);
             }
         }
     }
