@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
+
 namespace Pingfan.Kit
 {
     /// <summary>
@@ -12,7 +13,7 @@ namespace Pingfan.Kit
     {
         private static object _Locker = new object();
 
-        private static readonly string MainConfigFilePath =
+        public static string MainConfigFilePath =>
             Path.Combine(PathEx.CurrentDirectory, "app.ini");
 
 
@@ -25,42 +26,17 @@ namespace Pingfan.Kit
         {
             lock (_Locker)
             {
-                /*
-                var configIni = String.Empty;
-                if (File.Exists(MainConfigFilePath))
-                {
-                    configIni = FileEx.ReadAllText(MainConfigFilePath);
-                }
-
-                var rowData = $"{key}={Regex.Escape(configString)}";
-                //判断是否需要更新
-                var isMatch = Regex.IsMatch(configIni, rowData);
-                if (isMatch)
-                    return;
-
-
-                //判断原来的值是否存在
-                rowData = $"{key}=(.*?)\n";
-                isMatch = Regex.IsMatch(configIni, rowData);
-                if (isMatch)
-                {
-                    configIni = Regex.Replace(configIni, rowData, $"{key}={configString}\n");
-                }
-                else
-                {
-                    configIni += $"{key}={configString}\n";
-                }
-
-                FileEx.WriteAllText(MainConfigFilePath, configIni);
-                */
-
+                key = Regex.Escape(key);
+                
                 var lines = FileEx.ReadLines(MainConfigFilePath);
                 var sb = new StringBuilder();
+                var success = false;
                 foreach (var line in lines)
                 {
                     if (line.StartsWith(key + "="))
                     {
                         sb.AppendLine($"{key}={value}");
+                        success = true;
                     }
                     else
                     {
@@ -68,8 +44,10 @@ namespace Pingfan.Kit
                     }
                 }
 
-                FileEx.WriteAllText(MainConfigFilePath, sb.ToString());
+                if (success == false)
+                    sb.AppendLine($"{key}={value}");
 
+                FileEx.WriteAllText(MainConfigFilePath, sb.ToString());
             }
         }
 
@@ -94,7 +72,7 @@ namespace Pingfan.Kit
             {
                 return value;
             }
-            
+
             // 没有配置文件, 默认写入有一个配置文件
             if (File.Exists(MainConfigFilePath) == false)
             {
@@ -102,16 +80,19 @@ namespace Pingfan.Kit
                 return defaultValue;
             }
 
-            var lines = FileEx.ReadAllLines(MainConfigFilePath);
-            foreach (var line in lines)
+            lock (_Locker)
             {
-                if (line.StartsWith(key + "="))
+                var lines = FileEx.ReadAllLines(MainConfigFilePath);
+                foreach (var line in lines)
                 {
-                    value = line.Substring(key.Length + 1);
-                    value = Regex.Unescape(value);
-                    return value;
+                    if (line.StartsWith(key + "="))
+                    {
+                        value = line.Substring(key.Length + 1);
+                        return value;
+                    }
                 }
             }
+
             Set(key, defaultValue);
             return defaultValue;
         }
@@ -129,7 +110,6 @@ namespace Pingfan.Kit
             if (m.Success)
             {
                 var value = m.Groups[1].Value;
-                value = Regex.Unescape(value);
                 return value;
             }
 
@@ -144,6 +124,12 @@ namespace Pingfan.Kit
         public static bool HasCmd(string key)
         {
             return Environment.CommandLine.ContainsIgnoreCase(key);
+        }
+
+
+        public static bool Clear()
+        {
+            return FileEx.Delete(MainConfigFilePath);
         }
     }
 }

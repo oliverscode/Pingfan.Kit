@@ -122,6 +122,34 @@ namespace Pingfan.Kit
             }
         }
 
+
+        /// <summary>
+        /// 删除一个文件, 或者目录
+        /// </summary>
+        /// <param name="path"></param>
+        public static bool Delete(string path)
+        {
+            lock (path)
+            {
+                return Retry.Run(RetryCount, RetryInterval, () =>
+                {
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                        return true;
+                    }
+
+                    if (Directory.Exists(path))
+                    {
+                        Directory.Delete(path, true);
+                        return true;
+                    }
+
+                    return false;
+                });
+            }
+        }
+
         private static T Read<T>(string path, Func<T> fn) where T : class
         {
             if (File.Exists(path) == false)
