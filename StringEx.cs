@@ -16,7 +16,6 @@ namespace Pingfan.Kit
             return string.Equals(s1, s2, StringComparison.OrdinalIgnoreCase);
         }
 
-       
 
         /// <summary>
         /// 判断2个字符串相似百分比, 乱序不影响, 返回结果为0-1之间
@@ -27,7 +26,7 @@ namespace Pingfan.Kit
         {
             var shortStr = s1.Length > s2.Length ? s2 : s1;
             var longStr = s1.Length > s2.Length ? s1 : s2;
-            
+
             double value = 1;
             var per = 1.0 / shortStr.Length;
             foreach (var c in shortStr)
@@ -280,5 +279,29 @@ namespace Pingfan.Kit
 
             return list;
         }
+
+
+        /// <summary>
+        /// 拆分字符串
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        public static string[] Split(this string str, params string[] parms)
+        {
+            return str.Split(parms, StringSplitOptions.RemoveEmptyEntries);
+        }
+        
+        /// <summary>
+        /// 拆分字符串
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="parms"></param>
+        /// <returns></returns>
+        public static string[] Split(this string str, params char[] parms)
+        {
+            return str.Split(parms, StringSplitOptions.RemoveEmptyEntries);
+        }
+        
     }
 }

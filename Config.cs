@@ -59,6 +59,8 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static string Get(string key, string defaultValue = "")
         {
+            key = Regex.Escape(key);
+            
             // 如果有环境变量, 则使用环境变量
             var value = Environment.GetEnvironmentVariable(key);
             if (value?.IsNullOrEmpty() == false)
