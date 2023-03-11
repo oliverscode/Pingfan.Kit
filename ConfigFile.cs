@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.IO;
+
 namespace Pingfan.Kit
 {
     /// <summary>
@@ -12,7 +15,7 @@ namespace Pingfan.Kit
         {
             this.filePath = filePath;
             this.data = new Dictionary<string, Dictionary<string, string>>();
-            Load();
+            ReLoad();
         }
 
         // 读取配置值

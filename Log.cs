@@ -62,7 +62,6 @@ namespace Pingfan.Kit
 
         public Log()
         {
-
         }
 
         public Log(string logFileName)
@@ -80,7 +79,7 @@ namespace Pingfan.Kit
         /// 输出到磁盘的级别
         /// </summary>
         public LogLevel FileLevel { get; set; } =
-           LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL;
+            LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL;
 
         /// <summary>
         /// 日志回调
@@ -145,53 +144,55 @@ namespace Pingfan.Kit
         {
             if (!string.IsNullOrWhiteSpace(logString))
             {
-                // 先全局处理
-                this.OnHandler?.Invoke(logLevel, logString);
-
-                var str = $"[{logLevel.ToString()}]{DateTime.Now:yyyy-MM-dd HH:mm:ss} {logString}\n";
-
-                // 判断是否要输出到控制台
-                if ((logLevel & this.ConsoleLevel) != 0)
+                lock (this)
                 {
-                    if (logLevel == LogLevel.DBG)
+                    // 先全局处理
+                    this.OnHandler?.Invoke(logLevel, logString);
+
+                    var str = $"[{logLevel.ToString()}]{DateTime.Now:yyyy-MM-dd HH:mm:ss} {logString}\n";
+
+                    // 判断是否要输出到控制台
+                    if ((logLevel & this.ConsoleLevel) != 0)
                     {
-                        ConsoleEx.Write(logString, ConsoleColor.Cyan);
+                        if (logLevel == LogLevel.DBG)
+                        {
+                            ConsoleEx.Write(logString, ConsoleColor.Cyan);
+                        }
+                        else if (logLevel == LogLevel.SUC)
+                        {
+                            ConsoleEx.Write(logString, ConsoleColor.Green);
+                        }
+                        else if (logLevel == LogLevel.INF)
+                        {
+                            ConsoleEx.Write(logString, ConsoleColor.Blue);
+                        }
+                        else if (logLevel == LogLevel.WAR)
+                        {
+                            ConsoleEx.Write(logString, ConsoleColor.Yellow);
+                        }
+                        else if (logLevel == LogLevel.ERR)
+                        {
+                            ConsoleEx.Write(logString, ConsoleColor.Red);
+                        }
+                        else if (logLevel == LogLevel.FAL)
+                        {
+                            ConsoleEx.Write(logString, ConsoleColor.DarkMagenta);
+                        }
+                        else
+                        {
+                            Console.Write(logString);
+                        }
                     }
-                    else if (logLevel == LogLevel.SUC)
-                    {
-                        ConsoleEx.Write(logString, ConsoleColor.Green);
-                    }
-                    else if (logLevel == LogLevel.INF)
-                    {
-                        ConsoleEx.Write(logString, ConsoleColor.Blue);
-                    }
-                    else if (logLevel == LogLevel.WAR)
-                    {
-                        ConsoleEx.Write(logString, ConsoleColor.Yellow);
-                    }
-                    else if (logLevel == LogLevel.ERR)
-                    {
-                        ConsoleEx.Write(logString, ConsoleColor.Red);
-                    }
-                    else if (logLevel == LogLevel.FAL)
-                    {
-                        ConsoleEx.Write(logString, ConsoleColor.DarkMagenta);
-                    }
-                    else
-                    {
-                       Console.Write(logString);
-                    }
-                }
 
 
-                // 判断是否要输出到磁盘
-                if ((logLevel & this.FileLevel) != 0)
-                {
-                    var logPath = PathEx.Combine(_RootPath, $"{DateTime.Now:yyyy-MM-dd}{LogFileName}.log");
-                    FileEx.AppendAllText(logPath, str);
+                    // 判断是否要输出到磁盘
+                    if ((logLevel & this.FileLevel) != 0)
+                    {
+                        var logPath = PathEx.Combine(_RootPath, $"{DateTime.Now:yyyy-MM-dd}{LogFileName}.log");
+                        FileEx.AppendAllText(logPath, str);
+                    }
                 }
             }
         }
     }
-
 }
