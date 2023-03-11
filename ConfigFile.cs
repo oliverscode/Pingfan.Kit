@@ -1,5 +1,8 @@
-﻿namespace Pingfan.Kit
+namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 根据组名键名的方式读取配置文件
+    /// </summary>
     public class ConfigFile
     {
         private readonly string filePath; // 配置文件路径
@@ -38,13 +41,14 @@
         }
 
         // 加载配置文件
-        private void Load()
+        public void ReLoad()
         {
             if (!File.Exists(filePath))
             {
                 return;
             }
 
+            data.Clear();
             // 读取配置文件数据
             string[] lines = File.ReadAllLines(filePath);
             string currentSection = "";
