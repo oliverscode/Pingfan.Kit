@@ -160,6 +160,7 @@ namespace Pingfan.Kit
                     var result = method();
                     if (result)
                         return true;
+                    Thread.Sleep(delay);
                 }
                 catch (Exception e)
                 {
@@ -187,6 +188,7 @@ namespace Pingfan.Kit
                     var result = await method();
                     if (result)
                         return true;
+                    await Task.Delay(delay);
                 }
                 catch (Exception e)
                 {
