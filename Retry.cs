@@ -191,7 +191,7 @@ namespace Pingfan.Kit
                 catch (Exception e)
                 {
                     if (delay > 0)
-                        Thread.Sleep(delay);
+                        await Task.Delay(delay);
                 }
             }
 
