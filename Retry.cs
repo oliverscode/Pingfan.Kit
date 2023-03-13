@@ -142,5 +142,60 @@ namespace Pingfan.Kit
 
             throw exception;
         }
+
+
+        /// <summary>
+        /// 结尾为True直接返回
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="delay"></param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public static bool IsTrue(int count, int delay, Func<bool> method)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                try
+                {
+                    var result = method();
+                    if (result)
+                        return true;
+                }
+                catch (Exception e)
+                {
+                    if (delay > 0)
+                        Thread.Sleep(delay);
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 结尾为True直接返回
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="delay"></param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public static async Task<bool> IsTrue(int count, int delay, Func<Task<bool>> method)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                try
+                {
+                    var result = await method();
+                    if (result)
+                        return true;
+                }
+                catch (Exception e)
+                {
+                    if (delay > 0)
+                        Thread.Sleep(delay);
+                }
+            }
+
+            return false;
+        }
     }
 }
