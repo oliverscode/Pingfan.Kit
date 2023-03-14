@@ -25,7 +25,14 @@ namespace Pingfan.Kit
 
         private enum FnKind
         {
+            /// <summary>
+            /// 防抖器, 一定时间内只执行最后一次
+            /// </summary>
             Debounce,
+
+            /// <summary>
+            /// 节流器, 一定时间内只执行一次
+            /// </summary>
             Throttle,
         }
 
@@ -33,9 +40,9 @@ namespace Pingfan.Kit
         private static readonly ConcurrentDictionary<string, DataItem> _DebounceList =
             new ConcurrentDictionary<string, DataItem>(StringComparer.OrdinalIgnoreCase);
 
-        private static void _Fn(int delay, FnKind fnKind, Delegate action, params object[] parms)
+        private static void _Fn(string key, int delay, FnKind fnKind, Delegate action, params object[] parms)
         {
-            var key = action.GetMethodInfo().Name;
+            // var key = action.GetMethodInfo().Name;
             if (_DebounceList.TryGetValue(key, out var item))
             {
                 if (fnKind == FnKind.Debounce)
@@ -65,52 +72,52 @@ namespace Pingfan.Kit
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce(int delay, Action action)
+        public static void Debounce(string key, int delay, Action action)
         {
-            _Fn(delay, FnKind.Debounce, action);
+            _Fn(key, delay, FnKind.Debounce, action);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1>(int delay, Action<T1> action, T1 p1)
+        public static void Debounce<T1>(string key, int delay, Action<T1> action, T1 p1)
         {
-            _Fn(delay, FnKind.Debounce, action, p1);
+            _Fn(key, delay, FnKind.Debounce, action, p1);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2>(int delay, Action<T1, T2> action, T1 p1, T2 p2)
+        public static void Debounce<T1, T2>(string key, int delay, Action<T1, T2> action, T1 p1, T2 p2)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3>(int delay, Action<T1, T2, T3> action, T1 p1, T2 p2, T3 p3)
+        public static void Debounce<T1, T2, T3>(string key, int delay, Action<T1, T2, T3> action, T1 p1, T2 p2, T3 p3)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4>(int delay,
+        public static void Debounce<T1, T2, T3, T4>(string key, int delay,
             Action<T1, T2, T3, T4> action,
             T1 p1,
             T2 p2,
             T3 p3,
             T4 p4)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4, T5>(int delay,
+        public static void Debounce<T1, T2, T3, T4, T5>(string key, int delay,
             Action<T1, T2, T3, T4, T5> action,
             T1 p1,
             T2 p2,
@@ -118,13 +125,13 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4, T5, T6>(int delay,
+        public static void Debounce<T1, T2, T3, T4, T5, T6>(string key, int delay,
             Action<T1, T2, T3, T4, T5, T6> action,
             T1 p1,
             T2 p2,
@@ -133,13 +140,13 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4, T5, T6, T7>(int delay,
+        public static void Debounce<T1, T2, T3, T4, T5, T6, T7>(string key, int delay,
             Action<T1, T2, T3, T4, T5, T6, T7> action,
             T1 p1,
             T2 p2,
@@ -149,13 +156,13 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4, T5, T6, T7, T8>(int delay,
+        public static void Debounce<T1, T2, T3, T4, T5, T6, T7, T8>(string key, int delay,
             Action<T1, T2, T3, T4, T5, T6, T7, T8> action,
             T1 p1,
             T2 p2,
@@ -166,13 +173,13 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4, T5, T6, T7, T8, T9>(int delay,
+        public static void Debounce<T1, T2, T3, T4, T5, T6, T7, T8, T9>(string key, int delay,
             Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action,
             T1 p1,
             T2 p2,
@@ -184,58 +191,58 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce(int delay, Func<Task> action)
+        public static void Debounce(string key, int delay, Func<Task> action)
         {
-            _Fn(delay, FnKind.Debounce, action);
+            _Fn(key, delay, FnKind.Debounce, action);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1>(int delay, Func<T1, Task> action, T1 p1)
+        public static void Debounce<T1>(string key, int delay, Func<T1, Task> action, T1 p1)
         {
-            _Fn(delay, FnKind.Debounce, action, p1);
+            _Fn(key, delay, FnKind.Debounce, action, p1);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2>(int delay, Func<T1, T2, Task> action, T1 p1, T2 p2)
+        public static void Debounce<T1, T2>(string key, int delay, Func<T1, T2, Task> action, T1 p1, T2 p2)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3>(int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2, T3 p3)
+        public static void Debounce<T1, T2, T3>(string key, int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2, T3 p3)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4>(int delay,
+        public static void Debounce<T1, T2, T3, T4>(string key, int delay,
             Func<T1, T2, T3, T4, Task> action,
             T1 p1,
             T2 p2,
             T3 p3,
             T4 p4)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4, T5>(int delay,
+        public static void Debounce<T1, T2, T3, T4, T5>(string key, int delay,
             Func<T1, T2, T3, T4, T5, Task> action,
             T1 p1,
             T2 p2,
@@ -243,13 +250,13 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4, T5, T6>(int delay,
+        public static void Debounce<T1, T2, T3, T4, T5, T6>(string key, int delay,
             Func<T1, T2, T3, T4, T5, T6, Task> action,
             T1 p1,
             T2 p2,
@@ -258,13 +265,13 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4, T5, T6, T7>(int delay,
+        public static void Debounce<T1, T2, T3, T4, T5, T6, T7>(string key, int delay,
             Func<T1, T2, T3, T4, T5, T6, T7, Task> action,
             T1 p1,
             T2 p2,
@@ -274,13 +281,13 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4, T5, T6, T7, T8>(int delay,
+        public static void Debounce<T1, T2, T3, T4, T5, T6, T7, T8>(string key, int delay,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> action,
             T1 p1,
             T2 p2,
@@ -291,13 +298,13 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3, T4, T5, T6, T7, T8, T9>(int delay,
+        public static void Debounce<T1, T2, T3, T4, T5, T6, T7, T8, T9>(string key, int delay,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> action,
             T1 p1,
             T2 p2,
@@ -309,58 +316,58 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            _Fn(delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle(int delay, Action action)
+        public static void Throttle(string key, int delay, Action action)
         {
-            _Fn(delay, FnKind.Throttle, action);
+            _Fn(key, delay, FnKind.Throttle, action);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1>(int delay, Action<T1> action, T1 p1)
+        public static void Throttle<T1>(string key, int delay, Action<T1> action, T1 p1)
         {
-            _Fn(delay, FnKind.Throttle, action, p1);
+            _Fn(key, delay, FnKind.Throttle, action, p1);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2>(int delay, Action<T1, T2> action, T1 p1, T2 p2)
+        public static void Throttle<T1, T2>(string key, int delay, Action<T1, T2> action, T1 p1, T2 p2)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3>(int delay, Action<T1, T2, T3> action, T1 p1, T2 p2, T3 p3)
+        public static void Throttle<T1, T2, T3>(string key, int delay, Action<T1, T2, T3> action, T1 p1, T2 p2, T3 p3)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4>(int delay,
+        public static void Throttle<T1, T2, T3, T4>(string key, int delay,
             Action<T1, T2, T3, T4> action,
             T1 p1,
             T2 p2,
             T3 p3,
             T4 p4)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4, T5>(int delay,
+        public static void Throttle<T1, T2, T3, T4, T5>(string key, int delay,
             Action<T1, T2, T3, T4, T5> action,
             T1 p1,
             T2 p2,
@@ -368,13 +375,13 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4, T5, T6>(int delay,
+        public static void Throttle<T1, T2, T3, T4, T5, T6>(string key, int delay,
             Action<T1, T2, T3, T4, T5, T6> action,
             T1 p1,
             T2 p2,
@@ -383,13 +390,13 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4, T5, T6, T7>(int delay,
+        public static void Throttle<T1, T2, T3, T4, T5, T6, T7>(string key, int delay,
             Action<T1, T2, T3, T4, T5, T6, T7> action,
             T1 p1,
             T2 p2,
@@ -399,13 +406,13 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4, T5, T6, T7, T8>(int delay,
+        public static void Throttle<T1, T2, T3, T4, T5, T6, T7, T8>(string key, int delay,
             Action<T1, T2, T3, T4, T5, T6, T7, T8> action,
             T1 p1,
             T2 p2,
@@ -416,13 +423,13 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4, T5, T6, T7, T8, T9>(int delay,
+        public static void Throttle<T1, T2, T3, T4, T5, T6, T7, T8, T9>(string key, int delay,
             Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action,
             T1 p1,
             T2 p2,
@@ -434,58 +441,58 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle(int delay, Func<Task> action)
+        public static void Throttle(string key, int delay, Func<Task> action)
         {
-            _Fn(delay, FnKind.Throttle, action);
+            _Fn(key, delay, FnKind.Throttle, action);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1>(int delay, Func<T1, Task> action, T1 p1)
+        public static void Throttle<T1>(string key, int delay, Func<T1, Task> action, T1 p1)
         {
-            _Fn(delay, FnKind.Throttle, action, p1);
+            _Fn(key, delay, FnKind.Throttle, action, p1);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2>(int delay, Func<T1, T2, Task> action, T1 p1, T2 p2)
+        public static void Throttle<T1, T2>(string key, int delay, Func<T1, T2, Task> action, T1 p1, T2 p2)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3>(int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2, T3 p3)
+        public static void Throttle<T1, T2, T3>(string key, int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2, T3 p3)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4>(int delay,
+        public static void Throttle<T1, T2, T3, T4>(string key, int delay,
             Func<T1, T2, T3, T4, Task> action,
             T1 p1,
             T2 p2,
             T3 p3,
             T4 p4)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4, T5>(int delay,
+        public static void Throttle<T1, T2, T3, T4, T5>(string key, int delay,
             Func<T1, T2, T3, T4, T5, Task> action,
             T1 p1,
             T2 p2,
@@ -493,13 +500,13 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4, T5, T6>(int delay,
+        public static void Throttle<T1, T2, T3, T4, T5, T6>(string key, int delay,
             Func<T1, T2, T3, T4, T5, T6, Task> action,
             T1 p1,
             T2 p2,
@@ -508,13 +515,13 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4, T5, T6, T7>(int delay,
+        public static void Throttle<T1, T2, T3, T4, T5, T6, T7>(string key, int delay,
             Func<T1, T2, T3, T4, T5, T6, T7, Task> action,
             T1 p1,
             T2 p2,
@@ -524,13 +531,13 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4, T5, T6, T7, T8>(int delay,
+        public static void Throttle<T1, T2, T3, T4, T5, T6, T7, T8>(string key, int delay,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> action,
             T1 p1,
             T2 p2,
@@ -541,13 +548,13 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3, T4, T5, T6, T7, T8, T9>(int delay,
+        public static void Throttle<T1, T2, T3, T4, T5, T6, T7, T8, T9>(string key, int delay,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> action,
             T1 p1,
             T2 p2,
@@ -559,7 +566,7 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            _Fn(delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         #endregion
