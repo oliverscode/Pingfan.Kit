@@ -35,7 +35,7 @@ namespace Pingfan.Kit
                     {
                         action();
                     }
-                    catch 
+                    catch
                     {
                     }
                 }
@@ -72,7 +72,7 @@ namespace Pingfan.Kit
                     {
                         await action();
                     }
-                    catch 
+                    catch
                     {
                     }
                 }
@@ -96,6 +96,48 @@ namespace Pingfan.Kit
             };
             thread.Start();
             thread.Join();
+        }
+
+        public static void Run(int count, Action method)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                method();
+            }
+        }
+
+        /// <summary>
+        /// 重复执行指定次数的方法, i从1开始
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="method"></param>
+        public static void Run(int count, Action<int> method)
+        {
+            for (var i = 1; i <= count; i++)
+            {
+                method(i);
+            }
+        }
+
+        public static async Task Run(int count, Func<Task> method)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                await method();
+            }
+        }
+
+        /// <summary>
+        /// 重复执行指定次数的方法, i从1开始
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="method"></param>
+        public static async Task Run(int count, Func<int, Task> method)
+        {
+            for (var i = 1; i <= count; i++)
+            {
+                await method(i);
+            }
         }
     }
 }
