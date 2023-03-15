@@ -10,13 +10,10 @@ namespace Pingfan.Kit
     /// <summary>
     /// 事件监听派发类, 事件名区分大小写
     /// </summary>
-    public class EventEx
+    public static class EventEx
     {
-        private static object _EventLocker = new object();
-
-        private static readonly ConcurrentDictionary<string, List<EventsAction>> _Actions =
+        private static readonly ConcurrentDictionary<string, List<EventsAction>> _actions =
             new ConcurrentDictionary<string, List<EventsAction>>();
-
 
         #region 监听事件
 
@@ -254,7 +251,7 @@ namespace Pingfan.Kit
 
         public static void Emit(string eventName, params object[] args)
         {
-            if (_Actions.TryGetValue(eventName, out List<EventsAction> actions) == false)
+            if (!_actions.TryGetValue(eventName, out List<EventsAction> actions))
                 return;
 
             lock (eventName)
@@ -273,9 +270,9 @@ namespace Pingfan.Kit
             }
         }
 
-        public static void EmitWithTry(string eventName, params object[] args)
+        public static void EmitRunWithTry(string eventName, params object[] args)
         {
-            if (_Actions.TryGetValue(eventName, out List<EventsAction> actions) == false)
+            if (!_actions.TryGetValue(eventName, out List<EventsAction> actions))
                 return;
 
             lock (eventName)
@@ -297,73 +294,6 @@ namespace Pingfan.Kit
                         actions.Remove(eventsAction);
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// 异步派发每一个事件
-        /// </summary>
-        /// <param name="eventName"></param>
-        /// <param name="args"></param>
-        public static void EmitAsync(string eventName, params object[] args)
-        {
-            if (_Actions.TryGetValue(eventName, out List<EventsAction> actions) == false)
-                return;
-
-            lock (eventName)
-            {
-                var tasks = new Task[actions.Count];
-                for (int i = 0; i < actions.Count; i++)
-                {
-                    var eventsAction = actions[i];
-                    tasks[i] = Task.Run(() =>
-                    {
-                        var task = eventsAction.Action.DynamicInvoke(args) as Task;
-                        task?.Wait();
-                    });
-
-                    // 是否是单次执行, 如果是, 则移除
-                    if (eventsAction.IsOnce)
-                    {
-                        actions.Remove(eventsAction);
-                    }
-                }
-
-                Task.WaitAll(tasks);
-            }
-        }
-
-        public static void EmitAsyncWithTry(string eventName, params object[] args)
-        {
-            if (_Actions.TryGetValue(eventName, out List<EventsAction> actions) == false)
-                return;
-
-            lock (eventName)
-            {
-                var tasks = new Task[actions.Count];
-                for (int i = 0; i < actions.Count; i++)
-                {
-                    var eventsAction = actions[i];
-                    tasks[i] = Task.Run(() =>
-                    {
-                        try
-                        {
-                            var task = eventsAction.Action.DynamicInvoke(args) as Task;
-                            task?.Wait();
-                        }
-                        catch
-                        {
-                        }
-                    });
-
-                    // 是否是单次执行, 如果是, 则移除
-                    if (eventsAction.IsOnce)
-                    {
-                        actions.Remove(eventsAction);
-                    }
-                }
-
-                Task.WaitAll(tasks);
             }
         }
 
@@ -396,15 +326,15 @@ namespace Pingfan.Kit
 
         private static void AddAction(EventsAction eventsAction)
         {
-            lock (_EventLocker)
+            lock (_actions)
             {
-                if (!_Actions.ContainsKey(eventsAction.EventName))
+                if (!_actions.ContainsKey(eventsAction.EventName))
                 {
-                    _Actions[eventsAction.EventName] = new List<EventsAction>();
+                    _actions[eventsAction.EventName] = new List<EventsAction>();
                 }
 
                 eventsAction.Sign = Fn.GetSignture(eventsAction.Action);
-                var actions = _Actions[eventsAction.EventName];
+                var actions = _actions[eventsAction.EventName];
                 // sign必须和action全部一致才添加
                 if (actions.Count > 0 && actions.Any(x => x.Sign != eventsAction.Sign))
                 {
@@ -423,12 +353,12 @@ namespace Pingfan.Kit
 
         private static void RemoveAction(object obj, string eventName)
         {
-            lock (_EventLocker)
+            lock (_actions)
             {
                 if (string.IsNullOrEmpty(eventName))
                 {
                     // 删除obj对象的所有事件
-                    foreach (var pair in _Actions)
+                    foreach (var pair in _actions)
                     {
                         pair.Value.RemoveAll(action => action.Obj == obj);
                     }
@@ -436,7 +366,7 @@ namespace Pingfan.Kit
                 else
                 {
                     // 删除obj对象的eventName事件
-                    if (_Actions.TryGetValue(eventName, out var actions))
+                    if (_actions.TryGetValue(eventName, out var actions))
                     {
                         actions.RemoveAll(action => action.Obj == obj);
                     }

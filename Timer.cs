@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
-    public class Timer
+    public static class Timer
     {
         /// <summary>
         /// 创建一个定时器，但只执行1次
@@ -114,7 +114,6 @@ namespace Pingfan.Kit
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
-
         /// <summary>
         /// 创建一个定时器
         /// </summary>
@@ -161,7 +160,7 @@ namespace Pingfan.Kit
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
-        
+
         /// <summary>
         /// 创建一个定时器, 同时不抛出异常
         /// </summary>
