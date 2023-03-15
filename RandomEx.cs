@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Pingfan.Kit
 {
-    public class RandomEx
+    public static class RandomEx
     {
-        private static Random _Rd = new Random();
+        private static readonly Random _Rd = new Random();
 
         /// <summary>
         /// 生成一个随机数
@@ -37,7 +37,6 @@ namespace Pingfan.Kit
             {
                 sb.Append("abdefghjnpqrty");
             }
-          
             if (isUpper)
             {
                 sb.Append("ABDEFGHJLNPQRTY");
@@ -55,7 +54,6 @@ namespace Pingfan.Kit
             return new string(result);
         }
 
-
         /// <summary>
         /// 正态分布随机数
         /// </summary>
@@ -68,16 +66,14 @@ namespace Pingfan.Kit
         {
             int miu = min + (max - min) / 2;
             if (miu <= 0 || miu >= max)
-                throw new ArgumentException();
-
+                throw new ArgumentException("Invalid 'min' or 'max' value for the normal distribution.");
             if (sigma >= miu)
-                throw new ArgumentException();
+                throw new ArgumentException("Sigma value should be less than the mean value (miu).");
             if (sigma <= 0)
-                throw new ArgumentException();
+                throw new ArgumentException("Sigma value should be greater than 0.");
 
             double u1, u2, z, x;
             var result = 0;
-
 
             while (true)
             {
@@ -112,7 +108,6 @@ namespace Pingfan.Kit
             return _Rd.NextDouble() < probability;
         }
 
-
         /// <summary>
         /// 判断是否满足一个概率
         /// </summary>
@@ -122,7 +117,6 @@ namespace Pingfan.Kit
         {
             return (decimal)_Rd.NextDouble() < probability;
         }
-
 
         /// <summary>
         /// 从一个集合中随机取出一个元素
@@ -135,19 +129,6 @@ namespace Pingfan.Kit
             var index = RandomEx.Next(0, objs.Length);
             return objs[index];
         }
-
-        /// <summary>
-        /// 从一个集合中随机取出一个元素
-        /// </summary>
-        /// <param name="objs"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static T Next<T>(IEnumerable<T> objs)
-        {
-            // 随机从objs中取出一个元素
-            var index = RandomEx.Next(0, objs.Count());
-            return objs.ElementAt(index);
-        }
     }
 
     /// <summary>
@@ -158,6 +139,17 @@ namespace Pingfan.Kit
     {
         private readonly List<KeyValuePair<T, int>> _List = new List<KeyValuePair<T, int>>();
         private int MaxWeights = 0;
+
+        public RandomEx()
+        {
+        }
+        public RandomEx(IDictionary<T, int> items)
+        {
+            foreach (var item in items)
+            {
+                Add(item.Key, item.Value);
+            }
+        }
 
         /// <summary>
         /// 添加随机参数
@@ -171,7 +163,7 @@ namespace Pingfan.Kit
                 throw new ArgumentException(nameof(weights));
 
             _List.Add(new KeyValuePair<T, int>(obj, weights));
-            MaxWeights = _List.Sum(p => p.Value);
+            MaxWeights += weights;
         }
 
         /// <summary>

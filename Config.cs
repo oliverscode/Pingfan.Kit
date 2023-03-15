@@ -9,9 +9,9 @@ namespace Pingfan.Kit
     /// <summary>
     /// 读写配置类
     /// </summary>
-    public class Config
+    public static class Config
     {
-        private static object _Locker = new object();
+        private static readonly object _locker = new object();
 
         public static string MainConfigFilePath =>
             Path.Combine(PathEx.CurrentDirectory, "app.ini");
@@ -24,10 +24,9 @@ namespace Pingfan.Kit
         /// <param name="value"></param>
         public static void Set(string key, string value)
         {
-            lock (_Locker)
+            lock (_locker)
             {
                 key = Regex.Escape(key);
-                
                 var lines = FileEx.ReadLines(MainConfigFilePath);
                 var sb = new StringBuilder();
                 var success = false;
@@ -35,7 +34,7 @@ namespace Pingfan.Kit
                 {
                     if (line.StartsWith(key + "="))
                     {
-                        sb.AppendLine($"{key}={value}");
+                        sb.Append(key).Append('=').AppendLine(value);
                         success = true;
                     }
                     else
@@ -44,8 +43,8 @@ namespace Pingfan.Kit
                     }
                 }
 
-                if (success == false)
-                    sb.AppendLine($"{key}={value}");
+                if (!success)
+                    sb.Append(key).Append('=').AppendLine(value);
 
                 FileEx.WriteAllText(MainConfigFilePath, sb.ToString());
             }
@@ -60,7 +59,6 @@ namespace Pingfan.Kit
         public static string Get(string key, string defaultValue = "")
         {
             key = Regex.Escape(key);
-            
             // 如果有环境变量, 则使用环境变量
             var value = Environment.GetEnvironmentVariable(key);
             if (value?.IsNullOrEmpty() == false)
@@ -70,27 +68,26 @@ namespace Pingfan.Kit
 
             // 如果有命令行参数, 则使用命令行参数
             value = GetByCmd(key);
-            if (value.IsNullOrEmpty() == false)
+            if (!value.IsNullOrEmpty())
             {
                 return value;
             }
 
             // 没有配置文件, 默认写入有一个配置文件
-            if (File.Exists(MainConfigFilePath) == false)
+            if (!File.Exists(MainConfigFilePath))
             {
                 Set(key, defaultValue);
                 return defaultValue;
             }
 
-            lock (_Locker)
+            lock (_locker)
             {
                 var lines = FileEx.ReadAllLines(MainConfigFilePath);
                 foreach (var line in lines)
                 {
                     if (line.StartsWith(key + "="))
                     {
-                        value = line.Substring(key.Length + 1);
-                        return value;
+                        return line.Substring(key.Length + 1);
                     }
                 }
             }
@@ -111,10 +108,8 @@ namespace Pingfan.Kit
             var m = Regex.Match(Environment.CommandLine, $@"{key}=(\S+)");
             if (m.Success)
             {
-                var value = m.Groups[1].Value;
-                return value;
+                return m.Groups[1].Value;
             }
-
             return defaultValue;
         }
 
@@ -127,7 +122,6 @@ namespace Pingfan.Kit
         {
             return Environment.CommandLine.ContainsIgnoreCase(key);
         }
-
 
         public static bool Clear()
         {

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
-    public class StopwatchEx
+    public static class StopwatchEx
     {
         /// <summary>
         /// 计算执行时间

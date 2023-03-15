@@ -10,12 +10,11 @@ namespace Pingfan.Kit
     {
         /// <summary>
         /// 忽略大小写判断是否相同
-        /// </summary> 
+        /// </summary>
         public static bool EqualsIgnoreCase(this string s1, string s2)
         {
             return string.Equals(s1, s2, StringComparison.OrdinalIgnoreCase);
         }
-
 
         /// <summary>
         /// 判断2个字符串相似百分比, 乱序不影响, 返回结果为0-1之间
@@ -48,7 +47,6 @@ namespace Pingfan.Kit
             return s1.IndexOf(s2, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
-
         /// <summary>
         /// 是否为NULL或者空字符串
         /// </summary>
@@ -56,7 +54,6 @@ namespace Pingfan.Kit
         {
             return string.IsNullOrEmpty(s1);
         }
-
 
         /// <summary>
         /// 是否为NULL或者空白字符串
@@ -81,7 +78,6 @@ namespace Pingfan.Kit
         {
             return string.Format(s1, values);
         }
-
 
         public static int ToInt(this string str, int defaultValue = 0)
         {
@@ -232,7 +228,7 @@ namespace Pingfan.Kit
         {
             var list = new List<string>();
             var m = Regex.Match(input, pattern, options);
-            if (m.Success == false)
+            if (!m.Success)
                 return list;
 
             // 除了第一个元素全部返回
@@ -258,8 +254,6 @@ namespace Pingfan.Kit
             var ms = Regex.Matches(input, pattern, options);
             if (ms.Count == 0)
                 return list;
-
-
             foreach (Match m in ms)
             {
                 if (m.Success == false)
@@ -280,7 +274,6 @@ namespace Pingfan.Kit
             return list;
         }
 
-
         /// <summary>
         /// 拆分字符串
         /// </summary>
@@ -291,7 +284,7 @@ namespace Pingfan.Kit
         {
             return str.Split(parms, StringSplitOptions.RemoveEmptyEntries);
         }
-        
+
         /// <summary>
         /// 拆分字符串
         /// </summary>
@@ -302,6 +295,5 @@ namespace Pingfan.Kit
         {
             return str.Split(parms, StringSplitOptions.RemoveEmptyEntries);
         }
-        
     }
 }

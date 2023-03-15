@@ -96,8 +96,6 @@ namespace Pingfan.Kit
 
             return sb.ToString();
         }
-
-
         public static string Sha256(byte[] data)
         {
             var hash = SHA256.Create().ComputeHash(data);
@@ -150,6 +148,7 @@ namespace Pingfan.Kit
             {
                 sb.Append("[");
                 var key = data.GetType().ToString();
+                sb.Append(key);
                 sb.Append("]");
                 sb.Append("=");
                 sb.Append(data);

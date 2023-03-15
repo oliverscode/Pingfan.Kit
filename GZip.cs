@@ -3,7 +3,7 @@ using System.IO.Compression;
 
 namespace Pingfan.Kit
 {
-    public class GZip
+    public static class GZip
     {
         public static MemoryStream Decompress(Stream stream)
         {
@@ -22,7 +22,6 @@ namespace Pingfan.Kit
             {
                 return Decompress(stream).ToArray();
             }
-            
         }
 
         public static MemoryStream Compress(Stream stream)
@@ -34,7 +33,6 @@ namespace Pingfan.Kit
                 stream.CopyTo(destination);
                 return memoryStream;
             }
-           
         }
 
         public static byte[] Compress(byte[] data)
@@ -43,7 +41,6 @@ namespace Pingfan.Kit
             {
                 return Compress(stream).ToArray();
             }
-           
         }
     }
 }

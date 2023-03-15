@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Pingfan.Kit
 {
-    public class ExpressionEx
+    public static class ExpressionEx
     {
         /// <summary>
         /// 高性能创建一个对象
@@ -18,7 +18,6 @@ namespace Pingfan.Kit
             var type = typeof(T);
             return (T)CreateInstance(type, parms);
         }
-
 
         /// <summary>
         /// 高性能创建一个对象

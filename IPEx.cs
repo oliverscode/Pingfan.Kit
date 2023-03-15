@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace Pingfan.Kit
 {
-    public class IPEx
+    public static class IPEx
     {
         /// <summary>
         /// 获取局域网IPv4地址
@@ -31,10 +31,10 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static string GetExternalIp()
         {
+            const string url = "http://ip-api.com/json/?lang=zh-CN";
             // https://icanhazip.com
 
-            string externalip = "";
-            string url = "http://ip-api.com/json/?lang=zh-CN";
+            string externalip;
             try
             {
                 WebClient wc = new WebClient();

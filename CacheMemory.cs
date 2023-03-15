@@ -10,7 +10,7 @@ namespace Pingfan.Kit
     /// </summary>
     public static class CacheMemory<T>
     {
-        private static readonly ConcurrentDictionary<string, CachedItem> _CacheMap =
+        private static readonly ConcurrentDictionary<string, CachedItem> _cacheMap =
             new ConcurrentDictionary<string, CachedItem>(StringComparer.OrdinalIgnoreCase);
 
         private class CachedItem
@@ -22,7 +22,7 @@ namespace Pingfan.Kit
         static CacheMemory()
         {
             // 每5秒清理一下缓存
-            Timer.SetIntervalWithTry(5 * 1000, _Clear);
+            Timer.SetIntervalWithTry(5 * 1000, CleanExpiredCache);
         }
 
         /// <summary>
@@ -39,7 +39,6 @@ namespace Pingfan.Kit
                 throw new ArgumentNullException(nameof(key));
             }
 
-
             return _TryGet(key, out var item)
                 ? item
                 : defaultValue;
@@ -52,7 +51,11 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static bool HasKey(string key)
         {
-            return _CacheMap.ContainsKey(key);
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+            return _cacheMap.ContainsKey(key);
         }
 
         /// <summary>
@@ -94,13 +97,12 @@ namespace Pingfan.Kit
                 throw new ArgumentNullException(nameof(key));
             }
 
-            _CacheMap[key] = new CachedItem
+            _cacheMap[key] = new CachedItem
             {
-                ExpireDateTime = DateTime.Now.AddMilliseconds((seconds * 1000)),
+                ExpireDateTime = DateTime.Now.AddMilliseconds(seconds * 1000),
                 Data = data
             };
         }
-
 
         /// <summary>
         /// 设置缓存, 但不会设置过期时间
@@ -114,13 +116,13 @@ namespace Pingfan.Kit
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (_CacheMap.ContainsKey(key))
+            if (_cacheMap.ContainsKey(key))
             {
                 lock (key)
                 {
-                    if (_CacheMap.ContainsKey(key))
+                    if (_cacheMap.ContainsKey(key))
                     {
-                        _CacheMap[key].Data = data;
+                        _cacheMap[key].Data = data;
                         return true;
                     }
                 }
@@ -135,27 +137,31 @@ namespace Pingfan.Kit
         /// <param name="key"></param>
         /// <param name="seconds"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static void SetExpire(string key, decimal seconds = 1m)
+        public static bool SetExpire(string key, double seconds = 1)
         {
             if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
-            if (_CacheMap.TryGetValue(key, out var item))
-                item.ExpireDateTime = DateTime.Now.AddMilliseconds((double) (seconds * 1000));
+            if (_cacheMap.TryGetValue(key, out var item))
+            {
+                item.ExpireDateTime = DateTime.Now.AddSeconds(seconds);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
         /// 删除缓存
         /// </summary>
-        public static bool TryRemove(string key, out T result, T defaultValue = default(T))
+        public static bool TryRemove(string key, out T result, T defaultValue = default)
         {
             if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (_CacheMap.TryRemove(key, out var item))
+            if (_cacheMap.TryRemove(key, out var item))
             {
                 result = item.Data;
                 return true;
@@ -165,13 +171,12 @@ namespace Pingfan.Kit
             return false;
         }
 
-
         /// <summary>
         /// 清理全部缓存
         /// </summary>
         public static void Clear()
         {
-            _CacheMap.Clear();
+            _cacheMap.Clear();
         }
 
         /// <summary>
@@ -180,7 +185,7 @@ namespace Pingfan.Kit
         /// <param name="exp">支持字符串或者正则</param>
         public static void Clear(string exp)
         {
-            foreach (var kv in _CacheMap)
+            foreach (var kv in _cacheMap)
             {
                 if (kv.Key.ContainsIgnoreCase(exp) || Regex.IsMatch(kv.Key, exp))
                 {
@@ -192,9 +197,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 清理过期缓存
         /// </summary>
-        private static void _Clear()
+        public static void CleanExpiredCache()
         {
-            foreach (var kv in _CacheMap)
+            foreach (var kv in _cacheMap)
             {
                 if (kv.Value.ExpireDateTime <= DateTime.Now)
                 {
@@ -220,15 +225,14 @@ namespace Pingfan.Kit
                 throw new ArgumentNullException(nameof(key));
             }
 
-
-            if (_TryGet(key, out var item) == false)
+            if (!_TryGet(key, out var item))
             {
                 if (valueFactory == null)
                     throw new ArgumentNullException(nameof(valueFactory));
 
                 lock (key)
                 {
-                    if (_TryGet(key, out item) == false)
+                    if (!_TryGet(key, out item))
                     {
                         var data = valueFactory();
                         Set(key, data, seconds);
@@ -254,38 +258,35 @@ namespace Pingfan.Kit
         /// <param name="seconds"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static T GetOrSet(string key,
-            Func<Task<T>> valueFactory,
-            double seconds = 1d)
+        public static async Task<T> GetOrSetAsync(string key, Func<Task<T>> valueFactory, double seconds = 1d)
         {
             if (string.IsNullOrEmpty(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
-            if (_TryGet(key, out var item) == false)
+            if (!_TryGet(key, out var item))
             {
                 if (valueFactory == null)
+                {
                     throw new ArgumentNullException(nameof(valueFactory));
+                }
+
+                // 等待异步操作完成并获取数据
+                var data = await valueFactory();
 
                 lock (key)
                 {
-                    if (_TryGet(key, out item) == false)
+                    if (!_TryGet(key, out item))
                     {
-                        var data = valueFactory().Result;
                         Set(key, data, seconds);
-                        return data;
-                    }
-                    else
-                    {
-                        return item;
                     }
                 }
+
+                return data;
             }
-            else
-            {
-                return item;
-            }
+
+            return item;
         }
 
         /// <summary>
@@ -296,8 +297,8 @@ namespace Pingfan.Kit
         /// <returns></returns>
         private static bool _TryGet(string key, out T data)
         {
-            data = default(T);
-            if (_CacheMap.TryGetValue(key, out var item) && item.ExpireDateTime > DateTime.Now)
+            data = default;
+            if (_cacheMap.TryGetValue(key, out var item) && item.ExpireDateTime > DateTime.Now)
             {
                 data = item.Data;
                 return true;

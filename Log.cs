@@ -62,6 +62,9 @@ namespace Pingfan.Kit
 
         public Log()
         {
+#if DEBUG
+            ConsoleLevel = LogLevel.DBG | LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL;
+#endif
         }
 
         public Log(string logFileName)
@@ -72,8 +75,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 输出到控制台的级别
         /// </summary>
-        public LogLevel ConsoleLevel { get; set; } =
-            LogLevel.DBG | LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL;
+        public LogLevel ConsoleLevel { get; set; }
 
         /// <summary>
         /// 输出到磁盘的级别
@@ -84,7 +86,12 @@ namespace Pingfan.Kit
         /// <summary>
         /// 日志回调
         /// </summary>
-        public event Action<LogLevel, string> OnHandler;
+        public event Action<LogLevel, string> OnHandler
+        {
+            add { lock (_onHandler) { _onHandler += value; } }
+            remove { lock (_onHandler) { _onHandler -= value; } }
+        }
+        private event Action<LogLevel, string> _onHandler;
 
 
         /// <summary>
@@ -147,7 +154,7 @@ namespace Pingfan.Kit
                 lock (this)
                 {
                     // 先全局处理
-                    this.OnHandler?.Invoke(logLevel, logString);
+                    this._onHandler?.Invoke(logLevel, logString);
 
                     var str = $"[{logLevel.ToString()}]{DateTime.Now:yyyy-MM-dd HH:mm:ss} {logString}\n";
 

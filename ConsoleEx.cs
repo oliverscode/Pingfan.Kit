@@ -4,19 +4,19 @@ using System.Xml;
 
 namespace Pingfan.Kit
 {
-    public class ConsoleEx
+    public static class ConsoleEx
     {
-        private static object Locker = new object();
+        private static readonly object _locker = new object();
 
         public static string Input(string text,
             ConsoleColor outColor = ConsoleColor.Cyan,
             ConsoleColor inColor = ConsoleColor.Yellow)
         {
-            lock (Locker)
+            lock (_locker)
             {
                 var foregroundColor = Console.ForegroundColor;
 
-                if (string.IsNullOrEmpty(text) == false)
+                if (!string.IsNullOrEmpty(text))
                 {
                     Console.ForegroundColor = outColor;
                     Console.Write(text);
@@ -31,7 +31,7 @@ namespace Pingfan.Kit
 
         public static string InputPassword(string text, ConsoleColor outColor = ConsoleColor.Cyan)
         {
-            lock (Locker)
+            lock (_locker)
             {
                 var foregroundColor = Console.ForegroundColor;
                 Console.ForegroundColor = outColor;
@@ -52,7 +52,6 @@ namespace Pingfan.Kit
                         stringBuilder.Remove(stringBuilder.Length - 1, 1);
                         Console.Write("\b \b");
                     }
-
                     else if (char.IsLetterOrDigit(consoleKeyInfo.KeyChar)
                              || char.IsPunctuation(consoleKeyInfo.KeyChar))
                     {
@@ -60,7 +59,6 @@ namespace Pingfan.Kit
                         Console.Write("*"); // 显示星号
                     }
                 }
-
 
                 var result = stringBuilder.ToString();
                 Console.ForegroundColor = foregroundColor;
@@ -70,11 +68,22 @@ namespace Pingfan.Kit
 
         public static void Write(string text, ConsoleColor outColor = ConsoleColor.DarkGray)
         {
-            lock (Locker)
+            lock (_locker)
             {
                 var foregroundColor = Console.ForegroundColor;
                 Console.ForegroundColor = outColor;
                 Console.Write(text);
+                Console.ForegroundColor = foregroundColor;
+            }
+        }
+
+        public static void WriteLine(string text, ConsoleColor outColor = ConsoleColor.DarkGray)
+        {
+            lock (_locker)
+            {
+                var foregroundColor = Console.ForegroundColor;
+                Console.ForegroundColor = outColor;
+                Console.WriteLine(text);
                 Console.ForegroundColor = foregroundColor;
             }
         }

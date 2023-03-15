@@ -14,7 +14,7 @@ namespace Pingfan.Kit
             long unixTime = ((DateTimeOffset) datetime).ToUnixTimeSeconds();
             return unixTime;
         }
-        
+
         /// <summary>
         /// 当前时区转换成unix时间戳
         /// </summary>
@@ -46,7 +46,6 @@ namespace Pingfan.Kit
             return DateTimeOffset.FromUnixTimeMilliseconds(timestamp).LocalDateTime;
         }
 
-
         /// <summary>
         /// 转换成2020/01/01 00:00:00格式
         /// </summary>
@@ -56,7 +55,5 @@ namespace Pingfan.Kit
         {
             return datetime.ToString("yyyy/MM/dd HH:mm:ss");
         }
-        
-        
     }
 }

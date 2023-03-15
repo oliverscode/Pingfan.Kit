@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
-    public class Retry
+    public static class Retry
     {
         /// <summary>
         /// 间隔1秒一直重试1个任务
@@ -142,7 +142,6 @@ namespace Pingfan.Kit
 
             throw exception;
         }
-
 
         /// <summary>
         /// 结尾为True直接返回

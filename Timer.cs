@@ -189,7 +189,6 @@ namespace Pingfan.Kit
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
 
-
         /// <summary>
         /// 创建一个定时器, 如果返回false, 将终止定时器
         /// </summary>

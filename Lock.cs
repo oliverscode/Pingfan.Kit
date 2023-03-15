@@ -2,9 +2,9 @@
 
 namespace Pingfan.Kit
 {
-    public class Lock
+    public static class LockEx
     {
-        private static readonly object Locker = new object();
+        private static readonly object _locker = new object();
 
         /// <summary>
         /// 全局单线程执行
@@ -12,7 +12,7 @@ namespace Pingfan.Kit
         /// <param name="action"></param>
         public static void Run(Action action)
         {
-            lock (Locker)
+            lock (_locker)
             {
                 action();
             }

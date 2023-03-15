@@ -18,8 +18,5 @@ namespace Pingfan.Kit
         {
             return Task.Delay(RandomEx.Next(minMilliseconds, maxMilliseconds));
         }
-
-  
     }
 }
-

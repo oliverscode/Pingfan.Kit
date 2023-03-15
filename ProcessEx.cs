@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Pingfan.Kit
 {
-    public class ProcessEx
+    public static class ProcessEx
     {
         /// <summary>
         /// 判断是否运行过

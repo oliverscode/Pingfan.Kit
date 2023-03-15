@@ -7,7 +7,6 @@ namespace Pingfan.Kit
 {
     public class Progress : IDisposable
     {
-        private object locker = new object();
 
         private DateTime _startTime = DateTime.Now;
         private DateTime _endTime;
@@ -42,7 +41,7 @@ namespace Pingfan.Kit
         public bool IsComplete => Index >= _total;
 
         // 最近的速率
-        private List<long> _speedSum = new List<long>();
+        private readonly List<long> _speedSum = new List<long>();
         private const int maxSpeedSum = 20; // 取最近10条的平均值
 
         /// <summary>
@@ -64,7 +63,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 预计剩余时间
         /// </summary>
-
         public TimeSpan EstElapsed => new TimeSpan(EstSeconds * 1000 * 10000);
 
         /// <summary>
@@ -95,7 +93,7 @@ namespace Pingfan.Kit
                     return 0.0;
                 }
 
-                lock (locker)
+                lock (this)
                 {
                     var ticks = DateTime.Now.Ticks;
                     var timeCount = ticks - _startTime.Ticks;
@@ -128,7 +126,7 @@ namespace Pingfan.Kit
             Interlocked.Add(ref _currentIndex, count);
 
             // 增加每秒处理量
-            lock (locker)
+            lock (this)
             {
                 _speedSum.Add(count);
                 if (_speedSum.Count > maxSpeedSum)
@@ -147,7 +145,7 @@ namespace Pingfan.Kit
             if (_currentIndex != 0)
             {
                 // 增加每秒处理量
-                lock (locker)
+                lock (this)
                 {
                     _speedSum.Add(index - _currentIndex);
                     if (_speedSum.Count > maxSpeedSum)
@@ -156,12 +154,8 @@ namespace Pingfan.Kit
                     }
                 }
             }
-
-
             //设置当前位置
             Interlocked.Exchange(ref _currentIndex, index);
-
-
             if (index >= _total)
             {
                 _endTime = DateTime.Now;
@@ -219,7 +213,6 @@ namespace Pingfan.Kit
                                  + (EstElapsed.Minutes).ToString("D2")
                                  + ":"
                                  + (EstElapsed.Seconds).ToString("D2");
-
 
             if (IsComplete)
             {

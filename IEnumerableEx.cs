@@ -10,19 +10,15 @@ namespace Pingfan.Kit
 {
     public static class IEnumerableEx
     {
-        /// <summary>
-        /// 多线程遍历
-        /// </summary>
         public static async Task Each<T>(this IEnumerable<T> list, Action<T> callBack, int threadCount = 0)
         {
-            var enumerable = new ConcurrentQueue<T>(list);
+            var queue = new ConcurrentQueue<T>(list);
             if (threadCount <= 0)
                 threadCount = Environment.ProcessorCount * 2;
-            if (threadCount > enumerable.Count)
-                threadCount = enumerable.Count;
-            if (enumerable.Count <= 0)
+            if (threadCount > queue.Count)
+                threadCount = queue.Count;
+            if (queue.Count == 0)
                 return;
-
 
             var tasks = new Task[threadCount];
 
@@ -30,7 +26,7 @@ namespace Pingfan.Kit
             {
                 var t = Task.Factory.StartNew(() =>
                 {
-                    while (enumerable.TryDequeue(out T data))
+                    while (queue.TryDequeue(out T data))
                     {
                         callBack(data);
                     }
@@ -41,27 +37,24 @@ namespace Pingfan.Kit
             await Task.WhenAll(tasks);
         }
 
-        /// <summary>
-        /// 多线程遍历
-        /// </summary>
         public static async Task Each<T>(this IEnumerable<T> list, Func<T, Task> callBack, int threadCount = 0)
         {
-            var enumerable = new ConcurrentQueue<T>(list);
+            var queue = new ConcurrentQueue<T>(list);
             if (threadCount <= 0)
                 threadCount = Environment.ProcessorCount * 2;
-            if (threadCount > enumerable.Count)
-                threadCount = enumerable.Count;
-            if (enumerable.Count <= 0)
+            if (threadCount > queue.Count)
+                threadCount = queue.Count;
+            if (queue.Count <= 0)
                 return;
 
             var tasks = new Task[threadCount];
             for (var i = 0; i < threadCount; i++)
             {
-                var t = Task.Factory.StartNew(() =>
+                var t = Task.Factory.StartNew(async () =>
                 {
-                    while (enumerable.TryDequeue(out T data))
+                    while (queue.TryDequeue(out T data))
                     {
-                        callBack(data).Wait();
+                        await callBack(data);
                     }
                 }, TaskCreationOptions.LongRunning);
                 tasks[i] = t;
@@ -82,8 +75,6 @@ namespace Pingfan.Kit
             return list.ElementAt(index);
         }
 
-
-
         /// <summary>
         /// 返回乱序后的列表
         /// </summary>
@@ -92,7 +83,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static IEnumerable<T> RandomSort<T>(this IEnumerable<T> list)
         {
-            return list.OrderBy(p => Guid.NewGuid());
+            return list.OrderBy(_ => Guid.NewGuid());
         }
 
         /// <summary>
@@ -105,6 +96,5 @@ namespace Pingfan.Kit
         {
             return list.Any(p => p.ContainsIgnoreCase(value));
         }
-        
     }
 }

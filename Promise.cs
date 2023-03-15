@@ -5,51 +5,49 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 类似js的Promise
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Promise<T>
     {
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        public T Result => _task.Result;
+
         private readonly Task<T> _task = null;
 
+        /// <summary>
+        /// 类似js的Promise
+        /// </summary>
+        /// <param name="resolve"></param>
         public Promise(Action<Action<T>> resolve)
         {
-            _task = Task.Run<T>(async () =>
-            {
-                var cancel = new CancellationTokenSource();
-                var result = default(T);
-                var p = new Action<T>((o) =>
-                {
-                    result = o;
-                    cancel.Cancel();
-                });
-                resolve(p);
-                //等待被调用
-                while (cancel.IsCancellationRequested == false)
-                {
-                    await Task.Delay(1);
-                }
+            var tcs = new TaskCompletionSource<T>();
 
-                return result;
-            });
+            var p = new Action<T>((o) => tcs.SetResult(o));
+
+            resolve(p);
+
+            _task = tcs.Task;
         }
 
+        /// <summary>
+        /// 类似js的Promise
+        /// </summary>
+        /// <param name="resolve"></param>
         public Promise(Func<Action<T>, Task> resolve)
         {
-            _task = Task.Run<T>(async () =>
-            {
-                var cancel = new CancellationTokenSource();
-                var result = default(T);
-                var p = new Action<T>((o) =>
-                {
-                    result = o;
-                    cancel.Cancel();
-                });
-                await resolve(p);
-                //等待被调用
-                while (cancel.IsCancellationRequested == false)
-                {
-                    await Task.Delay(1);
-                }
+            var tcs = new TaskCompletionSource<T>();
 
-                return result;
+            var p = new Action<T>((o) => tcs.SetResult(o));
+
+            _task = Task.Run(async () =>
+            {
+                await resolve(p).ConfigureAwait(false);
+                await tcs.Task.ConfigureAwait(false);
+                return await tcs.Task.ConfigureAwait(false);
             });
         }
 
@@ -58,8 +56,5 @@ namespace Pingfan.Kit
             return _task.GetAwaiter();
         }
 
-        public void OnCompleted(Action continuation)
-        {
-        }
     }
 }

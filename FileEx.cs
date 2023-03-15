@@ -9,7 +9,7 @@ namespace Pingfan.Kit
     /// <summary>
     /// 文件操作类, 失败时会重试多次
     /// </summary>
-    public class FileEx
+    public static class FileEx
     {
         /// <summary>
         /// 重试次数
@@ -55,7 +55,6 @@ namespace Pingfan.Kit
             return Read(path, () => File.ReadAllLines(path, encoding)) ?? Array.Empty<string>();
         }
 
-
         /// <summary>
         /// 读取一个文件, 如果文件不存在会返回string[]
         /// </summary>
@@ -68,7 +67,6 @@ namespace Pingfan.Kit
             return Read(path, () => File.ReadLines(path, encoding)) ?? Array.Empty<string>();
         }
 
-
         /// <summary>
         /// 写入文件, 如果文件不存在则创建
         /// </summary>
@@ -78,7 +76,7 @@ namespace Pingfan.Kit
         {
             if (encoding == null)
                 encoding = Encoding.UTF8;
-            Write(path, () => { File.AppendAllText(path, contents, encoding); });
+            Write(path, () => File.AppendAllText(path, contents, encoding));
         }
 
         /// <summary>
@@ -90,9 +88,8 @@ namespace Pingfan.Kit
         {
             if (encoding == null)
                 encoding = Encoding.UTF8;
-            Write(path, () => { File.WriteAllText(path, contents, encoding); });
+            Write(path, () => File.WriteAllText(path, contents, encoding));
         }
-
 
         /// <summary>
         /// 写入文件, 如果文件不存在则创建
@@ -101,7 +98,7 @@ namespace Pingfan.Kit
         /// <param name="contents"></param>
         public static void WriteAllBytes(string path, byte[] contents)
         {
-            Write(path, () => { File.WriteAllBytes(path, contents); });
+            Write(path, () => File.WriteAllBytes(path, contents));
         }
 
         private static void Write(string path, Action fn)
@@ -112,7 +109,7 @@ namespace Pingfan.Kit
                 var dir = Path.GetDirectoryName(path);
                 Retry.Run(RetryCount, RetryInterval, () =>
                 {
-                    if (Directory.Exists(dir) == false)
+                    if (!Directory.Exists(dir))
                     {
                         Directory.CreateDirectory(dir);
                     }
@@ -121,7 +118,6 @@ namespace Pingfan.Kit
                 Retry.Run(RetryCount, RetryInterval, fn);
             }
         }
-
 
         /// <summary>
         /// 删除一个文件, 或者目录
@@ -152,7 +148,7 @@ namespace Pingfan.Kit
 
         private static T Read<T>(string path, Func<T> fn) where T : class
         {
-            if (File.Exists(path) == false)
+            if (!File.Exists(path))
             {
                 return null;
             }

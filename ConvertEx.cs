@@ -7,35 +7,39 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Pingfan.Kit
 {
-    public class ConvertEx
+    public static class ConvertEx
     {
-        /// <summary> 
-        /// 将一个object对象序列化，返回一个byte[]         
-        /// </summary> 
-        /// <param name="obj">能序列化的对象</param>         
-        /// <returns></returns> 
+        /// <summary>
+        /// 将一个object对象序列化，返回一个byte[]
+        /// </summary>
+        /// <param name="obj">能序列化的对象</param>
+        /// <returns></returns>
         public static byte[] ToBytes(object obj)
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                IFormatter formatter = new BinaryFormatter();
-                formatter.Binder = new VersionDeserializer();
+                IFormatter formatter = new BinaryFormatter
+                {
+                    Binder = new VersionDeserializer()
+                };
                 formatter.Serialize(ms, obj);
                 return ms.GetBuffer();
             }
         }
 
-        /// <summary> 
-        /// 将一个序列化后的byte[]数组还原         
+        /// <summary>
+        /// 将一个序列化后的byte[]数组还原
         /// </summary>
-        /// <param name="Bytes"></param>         
-        /// <returns></returns> 
+        /// <param name="Bytes"></param>
+        /// <returns></returns>
         public static object ToObject(byte[] Bytes)
         {
             using (MemoryStream ms = new MemoryStream(Bytes))
             {
-                IFormatter formatter = new BinaryFormatter();
-                formatter.Binder = new VersionDeserializer();
+                IFormatter formatter = new BinaryFormatter
+                {
+                    Binder = new VersionDeserializer()
+                };
                 return formatter.Deserialize(ms);
             }
         }
@@ -50,12 +54,13 @@ namespace Pingfan.Kit
         {
             using (MemoryStream ms = new MemoryStream(Bytes))
             {
-                IFormatter formatter = new BinaryFormatter();
-                formatter.Binder = new VersionDeserializer();
+                IFormatter formatter = new BinaryFormatter
+                {
+                    Binder = new VersionDeserializer()
+                };
                 return (T) ChangeType(formatter.Deserialize(ms), typeof(T));
             }
         }
-
 
         public static object ChangeType(object value, Type type)
         {
@@ -90,11 +95,8 @@ namespace Pingfan.Kit
 
         public override Type BindToType(string assemblyName, string typeName)
         {
-            Type deserializeType = null;
             _thisAssembly = Assembly.GetEntryAssembly()?.FullName;
-            deserializeType = Type.GetType($"{typeName}, {_thisAssembly}");
-
-            return deserializeType;
+            return Type.GetType($"{typeName}, {_thisAssembly}");
         }
     }
 }

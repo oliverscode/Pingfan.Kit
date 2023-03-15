@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace Pingfan.Kit
 {
-    public class PathEx
+    public static class PathEx
     {
         private static string _CurrentDirectory;
 

@@ -60,5 +60,4 @@ namespace Pingfan.Kit
             return adjustedSize;
         }
     }
-    
 }

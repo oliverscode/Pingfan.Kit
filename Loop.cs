@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
-    public class Loop
+    public static class Loop
     {
         /// <summary>
         /// 死循环运行一个方法
@@ -41,7 +41,6 @@ namespace Pingfan.Kit
                 }
             });
         }
-
 
         /// <summary>
         /// 死循环运行一个方法
