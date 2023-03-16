@@ -2,7 +2,7 @@
 
 namespace Pingfan.Kit
 {
-    public class ThreadEx
+    public static class ThreadEx
     {
         /// <summary>
         /// 支持一个范围的延迟

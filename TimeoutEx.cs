@@ -16,12 +16,12 @@ namespace Pingfan.Kit
         /// <param name="action"></param>
         /// <param name="seconds"></param>
         /// <exception cref="TimeoutException"></exception>
-        public static void RunWithTimeout(Action action, double seconds)
+        public static void Run(Action action, double seconds)
         {
-            CancellationTokenSource cts = new CancellationTokenSource();
-            CancellationToken token = cts.Token;
+            var cts = new CancellationTokenSource();
+            var token = cts.Token;
 
-            Task task = Task.Run(() =>
+            var task = Task.Run(() =>
             {
                 try
                 {
@@ -44,13 +44,13 @@ namespace Pingfan.Kit
         /// <param name="seconds"></param>
         /// <returns></returns>
         /// <exception cref="TimeoutException"></exception>
-        public static async Task RunWithTimeout(Func<Task> func, double seconds)
+        public static async Task Run(Func<Task> func, double seconds)
         {
             CancellationTokenSource cts = new CancellationTokenSource();
             CancellationToken token = cts.Token;
 
-            Task delayTask = Task.Delay(TimeSpan.FromSeconds(seconds), token);
-            Task task = func();
+            var delayTask = Task.Delay(TimeSpan.FromSeconds(seconds), token);
+            var task = func();
 
             var completedTask = await Task.WhenAny(task, delayTask);
             if (completedTask == task)
