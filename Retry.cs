@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
-    public static class Retry
+    public class Retry
     {
         /// <summary>
         /// 间隔1秒一直重试1个任务
@@ -143,60 +143,195 @@ namespace Pingfan.Kit
             throw exception;
         }
 
+        
+
         /// <summary>
-        /// 结尾为True直接返回
+        /// 失败重试
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="delay"></param>
-        /// <param name="method"></param>
+        /// <param name="count">执行总次数</param>
+        /// <param name="delay">每次等待多久</param>
+        /// <param name="executeMethod">执行的方法</param>
+        /// <param name="reTryMethod">判断超时的方法</param>
         /// <returns></returns>
-        public static bool IsTrue(int count, int delay, Func<bool> method)
+        public static RetryKind Until(int count, int delay, Action executeMethod, Func<int, RetryKind> reTryMethod)
         {
-            for (var i = 0; i < count; i++)
+            try
             {
-                try
+                executeMethod();
+
+                for (var i = 0; i < count; i++)
                 {
-                    var result = method();
-                    if (result)
-                        return true;
+                    var result = reTryMethod(i + 1);
+                    switch (result)
+                    {
+                        case RetryKind.Complete:
+                            return RetryKind.Complete;
+                        case RetryKind.Exception:
+                            return RetryKind.Exception;
+                        case RetryKind.Retry:
+                            executeMethod();
+                            break;
+                        case RetryKind.Wait:
+                            break;
+                        default:
+                            break;
+                    }
+
                     Thread.Sleep(delay);
                 }
-                catch (Exception)
-                {
-                    if (delay > 0)
-                        Thread.Sleep(delay);
-                }
+
+                return RetryKind.Wait;
             }
-
-            return false;
-        }
-
-        /// <summary>
-        /// 结尾为True直接返回
-        /// </summary>
-        /// <param name="count"></param>
-        /// <param name="delay"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static async Task<bool> IsTrue(int count, int delay, Func<Task<bool>> method)
-        {
-            for (var i = 0; i < count; i++)
+            catch (Exception e)
             {
-                try
+                return RetryKind.Exception;
+            }
+        }
+        
+        
+        /// <summary>
+        /// 失败重试
+        /// </summary>
+        /// <param name="count">执行总次数</param>
+        /// <param name="delay">每次等待多久</param>
+        /// <param name="executeMethod">执行的方法</param>
+        /// <param name="reTryMethod">判断超时的方法</param>
+        /// <returns></returns>
+        public static async Task<RetryKind> Until(int count, int delay, Func<Task> executeMethod, Func<int, RetryKind> reTryMethod)
+        {
+            try
+            {
+                await executeMethod();
+
+                for (var i = 0; i < count; i++)
                 {
-                    var result = await method();
-                    if (result)
-                        return true;
+                    var result = reTryMethod(i + 1);
+                    switch (result)
+                    {
+                        case RetryKind.Complete:
+                            return RetryKind.Complete;
+                        case RetryKind.Exception:
+                            return RetryKind.Exception;
+                        case RetryKind.Retry:
+                            await executeMethod();
+                            break;
+                        case RetryKind.Wait:
+                            break;
+                        default:
+                            break;
+                    }
+
                     await Task.Delay(delay);
                 }
-                catch (Exception)
-                {
-                    if (delay > 0)
-                        await Task.Delay(delay);
-                }
-            }
 
-            return false;
+                return RetryKind.Wait;
+            }
+            catch (Exception e)
+            {
+                return RetryKind.Exception;
+            }
         }
+        
+        /// <summary>
+        /// 失败重试
+        /// </summary>
+        /// <param name="count">执行总次数</param>
+        /// <param name="delay">每次等待多久</param>
+        /// <param name="executeMethod">执行的方法</param>
+        /// <param name="reTryMethod">判断超时的方法</param>
+        /// <returns></returns>
+        public static async Task<RetryKind> Until(int count, int delay, Action executeMethod, Func<int, Task<RetryKind>> reTryMethod)
+        {
+            try
+            {
+                executeMethod();
+
+                for (var i = 0; i < count; i++)
+                {
+                    var result = await reTryMethod(i + 1);
+                    switch (result)
+                    {
+                        case RetryKind.Complete:
+                            return RetryKind.Complete;
+                        case RetryKind.Exception:
+                            return RetryKind.Exception;
+                        case RetryKind.Retry:
+                            executeMethod();
+                            break;
+                        case RetryKind.Wait:
+                            break;
+                        default:
+                            break;
+                    }
+
+                    await Task.Delay(delay);
+                }
+
+                return RetryKind.Wait;
+            }
+            catch (Exception e)
+            {
+                return RetryKind.Exception;
+            }
+        }
+        
+        /// <summary>
+        /// 失败重试
+        /// </summary>
+        /// <param name="count">执行总次数</param>
+        /// <param name="delay">每次等待多久</param>
+        /// <param name="executeMethod">执行的方法</param>
+        /// <param name="reTryMethod">判断超时的方法</param>
+        /// <returns></returns>
+        public static async Task<RetryKind> Until(int count, int delay,  Func<Task> executeMethod, Func<int, Task<RetryKind>> reTryMethod)
+        {
+            try
+            {
+                await executeMethod();
+
+                for (var i = 0; i < count; i++)
+                {
+                    var result = await reTryMethod(i + 1);
+                    switch (result)
+                    {
+                        case RetryKind.Complete:
+                            return RetryKind.Complete;
+                        case RetryKind.Exception:
+                            return RetryKind.Exception;
+                        case RetryKind.Retry:
+                            await executeMethod();
+                            break;
+                        case RetryKind.Wait:
+                            break;
+                        default:
+                            break;
+                    }
+
+                    await Task.Delay(delay);
+                }
+
+                return RetryKind.Wait;
+            }
+            catch (Exception e)
+            {
+                return RetryKind.Exception;
+            }
+        }
+    }
+
+
+    public enum RetryKind
+    {
+        // 完成
+        Complete,
+
+        // 重试
+        Retry,
+
+        // 异常
+        Exception,
+
+        // 正常等待
+        Wait,
     }
 }
