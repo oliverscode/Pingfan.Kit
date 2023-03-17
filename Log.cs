@@ -86,14 +86,8 @@ namespace Pingfan.Kit
         /// <summary>
         /// 日志回调
         /// </summary>
-        public event Action<LogLevel, string> OnHandler
-        {
-            add { lock (_onHandler) { _onHandler += value; } }
-            remove { lock (_onHandler) { _onHandler -= value; } }
-        }
-        private event Action<LogLevel, string> _onHandler;
-
-
+        public event Action<LogLevel, string> OnHandler;
+  
         /// <summary>
         /// 写一个调试日志
         /// </summary>
@@ -154,7 +148,7 @@ namespace Pingfan.Kit
                 lock (this)
                 {
                     // 先全局处理
-                    this._onHandler?.Invoke(logLevel, logString);
+                    this.OnHandler?.Invoke(logLevel, logString);
 
                     var str = $"[{logLevel.ToString()}]{DateTime.Now:yyyy-MM-dd HH:mm:ss} {logString}\n";
 
