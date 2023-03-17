@@ -4,7 +4,7 @@
         <LangVersion>7.3</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>常用工具库, 大大提高工作效率</Description>
-        <PackageVersion>3.1.1</PackageVersion>
+        <PackageVersion>3.1.2</PackageVersion>
         <Authors>Oliver</Authors>
      
         <PackageProjectUrl>https://github.com/oliverscode/Pingfan.Kit</PackageProjectUrl>
@@ -31,12 +31,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../logo.png">
-          <Pack>True</Pack>
-          <PackagePath></PackagePath>
-        </None>
+        <None Include="../logo.png" />
         <None Update="README.md">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="logo.png">
+          <Pack>True</Pack>
+          <PackagePath></PackagePath>
         </None>
     </ItemGroup>
 
