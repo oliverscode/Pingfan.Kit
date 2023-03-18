@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Pingfan.Kit
 {
-    public class Hash
+    public class HashEx
     {
-        static Hash()
+        static HashEx()
         {
             GetCRC32Table();
         }
