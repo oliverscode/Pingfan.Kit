@@ -18,7 +18,13 @@ namespace Pingfan.Kit
             ReLoad();
         }
 
-        // 读取配置值
+        /// <summary>
+        /// 读取配置
+        /// </summary>
+        /// <param name="section"></param>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public string GetValue(string section, string key, string defaultValue = "")
         {
             if (data.ContainsKey(section) && data[section].ContainsKey(key))
@@ -31,8 +37,13 @@ namespace Pingfan.Kit
             }
         }
 
-        // 设置配置值
-        public void SetValue(string section, string key, string value)
+        /// <summary>
+        /// 设置指定值
+        /// </summary>
+        /// <param name="section"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public void SetValue(string section, string key, string value, bool isSave = true)
         {
             if (!data.ContainsKey(section))
             {
@@ -40,10 +51,39 @@ namespace Pingfan.Kit
             }
 
             data[section][key] = value;
-            Save();
+            if (isSave)
+                Save();
         }
 
-        // 加载配置文件
+        /// <summary>
+        /// 读取所有section
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetSections()
+        {
+            return new List<string>(data.Keys);
+        }
+
+        /// <summary>
+        /// 获取section下所有键
+        /// </summary>
+        /// <param name="section"></param>
+        /// <returns></returns>
+        public List<string> GetKeys(string section)
+        {
+            if (data.ContainsKey(section))
+            {
+                return new List<string>(data[section].Keys);
+            }
+            else
+            {
+                return new List<string>();
+            }
+        }
+
+        /// <summary>
+        /// 刷新配置文件
+        /// </summary>
         public void ReLoad()
         {
             if (!File.Exists(filePath))
@@ -79,8 +119,8 @@ namespace Pingfan.Kit
             }
         }
 
-        // 保存配置文件
-        private void Save()
+
+        public void Save()
         {
             List<string> lines = new List<string>();
             foreach (KeyValuePair<string, Dictionary<string, string>> section in data)
@@ -91,6 +131,14 @@ namespace Pingfan.Kit
                     lines.Add($"{kv.Key}={kv.Value}");
                 }
             }
+
+            // 判断目录是否存在, 不存在的话, 创建目录
+            string dir = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
 
             File.WriteAllLines(filePath, lines);
         }
