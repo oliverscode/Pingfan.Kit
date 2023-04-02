@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -110,6 +111,7 @@ namespace Pingfan.Kit
             {
                 return m.Groups[1].Value;
             }
+
             return defaultValue;
         }
 
@@ -118,9 +120,39 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static bool HasCmd(string key)
+        public static bool Has(string key)
         {
-            return Environment.CommandLine.ContainsIgnoreCase(key);
+            key = Regex.Escape(key);
+            // 如果有环境变量, 则使用环境变量
+            var value = Environment.GetEnvironmentVariable(key);
+            if (value?.IsNullOrEmpty() == false)
+            {
+                return true;
+            }
+
+            // 如果有命令行参数, 则使用命令行参数
+            value = GetByCmd(key);
+            if (!value.IsNullOrEmpty())
+            {
+                return true;
+            }
+
+            // 没有配置文件
+            if (!File.Exists(MainConfigFilePath))
+            {
+                return false;
+            }
+
+            lock (_locker)
+            {
+                var lines = FileEx.ReadAllLines(MainConfigFilePath);
+                if (lines.Any(line => line.StartsWith(key + "=")))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static bool Clear()

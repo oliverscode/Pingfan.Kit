@@ -50,9 +50,7 @@ namespace Pingfan.Kit
         {
             // 当前系统的目录分隔符
             var separator = Path.DirectorySeparatorChar;
-            // 其他系统分隔符
-            var otherSeparator = separator == '/' ? '\\' : '/';
-
+         
             var ps = new List<string>();
             foreach (var path in paths)
             {

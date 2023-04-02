@@ -25,7 +25,6 @@ namespace Pingfan.Kit
         /// </summary>
         public static Task SetTimeoutWithTry(int milliSecond,
             Action action,
-            Action<Exception> errAction = null,
             CancellationToken cancellationToken = default)
         {
             return Task.Factory.StartNew(async () =>
@@ -38,9 +37,9 @@ namespace Pingfan.Kit
                 {
                     action();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    errAction?.Invoke(e);
+                    // ignored
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
@@ -50,7 +49,6 @@ namespace Pingfan.Kit
         /// </summary>
         public static Task SetTimeoutWithTry(int milliSecond,
             Func<Task> action,
-            Func<Exception, Task> errAction = null,
             CancellationToken cancellationToken = default)
         {
             return Task.Factory.StartNew(async () =>
@@ -62,9 +60,9 @@ namespace Pingfan.Kit
                 {
                     await action();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    await errAction?.Invoke(e);
+                    // ignored
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
@@ -133,12 +131,12 @@ namespace Pingfan.Kit
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
 
+
         /// <summary>
         /// 创建一个定时器, 同时不抛出异常
         /// </summary>
         public static Task SetIntervalWithTry(int milliSecond,
             Func<Task> action,
-            Action<Exception> errAction = null,
             CancellationToken cancellationToken = default)
         {
             return Task.Factory.StartNew(async () =>
@@ -151,35 +149,7 @@ namespace Pingfan.Kit
                     }
                     catch (Exception e)
                     {
-                        errAction?.Invoke(e);
-                    }
-
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-                    await Task.Delay(milliSecond, cancellationToken);
-                }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        }
-
-        /// <summary>
-        /// 创建一个定时器, 同时不抛出异常
-        /// </summary>
-        public static Task SetIntervalWithTry(int milliSecond,
-            Func<Task> action,
-            Func<Exception, Task> errAction = null,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Factory.StartNew(async () =>
-            {
-                while (cancellationToken.IsCancellationRequested == false)
-                {
-                    try
-                    {
-                        await action();
-                    }
-                    catch (Exception e)
-                    {
-                        await errAction?.Invoke(e);
+                        // ignored
                     }
 
                     if (cancellationToken.IsCancellationRequested)
@@ -219,7 +189,6 @@ namespace Pingfan.Kit
         /// </summary>
         public static Task SetIntervalWithTry(int milliSecond,
             Func<bool> action,
-            Action<Exception> errAction = null,
             CancellationToken cancellationToken = default)
         {
             return Task.Factory.StartNew(async () =>
@@ -237,7 +206,7 @@ namespace Pingfan.Kit
                     }
                     catch (Exception e)
                     {
-                        errAction?.Invoke(e);
+                        // ignored
                     }
 
                     if (cancellationToken.IsCancellationRequested)
@@ -277,7 +246,6 @@ namespace Pingfan.Kit
         /// </summary>
         public static Task SetIntervalWithTry(int milliSecond,
             Func<Task<bool>> action,
-            Func<Exception, Task> errAction = null,
             CancellationToken cancellationToken = default)
         {
             return Task.Factory.StartNew(async () =>
@@ -293,9 +261,9 @@ namespace Pingfan.Kit
                             return;
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        await errAction?.Invoke(e);
+                        // ignored
                     }
 
                     if (cancellationToken.IsCancellationRequested)

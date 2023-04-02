@@ -258,7 +258,7 @@ namespace Pingfan.Kit
         /// <param name="seconds"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public static async Task<T> GetOrSetAsync(string key, Func<Task<T>> valueFactory, double seconds = 1d)
+        public static async Task<T> GetOrSet(string key, Func<Task<T>> valueFactory, double seconds = 1d)
         {
             if (string.IsNullOrEmpty(key))
             {

@@ -87,7 +87,7 @@ namespace Pingfan.Kit
         /// 日志回调
         /// </summary>
         public event Action<LogLevel, string> OnHandler;
-  
+
         /// <summary>
         /// 写一个调试日志
         /// </summary>
@@ -99,9 +99,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 写一个错入日志
         /// </summary>
-        public void Error(string logString)
+        public void Error(string logString, Exception e = null)
         {
-            WriteLine(LogLevel.ERR, logString);
+            WriteLine(LogLevel.ERR, logString + Environment.NewLine + e);
         }
 
         /// <summary>

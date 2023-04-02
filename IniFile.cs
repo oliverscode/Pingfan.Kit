@@ -6,12 +6,17 @@ namespace Pingfan.Kit
     /// <summary>
     /// 根据组名键名的方式读取配置文件
     /// </summary>
-    public class ConfigFile
+    public class IniFile
     {
         private readonly string filePath; // 配置文件路径
         private readonly Dictionary<string, Dictionary<string, string>> data; // 配置数据
 
-        public ConfigFile(string filePath)
+        /// <summary>
+        /// 获取所有Sections
+        /// </summary>
+        public List<string> Sections => new List<string>(data.Keys);
+
+        public IniFile(string filePath)
         {
             this.filePath = filePath;
             this.data = new Dictionary<string, Dictionary<string, string>>();
