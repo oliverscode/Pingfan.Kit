@@ -24,6 +24,10 @@ namespace Pingfan.Kit
         /// 生成一个密码
         /// </summary>
         /// <param name="length"></param>
+        /// <param name="isNumber">是否包含数字, 默认包含</param>
+        /// <param name="isLower">是否包含小写字母, 默认包含</param>
+        /// <param name="isUpper">是否包含大写字母, 默认包含</param>
+        /// <param name="isSpecial">是否包含特殊字符, 默认不包含</param>
         /// <returns></returns>
         public static string GeneratePassword(int length, bool isNumber = true, bool isLower = true,
             bool isUpper = true, bool isSpecial = false)
@@ -45,7 +49,8 @@ namespace Pingfan.Kit
             {
                 sb.Append("!@#$%^&*_+-=.");
             }
-            var chars = sb.ToString().ToCharArray();
+
+            var chars = sb.ToString();
             var result = new char[length];
             for (int i = 0; i < length; i++)
             {

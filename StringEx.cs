@@ -63,13 +63,6 @@ namespace Pingfan.Kit
             return string.IsNullOrWhiteSpace(s1);
         }
 
-        /// <summary>
-        /// 按分隔符组合一个数组成为一个新的字符串
-        /// </summary>
-        public static string Join(this string s1, params object[] values)
-        {
-            return string.Join(s1, values);
-        }
 
         /// <summary>
         /// 格式化一个字符串
@@ -220,8 +213,7 @@ namespace Pingfan.Kit
         /// 正则匹配一个字符串
         /// </summary>
         /// <param name="input"></param>
-        /// <param name="parttern"></param>
-        /// <param name="defaultValue"></param>
+        /// <param name="pattern"></param>
         /// <param name="options"></param>
         /// <returns></returns>
         public static List<string> Match(this string input, string pattern, RegexOptions options = RegexOptions.None)
@@ -278,22 +270,22 @@ namespace Pingfan.Kit
         /// 拆分字符串
         /// </summary>
         /// <param name="str"></param>
-        /// <param name="parms"></param>
+        /// <param name="args"></param>
         /// <returns></returns>
-        public static string[] Split(this string str, params string[] parms)
+        public static string[] Split(this string str, params string[] args)
         {
-            return str.Split(parms, StringSplitOptions.RemoveEmptyEntries);
+            return str.Split(args, StringSplitOptions.RemoveEmptyEntries);
         }
 
         /// <summary>
         /// 拆分字符串
         /// </summary>
         /// <param name="str"></param>
-        /// <param name="parms"></param>
+        /// <param name="args"></param>
         /// <returns></returns>
-        public static string[] Split(this string str, params char[] parms)
+        public static string[] Split(this string str, params char[] args)
         {
-            return str.Split(parms, StringSplitOptions.RemoveEmptyEntries);
+            return str.Split(args, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 }

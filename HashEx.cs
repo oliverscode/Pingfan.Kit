@@ -109,13 +109,13 @@ namespace Pingfan.Kit
             return sb.ToString();
         }
 
-        public static string MD5(string data)
+        public static string Md5(string data)
         {
             var bytes = Encoding.ASCII.GetBytes(data);
-            return MD5(bytes);
+            return Md5(bytes);
         }
 
-        public static string MD5(Stream stream)
+        public static string Md5(Stream stream)
         {
             var md5 = System.Security.Cryptography.MD5.Create();
             var hash = md5.ComputeHash(stream);
@@ -128,7 +128,7 @@ namespace Pingfan.Kit
             return sb.ToString();
         }
 
-        public static string MD5(byte[] data)
+        public static string Md5(byte[] data)
         {
             var md5 = System.Security.Cryptography.MD5.Create();
             var hash = md5.ComputeHash(data);

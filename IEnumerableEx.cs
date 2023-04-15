@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
-    public static class IEnumerableEx
+    public static class EnumerableEx
     {
         public static async Task Each<T>(this IEnumerable<T> list, Action<T> callBack, int threadCount = 0)
         {

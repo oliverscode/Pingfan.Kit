@@ -197,7 +197,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 清理过期缓存
         /// </summary>
-        public static void CleanExpiredCache()
+        private static void CleanExpiredCache()
         {
             foreach (var kv in _cacheMap)
             {

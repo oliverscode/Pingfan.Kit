@@ -1,15 +1,16 @@
-﻿
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
+using System.Linq;
+
 namespace Pingfan.Kit
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-
     /// <summary>
     /// 封装的线程安全集合
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ThreadSafeList<T>
+    public class ThreadSafeList<T> : IDisposable, IEnumerable<T>
     {
         private readonly List<T> _list = new List<T>();
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
@@ -148,6 +149,41 @@ namespace Pingfan.Kit
                 _lock.ExitWriteLock();
             }
         }
-    }
 
+        public T[] ToArray()
+        {
+            _lock.EnterReadLock();
+            try
+            {
+                return _list.ToArray();
+            }
+            finally
+            {
+                _lock.ExitReadLock();
+            }
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            _lock.EnterReadLock();
+            try
+            {
+                return _list.ToList().GetEnumerator();
+            }
+            finally
+            {
+                _lock.ExitReadLock();
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public void Dispose()
+        {
+            _lock.Dispose();
+        }
+    }
 }

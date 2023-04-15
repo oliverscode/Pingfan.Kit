@@ -14,7 +14,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 重试次数
         /// </summary>
-        public static int RetryCount { get; set; } = 20;
+        public static int RetryCount { get; set; } = 10;
 
         /// <summary>
         /// 重试间隔, 单位毫秒
@@ -25,28 +25,21 @@ namespace Pingfan.Kit
         /// 读取一个文件, 如果文件不存在会返回null
         /// </summary>
         /// <param name="path"></param>
+        /// <param name="encoding"></param>
         /// <returns></returns>
         public static string ReadAllText(string path, Encoding encoding = null)
         {
             if (encoding == null)
                 encoding = Encoding.UTF8;
-            return Read(path, () => File.ReadAllText(path));
+            return Read(path, () => File.ReadAllText(path, encoding));
         }
 
-        /// <summary>
-        /// 读取一个文件, 如果文件不存在会返回byte[0]
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static byte[] ReadAllBytes(string path)
-        {
-            return Read(path, () => File.ReadAllBytes(path)) ?? Array.Empty<byte>();
-        }
 
         /// <summary>
         /// 读取一个文件, 如果文件不存在会返回string[]
         /// </summary>
         /// <param name="path"></param>
+        /// <param name="encoding"></param>
         /// <returns></returns>
         public static string[] ReadAllLines(string path, Encoding encoding = null)
         {
@@ -59,6 +52,7 @@ namespace Pingfan.Kit
         /// 读取一个文件, 如果文件不存在会返回string[]
         /// </summary>
         /// <param name="path"></param>
+        /// <param name="encoding"></param>
         /// <returns></returns>
         public static IEnumerable<string> ReadLines(string path, Encoding encoding = null)
         {
@@ -72,33 +66,75 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="path"></param>
         /// <param name="contents"></param>
+        /// <param name="encoding"></param>
         public static void AppendAllText(string path, string contents, Encoding encoding = null)
         {
             if (encoding == null)
                 encoding = Encoding.UTF8;
+            
             Write(path, () => File.AppendAllText(path, contents, encoding));
         }
+        
+        /// <summary>
+        /// 写入文件, 如果文件不存在则创建
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="contents"></param>
+        /// <param name="encoding"></param>
+        public static void AppendAllLines(string path, IEnumerable<string> contents, Encoding encoding = null)
+        {
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+            Write(path, () => File.AppendAllLines(path, contents, encoding));
+        }
+        
 
         /// <summary>
         /// 写入文件, 如果文件不存在则创建
         /// </summary>
         /// <param name="path"></param>
         /// <param name="contents"></param>
+        /// <param name="encoding"></param>
         public static void WriteAllText(string path, string contents, Encoding encoding = null)
         {
             if (encoding == null)
                 encoding = Encoding.UTF8;
             Write(path, () => File.WriteAllText(path, contents, encoding));
         }
-
+        
         /// <summary>
         /// 写入文件, 如果文件不存在则创建
         /// </summary>
         /// <param name="path"></param>
         /// <param name="contents"></param>
-        public static void WriteAllBytes(string path, byte[] contents)
+        /// <param name="encoding"></param>
+        public static void WriteAllLines(string path, IEnumerable<string> contents, Encoding encoding = null)
         {
-            Write(path, () => File.WriteAllBytes(path, contents));
+            if (encoding == null)
+                encoding = Encoding.UTF8;
+            Write(path, () => File.WriteAllLines(path, contents, encoding));
+        }
+
+        
+        
+        /// <summary>
+        /// 读取一个文件, 如果文件不存在会返回byte[0]
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static byte[] ReadAllBytes(string path)
+        {
+            return Read(path, () => File.ReadAllBytes(path)) ?? Array.Empty<byte>();
+        }
+        
+        /// <summary>
+        /// 写入文件, 如果文件不存在则创建
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="buffer"></param>
+        public static void WriteAllBytes(string path, byte[] buffer)
+        {
+            Write(path, () => File.WriteAllBytes(path, buffer));
         }
 
         private static void Write(string path, Action fn)
