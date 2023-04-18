@@ -2,6 +2,7 @@
 
 namespace Pingfan.Kit
 {
+
     /// <summary>
     /// 日志级别
     /// </summary>
@@ -43,14 +44,24 @@ namespace Pingfan.Kit
         FAL = 32,
     }
 
+
+    public interface ILog
+    {
+
+        void Debug(string logString);
+        void Error(string logString, Exception e = null);
+        void Fatal(string logString);
+        void Info(string logString);
+        void Success(string logString);
+        void Warning(string logString);
+        void WriteLine(LogLevel logLevel, string logString);
+    }
+
     /// <summary>
     /// 日志记录器
     /// </summary>
-    public class Log
+    public class Log : ILog
     {
-        /// <summary>
-        /// 日志文件名
-        /// </summary>
         public string LogFileName { get; set; }
 
         private static readonly string _RootPath = PathEx.CombineFromCurrentDirectory("log");

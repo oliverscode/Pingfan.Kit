@@ -5,8 +5,31 @@ using System.Text;
 
 namespace Pingfan.Kit
 {
-    public static class RandomEx
+    public class RandomEx
     {
+        private double probability;
+        private double step;
+        public RandomEx(double probability, double step = 0.1)
+        {
+            this.probability = probability;
+            this.step = step;
+        }
+
+        public bool Next()
+        {
+            var isSuccessful = _Rd.NextDouble() < probability;
+            if (isSuccessful)
+            {
+                probability -= step;
+            }
+            else
+            {
+                probability += step;
+            }
+            return isSuccessful;
+        }
+
+        #region 静态部分
         private static readonly Random _Rd = new Random();
 
         /// <summary>
@@ -134,6 +157,7 @@ namespace Pingfan.Kit
             var index = RandomEx.Next(0, objs.Length);
             return objs[index];
         }
+        #endregion
     }
 
     /// <summary>
@@ -197,4 +221,5 @@ namespace Pingfan.Kit
             throw new Exception("获取不到权重");
         }
     }
+
 }

@@ -5,7 +5,7 @@ namespace Pingfan.Kit
     public static class NumberEx
     {
         /// <summary>
-        /// 计算2个数 大小之比
+        /// 计算2个数大小是否在一个比例之类, 默认1％
         /// </summary>
         /// <param name="num1"></param>
         /// <param name="num2"></param>
@@ -19,7 +19,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 计算2个数 大小之比
+        /// 计算2个数大小是否在一个比例之类, 默认1％
         /// </summary>
         /// <param name="num1"></param>
         /// <param name="num2"></param>
@@ -33,7 +33,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 计算2个数 大小之比
+        /// 计算2个数大小是否在一个比例之类, 默认1％
         /// </summary>
         /// <param name="num1"></param>
         /// <param name="num2"></param>
@@ -50,7 +50,7 @@ namespace Pingfan.Kit
         /// 转成含有B KB MB GB的字符串
         /// </summary>
         /// <param name="size"></param>
-        /// <param name="digits"></param>
+        /// <param name="digits">小数位</param>
         /// <returns></returns>
         public static string ToDataSize(this long size, int digits = 1)
         {
