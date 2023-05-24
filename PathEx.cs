@@ -70,5 +70,18 @@ namespace Pingfan.Kit
 
             return result;
         }
+        
+        /// <summary>
+        /// 如果目录不存在就创建这个目录
+        /// </summary>
+        /// <param name="path"></param>
+        public static void CreateDirectoryIfNotExists(string path)
+        {
+            var dir = Path.GetDirectoryName(path);
+            if (Directory.Exists(dir) == false)
+            {
+                Directory.CreateDirectory(dir);
+            }
+        }
     }
 }
