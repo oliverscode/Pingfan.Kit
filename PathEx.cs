@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace Pingfan.Kit
 {
@@ -50,7 +51,7 @@ namespace Pingfan.Kit
         {
             // 当前系统的目录分隔符
             var separator = Path.DirectorySeparatorChar;
-         
+
             var ps = new List<string>();
             foreach (var path in paths)
             {
@@ -70,7 +71,34 @@ namespace Pingfan.Kit
 
             return result;
         }
-        
+
+        /// <summary>
+        /// 按windows系统整理路径, 也就是\分隔符
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string FormatWindows(string path)
+        {
+            path = Regex.Replace(path, @"(\\+)", @"\");
+            path = Regex.Replace(path, @"(/+)", @"/");
+
+            return string.Join("\\", path.Split(new char[] { '\\', '/' }, StringSplitOptions.None));
+        }
+
+        /// <summary>
+        /// 按unix系统整理路径, 也就是/分隔符
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static string FormatUnix(string path)
+        {
+            path = Regex.Replace(path, @"(\\+)", @"\");
+            path = Regex.Replace(path, @"(/+)", @"/");
+
+            return string.Join("/", path.Split(new char[] { '\\', '/' }, StringSplitOptions.None));
+        }
+
+
         /// <summary>
         /// 如果目录不存在就创建这个目录
         /// </summary>

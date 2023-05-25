@@ -31,7 +31,7 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="timestamp"></param>
         /// <returns></returns>
-        public static DateTime ToUnixTimeSeconds(this long timestamp)
+        public static DateTime FromUnixTimeSeconds(this long timestamp)
         {
             return DateTimeOffset.FromUnixTimeSeconds(timestamp).LocalDateTime;
         }
@@ -41,13 +41,13 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="timestamp"></param>
         /// <returns></returns>
-        public static DateTime ToUnixTimeMilliseconds(this long timestamp)
+        public static DateTime FromUnixTimeMilliseconds(this long timestamp)
         {
             return DateTimeOffset.FromUnixTimeMilliseconds(timestamp).LocalDateTime;
         }
 
         /// <summary>
-        /// 转换成2020/01/01 00:00:00格式
+        /// 转换成yyyy/MM/dd HH:mm:ss的格式
         /// </summary>
         /// <param name="datetime"></param>
         /// <returns></returns>
