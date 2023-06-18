@@ -8,11 +8,18 @@ using System.Text.RegularExpressions;
 namespace Pingfan.Kit
 {
     /// <summary>
-    /// 读写配置类
+    /// 读写配置类, 默认1秒缓存
     /// </summary>
     public static class Config
     {
         private static readonly object _locker = new object();
+
+        /// <summary>
+        /// 默认时间, 单位秒, 默认1秒
+        /// </summary>
+        public static int CacheSeconds { get; set; } = 1;
+
+        private const string cacheKey = "PingFan.Config.Cache";
 
         public static string MainConfigFilePath =>
             Path.Combine(PathEx.CurrentDirectory, "app.ini");
@@ -28,7 +35,7 @@ namespace Pingfan.Kit
             lock (_locker)
             {
                 key = Regex.Escape(key);
-                var lines = FileEx.ReadLines(MainConfigFilePath);
+                var lines = ReadLinesCache();
                 var sb = new StringBuilder();
                 var success = false;
                 foreach (var line in lines)
@@ -48,6 +55,7 @@ namespace Pingfan.Kit
                     sb.Append(key).Append('=').AppendLine(value);
 
                 FileEx.WriteAllText(MainConfigFilePath, sb.ToString());
+                CacheMemory<string[]>.Clear(cacheKey);
             }
         }
 
@@ -83,7 +91,7 @@ namespace Pingfan.Kit
 
             lock (_locker)
             {
-                var lines = FileEx.ReadAllLines(MainConfigFilePath);
+                var lines = ReadLinesCache();
                 foreach (var line in lines)
                 {
                     if (line.StartsWith(key + "="))
@@ -145,7 +153,7 @@ namespace Pingfan.Kit
 
             lock (_locker)
             {
-                var lines = FileEx.ReadAllLines(MainConfigFilePath);
+                var lines = ReadLinesCache();
                 if (lines.Any(line => line.StartsWith(key + "=")))
                 {
                     return true;
@@ -155,8 +163,16 @@ namespace Pingfan.Kit
             return false;
         }
 
+        private static string[] ReadLinesCache()
+        {
+            return CacheMemory<string[]>.GetOrSet(cacheKey,
+                () => { return FileEx.ReadLines(MainConfigFilePath).ToArray(); },
+                CacheSeconds);
+        }
+
         public static bool Clear()
         {
+            CacheMemory<string[]>.Clear(cacheKey);
             return FileEx.Delete(MainConfigFilePath);
         }
     }

@@ -7,27 +7,24 @@ namespace Pingfan.Kit
     public static class ProcessEx
     {
         private static string MutexName = $"{Assembly.GetEntryAssembly().FullName}_{Environment.UserInteractive}";
+        private static Mutex mutex = null;
 
         public static bool HasRun
         {
             get
             {
-                // 尝试打开Mutex
                 bool createdNew;
-                using (var mutex = new Mutex(true, MutexName, out createdNew))
+                mutex = new Mutex(true, MutexName, out createdNew);
+                if (createdNew)
                 {
-                    if (createdNew)
-                    {
-                        // Mutex不存在，程序之前没有运行过
-                        mutex.ReleaseMutex();
-                        return false;
-                    }
+                    // Don't release the mutex until the application is closed
+                    return false;
                 }
 
-                // Mutex已存在，程序已经运行过
+                // Close the mutex if it's already been created
+                mutex.Close();
                 return true;
             }
         }
     }
-
 }
