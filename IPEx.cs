@@ -26,7 +26,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 获取自己外网Ip
+        /// 获取自己外网Ip, 获取失败会返回空字符串
         /// </summary>
         /// <returns></returns>
         public static string GetExternalIp()

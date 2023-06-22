@@ -14,12 +14,12 @@ namespace Pingfan.Kit
         /// <summary>
         /// 重试次数
         /// </summary>
-        public static int RetryCount { get; set; } = 10;
+        public static int retryCount = 10;
 
         /// <summary>
         /// 重试间隔, 单位毫秒
         /// </summary>
-        public static int RetryInterval { get; set; } = 100;
+        public static int retryInterval = 100;
 
         /// <summary>
         /// 读取一个文件, 如果文件不存在会返回null
@@ -71,10 +71,10 @@ namespace Pingfan.Kit
         {
             if (encoding == null)
                 encoding = Encoding.UTF8;
-            
+
             Write(path, () => File.AppendAllText(path, contents, encoding));
         }
-        
+
         /// <summary>
         /// 写入文件, 如果文件不存在则创建
         /// </summary>
@@ -87,7 +87,7 @@ namespace Pingfan.Kit
                 encoding = Encoding.UTF8;
             Write(path, () => File.AppendAllLines(path, contents, encoding));
         }
-        
+
 
         /// <summary>
         /// 写入文件, 如果文件不存在则创建
@@ -101,7 +101,7 @@ namespace Pingfan.Kit
                 encoding = Encoding.UTF8;
             Write(path, () => File.WriteAllText(path, contents, encoding));
         }
-        
+
         /// <summary>
         /// 写入文件, 如果文件不存在则创建
         /// </summary>
@@ -115,8 +115,7 @@ namespace Pingfan.Kit
             Write(path, () => File.WriteAllLines(path, contents, encoding));
         }
 
-        
-        
+
         /// <summary>
         /// 读取一个文件, 如果文件不存在会返回byte[0]
         /// </summary>
@@ -126,7 +125,7 @@ namespace Pingfan.Kit
         {
             return Read(path, () => File.ReadAllBytes(path)) ?? Array.Empty<byte>();
         }
-        
+
         /// <summary>
         /// 写入文件, 如果文件不存在则创建
         /// </summary>
@@ -143,7 +142,7 @@ namespace Pingfan.Kit
             lock (path)
             {
                 var dir = Path.GetDirectoryName(path);
-                Retry.Run(RetryCount, RetryInterval, () =>
+                Retry.Run(retryCount, retryInterval, () =>
                 {
                     if (!Directory.Exists(dir))
                     {
@@ -151,7 +150,7 @@ namespace Pingfan.Kit
                     }
                 });
 
-                Retry.Run(RetryCount, RetryInterval, fn);
+                Retry.Run(retryCount, retryInterval, fn);
             }
         }
 
@@ -163,7 +162,7 @@ namespace Pingfan.Kit
         {
             lock (path)
             {
-                return Retry.Run(RetryCount, RetryInterval, () =>
+                return Retry.Run(retryCount, retryInterval, () =>
                 {
                     if (File.Exists(path))
                     {
@@ -191,7 +190,7 @@ namespace Pingfan.Kit
 
             lock (path)
             {
-                return Retry.Run(RetryCount, RetryInterval, fn);
+                return Retry.Run(retryCount, retryInterval, fn);
             }
         }
     }

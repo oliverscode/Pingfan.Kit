@@ -6,13 +6,13 @@ namespace Pingfan.Kit
 {
     public static class ConsoleEx
     {
-        private static readonly object _locker = new object();
+        private static readonly object locker = new object();
 
         public static string Input(string text,
             ConsoleColor outColor = ConsoleColor.Cyan,
             ConsoleColor inColor = ConsoleColor.Yellow)
         {
-            lock (_locker)
+            lock (locker)
             {
                 var foregroundColor = Console.ForegroundColor;
 
@@ -31,7 +31,7 @@ namespace Pingfan.Kit
 
         public static string InputPassword(string text, ConsoleColor outColor = ConsoleColor.Cyan)
         {
-            lock (_locker)
+            lock (locker)
             {
                 var foregroundColor = Console.ForegroundColor;
                 Console.ForegroundColor = outColor;
@@ -68,7 +68,7 @@ namespace Pingfan.Kit
 
         public static void Write(string text, ConsoleColor outColor = ConsoleColor.DarkGray)
         {
-            lock (_locker)
+            lock (locker)
             {
                 var foregroundColor = Console.ForegroundColor;
                 Console.ForegroundColor = outColor;
@@ -79,7 +79,7 @@ namespace Pingfan.Kit
 
         public static void WriteLine(string text, ConsoleColor outColor = ConsoleColor.DarkGray)
         {
-            lock (_locker)
+            lock (locker)
             {
                 var foregroundColor = Console.ForegroundColor;
                 Console.ForegroundColor = outColor;

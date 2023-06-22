@@ -6,7 +6,7 @@ namespace Pingfan.Kit
 {
     public static class ProcessEx
     {
-        private static string MutexName = $"{Assembly.GetEntryAssembly().FullName}_{Environment.UserInteractive}";
+        private static string mutexName = $"{Assembly.GetEntryAssembly().FullName}_{Environment.UserInteractive}";
         private static Mutex mutex = null;
 
         public static bool HasRun
@@ -14,7 +14,7 @@ namespace Pingfan.Kit
             get
             {
                 bool createdNew;
-                mutex = new Mutex(true, MutexName, out createdNew);
+                mutex = new Mutex(true, mutexName, out createdNew);
                 if (createdNew)
                 {
                     // Don't release the mutex until the application is closed

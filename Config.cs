@@ -12,7 +12,7 @@ namespace Pingfan.Kit
     /// </summary>
     public static class Config
     {
-        private static readonly object _locker = new object();
+        private static readonly object locker = new object();
 
         /// <summary>
         /// 默认时间, 单位秒, 默认1秒
@@ -32,7 +32,7 @@ namespace Pingfan.Kit
         /// <param name="value"></param>
         public static void Set(string key, string value)
         {
-            lock (_locker)
+            lock (locker)
             {
                 key = Regex.Escape(key);
                 var lines = ReadLinesCache();
@@ -89,7 +89,7 @@ namespace Pingfan.Kit
                 return defaultValue;
             }
 
-            lock (_locker)
+            lock (locker)
             {
                 var lines = ReadLinesCache();
                 foreach (var line in lines)
@@ -151,7 +151,7 @@ namespace Pingfan.Kit
                 return false;
             }
 
-            lock (_locker)
+            lock (locker)
             {
                 var lines = ReadLinesCache();
                 if (lines.Any(line => line.StartsWith(key + "=")))

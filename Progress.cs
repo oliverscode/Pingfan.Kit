@@ -8,16 +8,16 @@ namespace Pingfan.Kit
     public class Progress : IDisposable
     {
 
-        private DateTime _startTime = DateTime.Now;
-        private DateTime _endTime;
+        private DateTime startTime = DateTime.Now;
+        private DateTime endTime;
 
         //每秒处理
-        private double _perSecondsCount;
+        private double perSecondsCount;
 
         /// <summary>
         /// 已用时间
         /// </summary>
-        public TimeSpan Elapsed => ((_endTime.Ticks > 0) ? _endTime : DateTime.Now) - _startTime;
+        public TimeSpan Elapsed => ((endTime.Ticks > 0) ? endTime : DateTime.Now) - startTime;
 
 
         private long _total;
@@ -41,7 +41,7 @@ namespace Pingfan.Kit
         public bool IsComplete => Index >= _total;
 
         // 最近的速率
-        private readonly List<long> _speedSum = new List<long>();
+        private readonly List<long> speedSum = new List<long>();
         private const int maxSpeedSum = 20; // 取最近10条的平均值
 
         /// <summary>
@@ -96,23 +96,23 @@ namespace Pingfan.Kit
                 lock (this)
                 {
                     var ticks = DateTime.Now.Ticks;
-                    var timeCount = ticks - _startTime.Ticks;
+                    var timeCount = ticks - startTime.Ticks;
 
                     if (timeCount < 100 * 10000)
                     {
-                        return _perSecondsCount;
+                        return perSecondsCount;
                     }
 
                     var avg = 0d;
-                    if (_speedSum.Count > 0)
-                        avg = _speedSum.Average();
+                    if (speedSum.Count > 0)
+                        avg = speedSum.Average();
 
                     // var speed = 10000000.0d * avg / timeCount;
                     // _perSecondsCount = Math.Round(speed, 2);
 
-                    _perSecondsCount = avg;
+                    perSecondsCount = avg;
 
-                    return _perSecondsCount;
+                    return perSecondsCount;
                 }
             }
         }
@@ -128,10 +128,10 @@ namespace Pingfan.Kit
             // 增加每秒处理量
             lock (this)
             {
-                _speedSum.Add(count);
-                if (_speedSum.Count > maxSpeedSum)
+                speedSum.Add(count);
+                if (speedSum.Count > maxSpeedSum)
                 {
-                    _speedSum.RemoveAt(0);
+                    speedSum.RemoveAt(0);
                 }
             }
         }
@@ -147,10 +147,10 @@ namespace Pingfan.Kit
                 // 增加每秒处理量
                 lock (this)
                 {
-                    _speedSum.Add(index - _currentIndex);
-                    if (_speedSum.Count > maxSpeedSum)
+                    speedSum.Add(index - _currentIndex);
+                    if (speedSum.Count > maxSpeedSum)
                     {
-                        _speedSum.RemoveAt(0);
+                        speedSum.RemoveAt(0);
                     }
                 }
             }
@@ -158,7 +158,7 @@ namespace Pingfan.Kit
             Interlocked.Exchange(ref _currentIndex, index);
             if (index >= _total)
             {
-                _endTime = DateTime.Now;
+                endTime = DateTime.Now;
             }
         }
 
@@ -171,7 +171,7 @@ namespace Pingfan.Kit
             Interlocked.Exchange(ref _total, total);
             if (Index >= _total)
             {
-                _endTime = DateTime.Now;
+                endTime = DateTime.Now;
             }
         }
 
@@ -186,7 +186,7 @@ namespace Pingfan.Kit
             Interlocked.Exchange(ref _total, total);
             if (_currentIndex >= _total)
             {
-                _endTime = DateTime.Now;
+                endTime = DateTime.Now;
             }
         }
 
@@ -197,8 +197,8 @@ namespace Pingfan.Kit
         {
             _total = 0L;
             _currentIndex = 0L;
-            _startTime = DateTime.Now;
-            _endTime = DateTime.MinValue;
+            startTime = DateTime.Now;
+            endTime = DateTime.MinValue;
         }
 
         public override string ToString()

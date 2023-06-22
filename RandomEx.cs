@@ -17,7 +17,7 @@ namespace Pingfan.Kit
 
         public bool Next()
         {
-            var isSuccessful = _Rd.NextDouble() < probability;
+            var isSuccessful = rd.NextDouble() < probability;
             if (isSuccessful)
             {
                 probability -= step;
@@ -30,7 +30,7 @@ namespace Pingfan.Kit
         }
 
         #region 静态部分
-        private static readonly Random _Rd = new Random();
+        private static readonly Random rd = new Random();
 
         /// <summary>
         /// 生成一个随机数
@@ -40,7 +40,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static int Next(int min, int max)
         {
-            return _Rd.Next(min, max);
+            return rd.Next(min, max);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Pingfan.Kit
             var result = new char[length];
             for (int i = 0; i < length; i++)
             {
-                result[i] = chars[_Rd.Next(0, chars.Length)];
+                result[i] = chars[rd.Next(0, chars.Length)];
             }
             return new string(result);
         }
@@ -105,8 +105,8 @@ namespace Pingfan.Kit
 
             while (true)
             {
-                u1 = _Rd.NextDouble();
-                u2 = _Rd.NextDouble();
+                u1 = rd.NextDouble();
+                u2 = rd.NextDouble();
 
                 z = Math.Sqrt(-2 * Math.Log(u1)) * Math.Sin(2 * Math.PI * u2);
                 x = miu + sigma * z;
@@ -123,7 +123,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static bool IsTrue(double probability)
         {
-            return _Rd.NextDouble() < probability;
+            return rd.NextDouble() < probability;
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static bool IsTrue(float probability)
         {
-            return _Rd.NextDouble() < probability;
+            return rd.NextDouble() < probability;
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static bool IsTrue(decimal probability)
         {
-            return (decimal)_Rd.NextDouble() < probability;
+            return (decimal)rd.NextDouble() < probability;
         }
 
         /// <summary>

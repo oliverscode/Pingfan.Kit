@@ -570,9 +570,7 @@ namespace Pingfan.Kit
         }
 
         #endregion
-
-
-
+        
         #region 获取方法签名
 
         private static Dictionary<Delegate, SignItem> _MethodSignatures = new Dictionary<Delegate, SignItem>();

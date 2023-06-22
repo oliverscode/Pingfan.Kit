@@ -9,7 +9,7 @@ namespace Pingfan.Kit
 {
     public static class PathEx
     {
-        private static string _CurrentDirectory;
+        private static string _currentDirectory;
 
         /// <summary>
         /// 当前程序运行的目录
@@ -18,13 +18,13 @@ namespace Pingfan.Kit
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(_CurrentDirectory))
+                if (string.IsNullOrWhiteSpace(_currentDirectory))
                 {
-                    _CurrentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+                    _currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
                                         + Path.DirectorySeparatorChar;
                 }
 
-                return _CurrentDirectory;
+                return _currentDirectory;
             }
         }
 

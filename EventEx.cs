@@ -12,7 +12,7 @@ namespace Pingfan.Kit
     /// </summary>
     public static class EventEx
     {
-        private static readonly ConcurrentDictionary<string, List<EventsAction>> _actions =
+        private static readonly ConcurrentDictionary<string, List<EventsAction>> actions =
             new ConcurrentDictionary<string, List<EventsAction>>();
 
         #region 监听事件
@@ -251,18 +251,18 @@ namespace Pingfan.Kit
 
         public static void Emit(string eventName, params object[] args)
         {
-            if (!_actions.TryGetValue(eventName, out List<EventsAction> actions))
+            if (!EventEx.actions.TryGetValue(eventName, out List<EventsAction> actions))
                 return;
 
             lock (eventName)
             {
                 foreach (var eventsAction in actions)
                 {
-                    var task = eventsAction.Action.DynamicInvoke(args) as Task;
+                    var task = eventsAction.action.DynamicInvoke(args) as Task;
                     task?.Wait();
 
                     // 是否是单次执行, 如果是, 则移除
-                    if (eventsAction.IsOnce)
+                    if (eventsAction.isOnce)
                     {
                         actions.Remove(eventsAction);
                     }
@@ -272,7 +272,7 @@ namespace Pingfan.Kit
 
         public static void EmitRunWithTry(string eventName, params object[] args)
         {
-            if (!_actions.TryGetValue(eventName, out List<EventsAction> actions))
+            if (!EventEx.actions.TryGetValue(eventName, out List<EventsAction> actions))
                 return;
 
             lock (eventName)
@@ -281,7 +281,7 @@ namespace Pingfan.Kit
                 {
                     try
                     {
-                        var task = eventsAction.Action.DynamicInvoke(args) as Task;
+                        var task = eventsAction.action.DynamicInvoke(args) as Task;
                         task.Wait();
                     }
                     catch
@@ -289,7 +289,7 @@ namespace Pingfan.Kit
                     }
 
                     // 是否是单次执行, 如果是, 则移除
-                    if (eventsAction.IsOnce)
+                    if (eventsAction.isOnce)
                     {
                         actions.Remove(eventsAction);
                     }
@@ -326,49 +326,49 @@ namespace Pingfan.Kit
 
         private static void AddAction(EventsAction eventsAction)
         {
-            lock (_actions)
+            lock (actions)
             {
-                if (!_actions.ContainsKey(eventsAction.EventName))
+                if (!EventEx.actions.ContainsKey(eventsAction.eventName))
                 {
-                    _actions[eventsAction.EventName] = new List<EventsAction>();
+                    EventEx.actions[eventsAction.eventName] = new List<EventsAction>();
                 }
 
-                eventsAction.Sign = Fn.GetSignture(eventsAction.Action);
-                var actions = _actions[eventsAction.EventName];
+                eventsAction.sign = Fn.GetSignture(eventsAction.action);
+                var actions = EventEx.actions[eventsAction.eventName];
                 // sign必须和action全部一致才添加
-                if (actions.Count > 0 && actions.Any(x => x.Sign != eventsAction.Sign))
+                if (actions.Count > 0 && actions.Any(x => x.sign != eventsAction.sign))
                 {
                     throw new Exception("方法签名不一致");
                 }
 
                 actions.Add(new EventsAction
                 {
-                    Obj = eventsAction.Obj,
-                    Action = eventsAction.Action,
-                    IsOnce = eventsAction.IsOnce,
-                    Sign = eventsAction.Sign,
+                    obj = eventsAction.obj,
+                    action = eventsAction.action,
+                    isOnce = eventsAction.isOnce,
+                    sign = eventsAction.sign,
                 });
             }
         }
 
         private static void RemoveAction(object obj, string eventName)
         {
-            lock (_actions)
+            lock (actions)
             {
                 if (string.IsNullOrEmpty(eventName))
                 {
                     // 删除obj对象的所有事件
-                    foreach (var pair in _actions)
+                    foreach (var pair in actions)
                     {
-                        pair.Value.RemoveAll(action => action.Obj == obj);
+                        pair.Value.RemoveAll(action => action.obj == obj);
                     }
                 }
                 else
                 {
                     // 删除obj对象的eventName事件
-                    if (_actions.TryGetValue(eventName, out var actions))
+                    if (EventEx.actions.TryGetValue(eventName, out var actions))
                     {
-                        actions.RemoveAll(action => action.Obj == obj);
+                        actions.RemoveAll(action => action.obj == obj);
                     }
                 }
             }
@@ -381,12 +381,12 @@ namespace Pingfan.Kit
             /// <summary>
             /// 绑定的对象,方便做识别
             /// </summary>
-            public object Obj;
+            public object obj;
 
-            public string EventName;
-            public Delegate Action;
-            public bool IsOnce;
-            public string Sign;
+            public string eventName;
+            public Delegate action;
+            public bool isOnce;
+            public string sign;
 
             public EventsAction()
             {
@@ -394,10 +394,10 @@ namespace Pingfan.Kit
 
             public EventsAction(object obj, string eventName, Delegate action, bool isOnce)
             {
-                Obj = obj;
-                EventName = eventName;
-                Action = action;
-                IsOnce = isOnce;
+                this.obj = obj;
+                this.eventName = eventName;
+                this.action = action;
+                this.isOnce = isOnce;
             }
         }
     }

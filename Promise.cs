@@ -14,9 +14,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 获取结果
         /// </summary>
-        public T Result => _task.Result;
+        public T Result => task.Result;
 
-        private readonly Task<T> _task = null;
+        private readonly Task<T> task = null;
 
         /// <summary>
         /// 类似js的Promise
@@ -30,7 +30,7 @@ namespace Pingfan.Kit
 
             resolve(p);
 
-            _task = tcs.Task;
+            task = tcs.Task;
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Pingfan.Kit
 
             var p = new Action<T>((o) => tcs.SetResult(o));
 
-            _task = Task.Run(async () =>
+            task = Task.Run(async () =>
             {
                 await resolve(p).ConfigureAwait(false);
                 await tcs.Task.ConfigureAwait(false);
@@ -53,7 +53,7 @@ namespace Pingfan.Kit
 
         public TaskAwaiter<T> GetAwaiter()
         {
-            return _task.GetAwaiter();
+            return task.GetAwaiter();
         }
 
     }
