@@ -12,19 +12,41 @@ namespace Pingfan.Kit
         private static string _currentDirectory;
 
         /// <summary>
-        /// 当前程序运行的目录
+        /// 当前程序运行的目录, 会先获取当前进程的环境变量RootDir, 如果没有则获取当前启动程序的Assembly目录
         /// </summary>
         public static string CurrentDirectory
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(_currentDirectory))
+                lock (_currentDirectory)
                 {
-                    _currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-                                        + Path.DirectorySeparatorChar;
-                }
+                    if (string.IsNullOrWhiteSpace(_currentDirectory))
+                    {
+                        // 先从环境变量中取
+                        _currentDirectory =
+                            Environment.GetEnvironmentVariable("RootDir", EnvironmentVariableTarget.Process);
+                        if (string.IsNullOrWhiteSpace(_currentDirectory))
+                            _currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+                                                + Path.DirectorySeparatorChar;
+                    }
 
-                return _currentDirectory;
+                    return _currentDirectory;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 把当前程序目录设置到RootDir进程环境变量里
+        /// </summary>
+        public static void RegisterCurrentDirectory()
+        {
+            lock (_currentDirectory)
+            {
+                var path = Environment.GetEnvironmentVariable("RootDir", EnvironmentVariableTarget.Process);
+                if (path.EqualsIgnoreCase(CurrentDirectory) == false)
+                {
+                    Environment.SetEnvironmentVariable("RootDir", CurrentDirectory, EnvironmentVariableTarget.Process);
+                }
             }
         }
 

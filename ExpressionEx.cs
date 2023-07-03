@@ -33,4 +33,21 @@ namespace Pingfan.Kit
             return fn();
         }
     }
+    
+    public static class TypeEx
+    {
+        /// <summary>
+        /// 高性能创建一个对象
+        /// </summary>
+        /// <returns></returns>
+        public static object CreateInstance(this Type type, params object[] parms)
+        {
+            var fn = CacheMemory<Func<object>>.GetOrSet(type.FullName, () =>
+            {
+                Expression<Func<object>> lambda = () => Activator.CreateInstance(type, parms);
+                return lambda.Compile();
+            }, 60 * 60 * 24);
+            return fn();
+        }
+    }
 }
