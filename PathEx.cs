@@ -9,8 +9,6 @@ namespace Pingfan.Kit
 {
     public static class PathEx
     {
-        private static string _currentDirectory;
-
         /// <summary>
         /// 当前程序运行的目录, 会先获取当前进程的环境变量RootDir, 如果没有则获取当前启动程序的Assembly目录
         /// </summary>
@@ -18,36 +16,25 @@ namespace Pingfan.Kit
         {
             get
             {
-                lock (_currentDirectory)
-                {
-                    if (string.IsNullOrWhiteSpace(_currentDirectory))
-                    {
-                        // 先从环境变量中取
-                        _currentDirectory =
-                            Environment.GetEnvironmentVariable("RootDir", EnvironmentVariableTarget.Process);
-                        if (string.IsNullOrWhiteSpace(_currentDirectory))
-                            _currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-                                                + Path.DirectorySeparatorChar;
-                    }
+                // 先从环境变量中取
+                var path =
+                    Environment.GetEnvironmentVariable("RootDir", EnvironmentVariableTarget.Process);
+                
+                // 如果没有, 则从启动程序的Assembly目录中取
+                if (string.IsNullOrWhiteSpace(path))
+                    path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+                           + Path.DirectorySeparatorChar;
 
-                    return _currentDirectory;
-                }
+                return path;
             }
         }
 
         /// <summary>
         /// 把当前程序目录设置到RootDir进程环境变量里
         /// </summary>
-        public static void RegisterCurrentDirectory()
+        public static void SetCurrentDirectory(string dir = "")
         {
-            lock (_currentDirectory)
-            {
-                var path = Environment.GetEnvironmentVariable("RootDir", EnvironmentVariableTarget.Process);
-                if (path.EqualsIgnoreCase(CurrentDirectory) == false)
-                {
-                    Environment.SetEnvironmentVariable("RootDir", CurrentDirectory, EnvironmentVariableTarget.Process);
-                }
-            }
+            Environment.SetEnvironmentVariable("RootDir", CurrentDirectory, EnvironmentVariableTarget.Process);
         }
 
         /// <summary>

@@ -2,7 +2,6 @@
 
 namespace Pingfan.Kit
 {
-
     /// <summary>
     /// 日志级别
     /// </summary>
@@ -47,7 +46,6 @@ namespace Pingfan.Kit
 
     public interface ILog
     {
-
         void Debug(string logString);
         void Error(string logString, Exception e = null);
         void Fatal(string logString);
@@ -76,9 +74,6 @@ namespace Pingfan.Kit
 
         public Log()
         {
-#if DEBUG
-            ConsoleLevel = LogLevel.DBG | LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL;
-#endif
         }
 
         public Log(string logFileName)
@@ -89,13 +84,15 @@ namespace Pingfan.Kit
         /// <summary>
         /// 输出到控制台的级别
         /// </summary>
-        public LogLevel ConsoleLevel { get; set; }
+        public LogLevel ConsoleLevel { get; set; } =
+            LogLevel.DBG | LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL;
 
         /// <summary>
         /// 输出到磁盘的级别
         /// </summary>
-        public LogLevel FileLevel { get; set; } =
-            LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL;
+        public LogLevel FileLevel { get; set; } = (LogLevel)(Config.Get("LogLevel",
+            (LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL).ToString()).ToInt());
+
 
         /// <summary>
         /// 日志回调
