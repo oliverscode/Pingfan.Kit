@@ -29,7 +29,7 @@ namespace Pingfan.Kit
         /// 获取自己外网Ip, 获取失败会返回空字符串
         /// </summary>
         /// <returns></returns>
-        public static string GetExternalIp()
+        public static string GetPublicIp()
         {
             var url = "http://ifconfig.me/ip";
             // const string url = "http://ip-api.com/json/?lang=zh-CN";
