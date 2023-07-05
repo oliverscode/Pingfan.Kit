@@ -95,9 +95,9 @@ namespace Pingfan.Kit
 
 
         /// <summary>
-        /// 日志回调
+        /// 日志回调, 如果返回true, 则不再输出到控制台以及磁盘
         /// </summary>
-        public event Action<LogLevel, string> OnHandler;
+        public Func<LogLevel, string, bool> OnHandler;
 
         /// <summary>
         /// 写一个调试日志
@@ -159,7 +159,9 @@ namespace Pingfan.Kit
                 lock (this)
                 {
                     // 先全局处理
-                    this.OnHandler?.Invoke(logLevel, logString);
+                    var result = this.OnHandler?.Invoke(logLevel, logString);
+                    if (result == true)
+                        return;
 
                     var str = $"[{logLevel.ToString()}]{DateTime.Now:yyyy-MM-dd HH:mm:ss} {logString}\n";
 
@@ -168,31 +170,31 @@ namespace Pingfan.Kit
                     {
                         if (logLevel == LogLevel.DBG)
                         {
-                            ConsoleEx.Write(logString, ConsoleColor.Cyan);
+                            ConsoleEx.WriteLine(logString, ConsoleColor.Cyan);
                         }
                         else if (logLevel == LogLevel.SUC)
                         {
-                            ConsoleEx.Write(logString, ConsoleColor.Green);
+                            ConsoleEx.WriteLine(logString, ConsoleColor.Green);
                         }
                         else if (logLevel == LogLevel.INF)
                         {
-                            ConsoleEx.Write(logString, ConsoleColor.Blue);
+                            ConsoleEx.WriteLine(logString, ConsoleColor.Blue);
                         }
                         else if (logLevel == LogLevel.WAR)
                         {
-                            ConsoleEx.Write(logString, ConsoleColor.Yellow);
+                            ConsoleEx.WriteLine(logString, ConsoleColor.Yellow);
                         }
                         else if (logLevel == LogLevel.ERR)
                         {
-                            ConsoleEx.Write(logString, ConsoleColor.Red);
+                            ConsoleEx.WriteLine(logString, ConsoleColor.Red);
                         }
                         else if (logLevel == LogLevel.FAL)
                         {
-                            ConsoleEx.Write(logString, ConsoleColor.DarkMagenta);
+                            ConsoleEx.WriteLine(logString, ConsoleColor.DarkMagenta);
                         }
                         else
                         {
-                            Console.Write(logString);
+                            Console.WriteLine(logString);
                         }
                     }
 
