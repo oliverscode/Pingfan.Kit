@@ -9,19 +9,17 @@ namespace Pingfan.Kit
         /// <summary>
         /// 间隔1秒一直重试1个任务
         /// </summary>
-        /// <param name="method"></param>
-        public static void Run(Action method, Action<Exception> errorCallback = null)
+        public static void Run(Action method, Action<Exception> handleError = null)
         {
-            Run(int.MaxValue, 1000, method, errorCallback);
+            Run(int.MaxValue, 1000, method, handleError);
         }
 
         /// <summary>
         /// 间隔1秒一直重试1个任务
         /// </summary>
-        /// <param name="method"></param>
-        public static async Task Run(Func<Task> method, Action<Exception> errorCallback = null)
+        public static async Task Run(Func<Task> method, Action<Exception> handleError = null)
         {
-            await Run(int.MaxValue, 1000, method, errorCallback);
+            await Run(int.MaxValue, 1000, method, handleError);
         }
 
         /// <summary>
@@ -30,8 +28,9 @@ namespace Pingfan.Kit
         /// <param name="count">重试次数</param>
         /// <param name="delay">失败后等待毫秒数</param>
         /// <param name="method"></param>
+        /// <param name="handleError"></param>
         /// <exception cref="Exception"></exception>
-        public static void Run(int count, int delay, Action method, Action<Exception> errorCallback = null)
+        public static void Run(int count, int delay, Action method, Action<Exception> handleError = null)
         {
             Exception exception = null;
             for (var i = 0; i < count; i++)
@@ -44,7 +43,7 @@ namespace Pingfan.Kit
                 catch (Exception e)
                 {
                     exception = e;
-                    errorCallback?.Invoke(e);
+                    handleError?.Invoke(e);
                     if (delay > 0)
                         Thread.Sleep(delay);
                 }
@@ -59,10 +58,11 @@ namespace Pingfan.Kit
         /// <param name="count">重试次数</param>
         /// <param name="delay">失败后等待毫秒数</param>
         /// <param name="method"></param>
+        /// <param name="handleError"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static T Run<T>(int count, int delay, Func<T> method, Action<Exception> errorCallback = null)
+        public static T Run<T>(int count, int delay, Func<T> method, Action<Exception> handleError = null)
         {
             Exception exception = null;
             for (var i = 0; i < count; i++)
@@ -74,7 +74,7 @@ namespace Pingfan.Kit
                 catch (Exception e)
                 {
                     exception = e;
-                    errorCallback?.Invoke(e);
+                    handleError?.Invoke(e);
                     if (delay > 0)
                         Thread.Sleep(delay);
                 }
@@ -89,8 +89,9 @@ namespace Pingfan.Kit
         /// <param name="count">重试次数</param>
         /// <param name="delay">失败后等待毫秒数</param>
         /// <param name="method"></param>
+        /// <param name="handleError"></param>
         /// <exception cref="Exception"></exception>
-        public static async Task Run(int count, int delay, Func<Task> method, Action<Exception> errorCallback = null)
+        public static async Task Run(int count, int delay, Func<Task> method, Action<Exception> handleError = null)
         {
             Exception exception = null;
             for (var i = 0; i < count; i++)
@@ -103,7 +104,7 @@ namespace Pingfan.Kit
                 catch (Exception e)
                 {
                     exception = e;
-                    errorCallback?.Invoke(e);
+                    handleError?.Invoke(e);
                     if (delay > 0)
                         await Task.Delay(delay);
                 }
@@ -118,11 +119,12 @@ namespace Pingfan.Kit
         /// <param name="count">重试次数</param>
         /// <param name="delay">失败后等待毫秒数</param>
         /// <param name="method"></param>
+        /// <param name="handleError"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         public static async Task<T> Run<T>(int count, int delay, Func<Task<T>> method,
-            Action<Exception> errorCallback = null)
+            Action<Exception> handleError = null)
         {
             Exception exception = null;
             for (var i = 0; i < count; i++)
@@ -134,7 +136,7 @@ namespace Pingfan.Kit
                 catch (Exception e)
                 {
                     exception = e;
-                    errorCallback?.Invoke(e);
+                    handleError?.Invoke(e);
                     if (delay > 0)
                         await Task.Delay(delay);
                 }

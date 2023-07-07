@@ -6,6 +6,8 @@ namespace Pingfan.Kit
 {
     public static class Timer
     {
+        public static event Action<Exception> OnError;
+
         /// <summary>
         /// 创建一个定时器，但只执行1次
         /// </summary>
@@ -37,9 +39,9 @@ namespace Pingfan.Kit
                 {
                     action();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // ignored
+                    OnError?.Invoke(e);
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
@@ -60,9 +62,9 @@ namespace Pingfan.Kit
                 {
                     await action();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    // ignored
+                    OnError?.Invoke(e);
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
@@ -149,7 +151,7 @@ namespace Pingfan.Kit
                     }
                     catch (Exception e)
                     {
-                        // ignored
+                        OnError?.Invoke(e);
                     }
 
                     if (cancellationToken.IsCancellationRequested)
@@ -206,7 +208,7 @@ namespace Pingfan.Kit
                     }
                     catch (Exception e)
                     {
-                        // ignored
+                        OnError?.Invoke(e);
                     }
 
                     if (cancellationToken.IsCancellationRequested)
@@ -261,9 +263,9 @@ namespace Pingfan.Kit
                             return;
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        // ignored
+                        OnError?.Invoke(e);
                     }
 
                     if (cancellationToken.IsCancellationRequested)

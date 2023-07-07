@@ -6,6 +6,7 @@ namespace Pingfan.Kit
 {
     public static class Loop
     {
+        public static event Action<Exception> OnError; 
         /// <summary>
         /// 死循环运行一个方法
         /// </summary>
@@ -35,8 +36,9 @@ namespace Pingfan.Kit
                     {
                         action();
                     }
-                    catch
+                    catch(Exception e)
                     {
+                        OnError?.Invoke(e);
                     }
                 }
             });
@@ -71,8 +73,9 @@ namespace Pingfan.Kit
                     {
                         await action();
                     }
-                    catch
+                    catch(Exception e)
                     {
+                        OnError?.Invoke(e);
                     }
                 }
             });

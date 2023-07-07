@@ -40,7 +40,7 @@ namespace Pingfan.Kit
         private static readonly ConcurrentDictionary<string, DataItem> _DebounceList =
             new ConcurrentDictionary<string, DataItem>(StringComparer.OrdinalIgnoreCase);
 
-        private static void _Fn(string key, int delay, FnKind fnKind, Delegate action, params object[] parms)
+        private static void fn(string key, int delay, FnKind fnKind, Delegate action, params object[] parms)
         {
             // var key = action.GetMethodInfo().Name;
             if (_DebounceList.TryGetValue(key, out var item))
@@ -74,7 +74,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce(string key, int delay, Action action)
         {
-            _Fn(key, delay, FnKind.Debounce, action);
+            fn(key, delay, FnKind.Debounce, action);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1>(string key, int delay, Action<T1> action, T1 p1)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1);
+            fn(key, delay, FnKind.Debounce, action, p1);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1, T2>(string key, int delay, Action<T1, T2> action, T1 p1, T2 p2)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2);
+            fn(key, delay, FnKind.Debounce, action, p1, p2);
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1, T2, T3>(string key, int delay, Action<T1, T2, T3> action, T1 p1, T2 p2, T3 p3)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Pingfan.Kit
             T3 p3,
             T4 p4)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4);
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         /// <summary>
@@ -199,7 +199,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce(string key, int delay, Func<Task> action)
         {
-            _Fn(key, delay, FnKind.Debounce, action);
+            fn(key, delay, FnKind.Debounce, action);
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1>(string key, int delay, Func<T1, Task> action, T1 p1)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1);
+            fn(key, delay, FnKind.Debounce, action, p1);
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1, T2>(string key, int delay, Func<T1, T2, Task> action, T1 p1, T2 p2)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2);
+            fn(key, delay, FnKind.Debounce, action, p1, p2);
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1, T2, T3>(string key, int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2, T3 p3)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
         }
 
         /// <summary>
@@ -236,7 +236,7 @@ namespace Pingfan.Kit
             T3 p3,
             T4 p4)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4);
         }
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
@@ -281,7 +281,7 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
@@ -316,7 +316,7 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            _Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         /// <summary>
@@ -324,7 +324,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle(string key, int delay, Action action)
         {
-            _Fn(key, delay, FnKind.Throttle, action);
+            fn(key, delay, FnKind.Throttle, action);
         }
 
         /// <summary>
@@ -332,7 +332,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1>(string key, int delay, Action<T1> action, T1 p1)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1);
+            fn(key, delay, FnKind.Throttle, action, p1);
         }
 
         /// <summary>
@@ -340,7 +340,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1, T2>(string key, int delay, Action<T1, T2> action, T1 p1, T2 p2)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2);
+            fn(key, delay, FnKind.Throttle, action, p1, p2);
         }
 
         /// <summary>
@@ -348,7 +348,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1, T2, T3>(string key, int delay, Action<T1, T2, T3> action, T1 p1, T2 p2, T3 p3)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
         }
 
         /// <summary>
@@ -361,7 +361,7 @@ namespace Pingfan.Kit
             T3 p3,
             T4 p4)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4);
         }
 
         /// <summary>
@@ -375,7 +375,7 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
@@ -390,7 +390,7 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
@@ -406,7 +406,7 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
@@ -423,7 +423,7 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
@@ -441,7 +441,7 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         /// <summary>
@@ -449,7 +449,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle(string key, int delay, Func<Task> action)
         {
-            _Fn(key, delay, FnKind.Throttle, action);
+            fn(key, delay, FnKind.Throttle, action);
         }
 
         /// <summary>
@@ -457,7 +457,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1>(string key, int delay, Func<T1, Task> action, T1 p1)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1);
+            fn(key, delay, FnKind.Throttle, action, p1);
         }
 
         /// <summary>
@@ -465,7 +465,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1, T2>(string key, int delay, Func<T1, T2, Task> action, T1 p1, T2 p2)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2);
+            fn(key, delay, FnKind.Throttle, action, p1, p2);
         }
 
         /// <summary>
@@ -473,7 +473,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1, T2, T3>(string key, int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2, T3 p3)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
         }
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace Pingfan.Kit
             T3 p3,
             T4 p4)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4);
         }
 
         /// <summary>
@@ -500,7 +500,7 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
@@ -515,7 +515,7 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
@@ -531,7 +531,7 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
@@ -548,7 +548,7 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
@@ -566,7 +566,7 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            _Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         #endregion

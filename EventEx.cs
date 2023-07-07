@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pingfan.Kit
@@ -254,19 +255,23 @@ namespace Pingfan.Kit
             if (!EventEx.actions.TryGetValue(eventName, out List<EventsAction> actions))
                 return;
 
-            lock (eventName)
-            {
-                foreach (var eventsAction in actions)
-                {
-                    var task = eventsAction.action.DynamicInvoke(args) as Task;
-                    task?.Wait();
+            var removeList = new List<EventsAction>();
 
-                    // 是否是单次执行, 如果是, 则移除
-                    if (eventsAction.isOnce)
-                    {
-                        actions.Remove(eventsAction);
-                    }
+            foreach (var eventsAction in actions)
+            {
+                var task = eventsAction.action.DynamicInvoke(args) as Task;
+                task?.Wait();
+
+                // 是否是单次执行, 如果是, 则移除
+                if (eventsAction.isOnce)
+                {
+                    removeList.Add(eventsAction);
                 }
+            }
+
+            foreach (var eventsAction in removeList)
+            {
+                actions.Remove(eventsAction);
             }
         }
 
@@ -275,25 +280,22 @@ namespace Pingfan.Kit
             if (!EventEx.actions.TryGetValue(eventName, out List<EventsAction> actions))
                 return;
 
-            lock (eventName)
+            var removeList = new List<EventsAction>();
+            foreach (var eventsAction in actions)
             {
-                foreach (var eventsAction in actions)
-                {
-                    try
-                    {
-                        var task = eventsAction.action.DynamicInvoke(args) as Task;
-                        task.Wait();
-                    }
-                    catch
-                    {
-                    }
+                var task = eventsAction.action.DynamicInvoke(args) as Task;
+                task?.Wait();
 
-                    // 是否是单次执行, 如果是, 则移除
-                    if (eventsAction.isOnce)
-                    {
-                        actions.Remove(eventsAction);
-                    }
+                // 是否是单次执行, 如果是, 则移除
+                if (eventsAction.isOnce)
+                {
+                    removeList.Add(eventsAction);
                 }
+            }
+
+            foreach (var eventsAction in removeList)
+            {
+                actions.Remove(eventsAction);
             }
         }
 
@@ -326,36 +328,30 @@ namespace Pingfan.Kit
 
         private static void AddAction(EventsAction eventsAction)
         {
-            lock (actions)
+            EventEx.actions.GetOrAdd(eventsAction.eventName, _ => new List<EventsAction>()).Add(eventsAction);
+            
+            eventsAction.sign = Fn.GetSignture(eventsAction.action);
+            var actions = EventEx.actions[eventsAction.eventName];
+            // sign必须和action全部一致才添加
+            if (actions.Count > 0 && actions.Any(x => x.sign != eventsAction.sign))
             {
-                if (!EventEx.actions.ContainsKey(eventsAction.eventName))
-                {
-                    EventEx.actions[eventsAction.eventName] = new List<EventsAction>();
-                }
-
-                eventsAction.sign = Fn.GetSignture(eventsAction.action);
-                var actions = EventEx.actions[eventsAction.eventName];
-                // sign必须和action全部一致才添加
-                if (actions.Count > 0 && actions.Any(x => x.sign != eventsAction.sign))
-                {
-                    throw new Exception("方法签名不一致");
-                }
-
-                actions.Add(new EventsAction
-                {
-                    obj = eventsAction.obj,
-                    action = eventsAction.action,
-                    isOnce = eventsAction.isOnce,
-                    sign = eventsAction.sign,
-                });
+                throw new Exception("方法签名不一致");
             }
+
+            actions.Add(new EventsAction
+            {
+                obj = eventsAction.obj,
+                action = eventsAction.action,
+                isOnce = eventsAction.isOnce,
+                sign = eventsAction.sign,
+            });
         }
 
         private static void RemoveAction(object obj, string eventName)
         {
-            lock (actions)
+            if (string.IsNullOrEmpty(eventName))
             {
-                if (string.IsNullOrEmpty(eventName))
+                lock (actions)
                 {
                     // 删除obj对象的所有事件
                     foreach (var pair in actions)
@@ -363,16 +359,27 @@ namespace Pingfan.Kit
                         pair.Value.RemoveAll(action => action.obj == obj);
                     }
                 }
-                else
+            }
+            else
+            {
+                List<EventsAction> eventActions;
+                lock (actions)
                 {
-                    // 删除obj对象的eventName事件
-                    if (EventEx.actions.TryGetValue(eventName, out var actions))
+                    if (!EventEx.actions.TryGetValue(eventName, out eventActions))
                     {
-                        actions.RemoveAll(action => action.obj == obj);
+                        // 如果在给定的事件名称下找不到动作，直接返回
+                        return;
                     }
+                }
+                lock (eventActions)
+                {
+                    eventActions.RemoveAll(action => action.obj == obj);
                 }
             }
         }
+
+
+
 
         #endregion
 
