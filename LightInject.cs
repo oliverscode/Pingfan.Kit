@@ -1,4 +1,5 @@
-﻿#nullable disable
+﻿#if net48 || NETCOREAPP
+
 #if NETSTANDARD2_0
 #define USE_EXPRESSIONS
 #endif
@@ -8861,3 +8862,5 @@ but either way the scope has to be started with 'container.BeginScope()'";
             typeof(IEnumerable<>).MakeGenericType(type);
     }
 }
+
+#endif
