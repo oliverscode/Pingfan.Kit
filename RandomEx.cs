@@ -1,36 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Pingfan.Kit
 {
     public class RandomEx
     {
-        private double probability;
-        private double step;
+        private double _probability;
+        private double _step;
         public RandomEx(double probability, double step = 0.1)
         {
-            this.probability = probability;
-            this.step = step;
+            this._probability = probability;
+            this._step = step;
         }
 
         public bool Next()
         {
-            var isSuccessful = rd.NextDouble() < probability;
+            var isSuccessful = Rd.NextDouble() < _probability;
             if (isSuccessful)
             {
-                probability -= step;
+                _probability -= _step;
             }
             else
             {
-                probability += step;
+                _probability += _step;
             }
             return isSuccessful;
         }
 
         #region 静态部分
-        private static readonly Random rd = new Random();
+        private static readonly Random Rd = new Random();
 
         /// <summary>
         /// 生成一个随机数
@@ -40,7 +39,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static int Next(int min, int max)
         {
-            return rd.Next(min, max);
+            return Rd.Next(min, max);
         }
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace Pingfan.Kit
             var result = new char[length];
             for (int i = 0; i < length; i++)
             {
-                result[i] = chars[rd.Next(0, chars.Length)];
+                result[i] = chars[Rd.Next(0, chars.Length)];
             }
             return new string(result);
         }
@@ -101,12 +100,12 @@ namespace Pingfan.Kit
                 throw new ArgumentException("Sigma value should be greater than 0.");
 
             double u1, u2, z, x;
-            var result = 0;
+            int result;
 
             while (true)
             {
-                u1 = rd.NextDouble();
-                u2 = rd.NextDouble();
+                u1 = Rd.NextDouble();
+                u2 = Rd.NextDouble();
 
                 z = Math.Sqrt(-2 * Math.Log(u1)) * Math.Sin(2 * Math.PI * u2);
                 x = miu + sigma * z;
@@ -123,7 +122,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static bool IsTrue(double probability)
         {
-            return rd.NextDouble() < probability;
+            return Rd.NextDouble() < probability;
         }
 
         /// <summary>
@@ -133,7 +132,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static bool IsTrue(float probability)
         {
-            return rd.NextDouble() < probability;
+            return Rd.NextDouble() < probability;
         }
 
         /// <summary>
@@ -143,7 +142,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static bool IsTrue(decimal probability)
         {
-            return (decimal)rd.NextDouble() < probability;
+            return (decimal)Rd.NextDouble() < probability;
         }
 
         /// <summary>
@@ -166,8 +165,8 @@ namespace Pingfan.Kit
     /// <typeparam name="T"></typeparam>
     public class RandomEx<T>
     {
-        private readonly List<KeyValuePair<T, int>> _List = new List<KeyValuePair<T, int>>();
-        private int MaxWeights = 0;
+        private readonly List<KeyValuePair<T, int>> _list = new List<KeyValuePair<T, int>>();
+        private int _maxWeights;
 
         public RandomEx()
         {
@@ -191,8 +190,8 @@ namespace Pingfan.Kit
             if (weights < 0)
                 throw new ArgumentException(nameof(weights));
 
-            _List.Add(new KeyValuePair<T, int>(obj, weights));
-            MaxWeights += weights;
+            _list.Add(new KeyValuePair<T, int>(obj, weights));
+            _maxWeights += weights;
         }
 
         /// <summary>
@@ -202,20 +201,20 @@ namespace Pingfan.Kit
         /// <exception cref="Exception"></exception>
         public T Next()
         {
-            if (_List.Count <= 0)
+            if (_list.Count <= 0)
                 throw new Exception("获取不到随机对象");
 
-            var index = RandomEx.Next(0, MaxWeights);
-            var currentMax = _List[0].Value;
-            for (var i = 0; i < _List.Count; i++)
+            var index = RandomEx.Next(0, _maxWeights);
+            var currentMax = _list[0].Value;
+            for (var i = 0; i < _list.Count; i++)
             {
-                var row = _List[i];
+                var row = _list[i];
                 if (index < currentMax)
                 {
                     return row.Key;
                 }
 
-                currentMax += _List[i + 1].Value;
+                currentMax += _list[i + 1].Value;
             }
 
             throw new Exception("获取不到权重");

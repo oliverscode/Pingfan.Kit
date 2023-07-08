@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -30,7 +29,7 @@ namespace Pingfan.Kit
             var per = 1.0 / shortStr.Length;
             foreach (var c in shortStr)
             {
-                if (!longStr.Contains(c))
+                if (!longStr.Contains(c.ToString()))
                 {
                     value -= per;
                 }
@@ -86,7 +85,7 @@ namespace Pingfan.Kit
         {
             if (uint.TryParse(str, out var result))
             {
-                return (uint)result;
+                return result;
             }
 
             return defaultValue;
@@ -96,50 +95,50 @@ namespace Pingfan.Kit
         {
             if (long.TryParse(str, out var result))
             {
-                return (long)result;
+                return result;
             }
 
-            return (long)defaultValue;
+            return defaultValue;
         }
 
         public static ulong ToULong(this string str, ulong defaultValue = 0)
         {
             if (ulong.TryParse(str, out var result))
             {
-                return (ulong)result;
+                return result;
             }
 
-            return (ulong)defaultValue;
+            return defaultValue;
         }
 
         public static float ToFloat(this string str, float defaultValue = 0)
         {
             if (float.TryParse(str, out var result))
             {
-                return (float)result;
+                return result;
             }
 
-            return (float)defaultValue;
+            return defaultValue;
         }
 
         public static double ToDouble(this string str, double defaultValue = 0)
         {
             if (double.TryParse(str, out var result))
             {
-                return (double)result;
+                return result;
             }
 
-            return (double)defaultValue;
+            return defaultValue;
         }
 
         public static decimal ToDecimal(this string str, decimal defaultValue = 0)
         {
             if (decimal.TryParse(str, out var result))
             {
-                return (decimal)result;
+                return result;
             }
 
-            return (decimal)defaultValue;
+            return defaultValue;
         }
 
         public static bool ToBool(this string str)

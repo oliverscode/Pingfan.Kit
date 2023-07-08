@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -16,12 +15,9 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static byte[] ToBytes(object obj)
         {
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                IFormatter formatter = new BinaryFormatter
-                {
-                    Binder = new VersionDeserializer()
-                };
+                var formatter = GetFormatter();
                 formatter.Serialize(ms, obj);
                 return ms.GetBuffer();
             }
@@ -30,16 +26,13 @@ namespace Pingfan.Kit
         /// <summary>
         /// 将一个序列化后的byte[]数组还原
         /// </summary>
-        /// <param name="Bytes"></param>
+        /// <param name="bytes"></param>
         /// <returns></returns>
-        public static object ToObject(byte[] Bytes)
+        public static object ToObject(byte[] bytes)
         {
-            using (MemoryStream ms = new MemoryStream(Bytes))
+            using (var ms = new MemoryStream(bytes))
             {
-                IFormatter formatter = new BinaryFormatter
-                {
-                    Binder = new VersionDeserializer()
-                };
+                var formatter = GetFormatter();
                 return formatter.Deserialize(ms);
             }
         }
@@ -47,19 +40,21 @@ namespace Pingfan.Kit
         /// <summary>
         /// 将一个序列化后的byte[]数组还原成指定类型
         /// </summary>
-        /// <param name="Bytes"></param>
+        /// <param name="bytes"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T ToObject<T>(byte[] Bytes)
+        public static T ToObject<T>(byte[] bytes)
         {
-            using (MemoryStream ms = new MemoryStream(Bytes))
+            using (var ms = new MemoryStream(bytes))
             {
-                IFormatter formatter = new BinaryFormatter
-                {
-                    Binder = new VersionDeserializer()
-                };
-                return (T) ChangeType(formatter.Deserialize(ms), typeof(T));
+                var formatter = GetFormatter();
+                return (T)ChangeType(formatter.Deserialize(ms), typeof(T));
             }
+        }
+
+        private static IFormatter GetFormatter()
+        {
+            return new BinaryFormatter { Binder = new VersionDeserializer() };
         }
 
         public static object ChangeType(object value, Type type)
@@ -79,19 +74,19 @@ namespace Pingfan.Kit
             {
                 Type innerType = type.GetGenericArguments()[0];
                 object innerValue = ChangeType(value, innerType);
-                return Activator.CreateInstance(type, new object[] {innerValue});
+                return Activator.CreateInstance(type, new object[] { innerValue });
             }
 
             if (value is string && type == typeof(Guid)) return new Guid(value as string);
             if (value is string && type == typeof(Version)) return new Version(value as string);
             if (!(value is IConvertible)) return value;
-            return System.Convert.ChangeType(value, type);
+            return Convert.ChangeType(value, type);
         }
     }
 
     internal sealed class VersionDeserializer : SerializationBinder
     {
-        private static string _thisAssembly = null;
+        private static string _thisAssembly;
 
         public override Type BindToType(string assemblyName, string typeName)
         {

@@ -35,7 +35,7 @@ namespace Pingfan.Kit
             // const string url = "http://ip-api.com/json/?lang=zh-CN";
             // https://icanhazip.com
 
-            string externalip;
+            string ip;
             try
             {
                 WebClient wc = new WebClient();
@@ -45,9 +45,9 @@ namespace Pingfan.Kit
             }
             catch
             {
-                externalip = "";
+                ip = "";
             }
-            return externalip;
+            return ip;
         }
     }
 }

@@ -64,7 +64,7 @@ namespace Pingfan.Kit
             var ps = new List<string>();
             foreach (var path in paths)
             {
-                var p = path.Split(new char[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
+                var p = path.Split(new [] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
                 ps.AddRange(p);
             }
 
@@ -91,7 +91,7 @@ namespace Pingfan.Kit
             path = Regex.Replace(path, @"(\\+)", @"\");
             path = Regex.Replace(path, @"(/+)", @"/");
 
-            return string.Join("\\", path.Split(new char[] { '\\', '/' }, StringSplitOptions.None));
+            return string.Join("\\", path.Split(new [] { '\\', '/' }, StringSplitOptions.None));
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Pingfan.Kit
             path = Regex.Replace(path, @"(\\+)", @"\");
             path = Regex.Replace(path, @"(/+)", @"/");
 
-            return string.Join("/", path.Split(new char[] { '\\', '/' }, StringSplitOptions.None));
+            return string.Join("/", path.Split(new [] { '\\', '/' }, StringSplitOptions.None));
         }
 
 
@@ -117,7 +117,7 @@ namespace Pingfan.Kit
             var dir = Path.GetDirectoryName(path);
             if (Directory.Exists(dir) == false)
             {
-                Directory.CreateDirectory(dir);
+                Directory.CreateDirectory(dir ?? throw new InvalidOperationException());
             }
         }
     }

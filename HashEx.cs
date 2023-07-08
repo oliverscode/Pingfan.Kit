@@ -4,37 +4,40 @@ using System.Text;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 常用的Hash算法
+    /// </summary>
     public class HashEx
     {
         static HashEx()
         {
-            GetCRC32Table();
+            GetCrc32Table();
         }
 
         protected static ulong[] Crc32Table;
 
         //生成CRC32码表
-        private static void GetCRC32Table()
+        private static void GetCrc32Table()
         {
-            ulong Crc;
+            ulong crc;
             Crc32Table = new ulong[256];
             int i, j;
             for (i = 0; i < 256; i++)
             {
-                Crc = (ulong)i;
+                crc = (ulong)i;
                 for (j = 8; j > 0; j--)
                 {
-                    if ((Crc & 1) == 1)
-                        Crc = (Crc >> 1) ^ 0xEDB88320;
+                    if ((crc & 1) == 1)
+                        crc = (crc >> 1) ^ 0xEDB88320;
                     else
-                        Crc >>= 1;
+                        crc >>= 1;
                 }
 
-                Crc32Table[i] = Crc;
+                Crc32Table[i] = crc;
             }
         }
 
-        public static string CRC32(byte[] buffer)
+        public static string Crc32(byte[] buffer)
         {
             int len = buffer.Length;
             ulong value = 0xffffffff;
@@ -46,7 +49,7 @@ namespace Pingfan.Kit
             return (value ^ 0xffffffff).ToString("x2");
         }
 
-        public static string CRC32(Stream stream)
+        public static string Crc32(Stream stream)
         {
             var len = stream.Length;
             ulong value = 0xffffffff;
@@ -58,7 +61,7 @@ namespace Pingfan.Kit
             return (value ^ 0xffffffff).ToString("x2");
         }
 
-        public static string CRC32(string data)
+        public static string Crc32(string data)
         {
             var buffer = Encoding.ASCII.GetBytes(data);
             int len = buffer.Length;
@@ -117,7 +120,7 @@ namespace Pingfan.Kit
 
         public static string Md5(Stream stream)
         {
-            var md5 = System.Security.Cryptography.MD5.Create();
+            var md5 = MD5.Create();
             var hash = md5.ComputeHash(stream);
             var sb = new StringBuilder();
             foreach (var b in hash)
@@ -130,7 +133,7 @@ namespace Pingfan.Kit
 
         public static string Md5(byte[] data)
         {
-            var md5 = System.Security.Cryptography.MD5.Create();
+            var md5 = MD5.Create();
             var hash = md5.ComputeHash(data);
             var sb = new StringBuilder();
             foreach (var b in hash)
@@ -141,10 +144,10 @@ namespace Pingfan.Kit
             return sb.ToString();
         }
 
-        public static string Signature(params object[] datas)
+        public static string Signature(params object[] args)
         {
             var sb = new StringBuilder();
-            foreach (var data in datas)
+            foreach (var data in args)
             {
                 sb.Append("[");
                 var key = data.GetType().ToString();

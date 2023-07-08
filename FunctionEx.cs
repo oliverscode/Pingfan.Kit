@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,16 +8,9 @@ namespace Pingfan.Kit
     /// <summary>
     /// 封装了防抖器和节流器
     /// </summary>
-    public static class Fn
+    public static class FunctionEx
     {
-        #region 防抖器和节流器
-
-        private class DataItem
-        {
-            public Task Timer { get; set; }
-            public CancellationTokenSource Cts { get; set; }
-        }
-
+        
         private enum FnKind
         {
             /// <summary>
@@ -35,20 +23,25 @@ namespace Pingfan.Kit
             /// </summary>
             Throttle,
         }
-
-
-        private static readonly ConcurrentDictionary<string, DataItem> _DebounceList =
+        private class DataItem
+        {
+            public Task Timer;
+            public CancellationTokenSource Cts;
+        }
+        
+        
+        private static readonly ConcurrentDictionary<string, DataItem> List =
             new ConcurrentDictionary<string, DataItem>(StringComparer.OrdinalIgnoreCase);
 
-        private static void fn(string key, int delay, FnKind fnKind, Delegate action, params object[] parms)
+        private static void Fn(string key, int delay, FnKind fnKind, Delegate action, params object[] args)
         {
             // var key = action.GetMethodInfo().Name;
-            if (_DebounceList.TryGetValue(key, out var item))
+            if (List.TryGetValue(key, out var item))
             {
                 if (fnKind == FnKind.Debounce)
                 {
                     item.Cts.Cancel();
-                    _DebounceList.TryRemove(key, out _);
+                    List.TryRemove(key, out _);
                 }
                 else if (fnKind == FnKind.Throttle)
                 {
@@ -59,22 +52,25 @@ namespace Pingfan.Kit
             var cts = new CancellationTokenSource();
             var timer = Timer.SetTimeout(delay, () =>
             {
-                action.DynamicInvoke(parms);
-                _DebounceList.TryRemove(key, out _);
+                action.DynamicInvoke(args);
+                List.TryRemove(key, out _);
             }, cts.Token);
-            _DebounceList[key] = new DataItem
+            List[key] = new DataItem
             {
                 Timer = timer,
                 Cts = cts
             };
         }
+        
+        #region 防抖器部分
 
+        
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
         public static void Debounce(string key, int delay, Action action)
         {
-            fn(key, delay, FnKind.Debounce, action);
+            Fn(key, delay, FnKind.Debounce, action);
         }
 
         /// <summary>
@@ -82,7 +78,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1>(string key, int delay, Action<T1> action, T1 p1)
         {
-            fn(key, delay, FnKind.Debounce, action, p1);
+            Fn(key, delay, FnKind.Debounce, action, p1);
         }
 
         /// <summary>
@@ -90,7 +86,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1, T2>(string key, int delay, Action<T1, T2> action, T1 p1, T2 p2)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2);
         }
 
         /// <summary>
@@ -98,7 +94,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1, T2, T3>(string key, int delay, Action<T1, T2, T3> action, T1 p1, T2 p2, T3 p3)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
         }
 
         /// <summary>
@@ -111,7 +107,7 @@ namespace Pingfan.Kit
             T3 p3,
             T4 p4)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4);
         }
 
         /// <summary>
@@ -125,7 +121,7 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
@@ -140,7 +136,7 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
@@ -156,7 +152,7 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
@@ -173,7 +169,7 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
@@ -191,7 +187,7 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         /// <summary>
@@ -199,7 +195,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce(string key, int delay, Func<Task> action)
         {
-            fn(key, delay, FnKind.Debounce, action);
+            Fn(key, delay, FnKind.Debounce, action);
         }
 
         /// <summary>
@@ -207,7 +203,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1>(string key, int delay, Func<T1, Task> action, T1 p1)
         {
-            fn(key, delay, FnKind.Debounce, action, p1);
+            Fn(key, delay, FnKind.Debounce, action, p1);
         }
 
         /// <summary>
@@ -215,7 +211,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1, T2>(string key, int delay, Func<T1, T2, Task> action, T1 p1, T2 p2)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2);
         }
 
         /// <summary>
@@ -223,7 +219,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Debounce<T1, T2, T3>(string key, int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2, T3 p3)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
         }
 
         /// <summary>
@@ -236,7 +232,7 @@ namespace Pingfan.Kit
             T3 p3,
             T4 p4)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4);
         }
 
         /// <summary>
@@ -250,7 +246,7 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
@@ -265,7 +261,7 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
@@ -281,7 +277,7 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
@@ -298,7 +294,7 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
@@ -316,15 +312,18 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
+        #endregion
 
+        #region 节流器部分
+        
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
         public static void Throttle(string key, int delay, Action action)
         {
-            fn(key, delay, FnKind.Throttle, action);
+            Fn(key, delay, FnKind.Throttle, action);
         }
 
         /// <summary>
@@ -332,7 +331,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1>(string key, int delay, Action<T1> action, T1 p1)
         {
-            fn(key, delay, FnKind.Throttle, action, p1);
+            Fn(key, delay, FnKind.Throttle, action, p1);
         }
 
         /// <summary>
@@ -340,7 +339,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1, T2>(string key, int delay, Action<T1, T2> action, T1 p1, T2 p2)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2);
         }
 
         /// <summary>
@@ -348,7 +347,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1, T2, T3>(string key, int delay, Action<T1, T2, T3> action, T1 p1, T2 p2, T3 p3)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
         }
 
         /// <summary>
@@ -361,7 +360,7 @@ namespace Pingfan.Kit
             T3 p3,
             T4 p4)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4);
         }
 
         /// <summary>
@@ -375,7 +374,7 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
@@ -390,7 +389,7 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
@@ -406,7 +405,7 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
@@ -423,7 +422,7 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
@@ -441,7 +440,7 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         /// <summary>
@@ -449,7 +448,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle(string key, int delay, Func<Task> action)
         {
-            fn(key, delay, FnKind.Throttle, action);
+            Fn(key, delay, FnKind.Throttle, action);
         }
 
         /// <summary>
@@ -457,7 +456,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1>(string key, int delay, Func<T1, Task> action, T1 p1)
         {
-            fn(key, delay, FnKind.Throttle, action, p1);
+            Fn(key, delay, FnKind.Throttle, action, p1);
         }
 
         /// <summary>
@@ -465,7 +464,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1, T2>(string key, int delay, Func<T1, T2, Task> action, T1 p1, T2 p2)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2);
         }
 
         /// <summary>
@@ -473,7 +472,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Throttle<T1, T2, T3>(string key, int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2, T3 p3)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
         }
 
         /// <summary>
@@ -486,7 +485,7 @@ namespace Pingfan.Kit
             T3 p3,
             T4 p4)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4);
         }
 
         /// <summary>
@@ -500,7 +499,7 @@ namespace Pingfan.Kit
             T4 p4,
             T5 p5)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5);
         }
 
         /// <summary>
@@ -515,7 +514,7 @@ namespace Pingfan.Kit
             T5 p5,
             T6 p6)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6);
         }
 
         /// <summary>
@@ -531,7 +530,7 @@ namespace Pingfan.Kit
             T6 p6,
             T7 p7)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7);
         }
 
         /// <summary>
@@ -548,7 +547,7 @@ namespace Pingfan.Kit
             T7 p7,
             T8 p8)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8);
         }
 
         /// <summary>
@@ -566,88 +565,10 @@ namespace Pingfan.Kit
             T8 p8,
             T9 p9)
         {
-            fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
+            Fn(key, delay, FnKind.Throttle, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
 
         #endregion
         
-        #region 获取方法签名
-
-        private static Dictionary<Delegate, SignItem> _MethodSignatures = new Dictionary<Delegate, SignItem>();
-        private static object _LockerSign = new Object();
-
-        public static string GetSignture(Delegate fn)
-        {
-            if (_MethodSignatures.ContainsKey(fn))
-            {
-                return _MethodSignatures[fn].Sign;
-            }
-
-            lock (_LockerSign)
-            {
-                if (_MethodSignatures.ContainsKey(fn))
-                {
-                    return _MethodSignatures[fn].Sign;
-                }
-
-                GenFn(fn);
-                return _MethodSignatures[fn].Sign;
-            }
-        }
-
-        public static int GetArgsCount(Delegate fn)
-        {
-            if (_MethodSignatures.ContainsKey(fn))
-            {
-                return _MethodSignatures[fn].ArgsCount;
-            }
-
-            lock (_LockerSign)
-            {
-                if (_MethodSignatures.ContainsKey(fn))
-                {
-                    return _MethodSignatures[fn].ArgsCount;
-                }
-
-                GenFn(fn);
-                return _MethodSignatures[fn].ArgsCount;
-            }
-        }
-
-        private static void GenFn(Delegate fn)
-        {
-            // 获取fn的签名
-            var method = fn.Method;
-            var sb = new StringBuilder();
-            sb.Append(method.Name);
-            sb.Append("(");
-            var parameters = method.GetParameters();
-            foreach (var parameter in parameters)
-            {
-                sb.Append(parameter.ParameterType.Name);
-                sb.Append(",");
-            }
-
-            if (parameters.Length > 0)
-            {
-                sb.Remove(sb.Length - 1, 1);
-            }
-
-            sb.Append(")");
-            var sign = sb.ToString();
-            _MethodSignatures[fn] = new SignItem() { Sign = sign, ArgsCount = parameters.Length };
-        }
-
-        private class SignItem
-        {
-            public string Sign { get; set; }
-
-            /// <summary>
-            /// 参数的个数
-            /// </summary>
-            public int ArgsCount { get; set; }
-        }
-
-        #endregion
     }
 }

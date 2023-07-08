@@ -6,20 +6,22 @@ namespace Pingfan.Kit
 {
     public class Retry
     {
+        public static event Action<Exception> OnError;
+
         /// <summary>
         /// 间隔1秒一直重试1个任务
         /// </summary>
-        public static void Run(Action method, Action<Exception> handleError = null)
+        public static void Run(Action method)
         {
-            Run(int.MaxValue, 1000, method, handleError);
+            Run(int.MaxValue, 1000, method);
         }
 
         /// <summary>
         /// 间隔1秒一直重试1个任务
         /// </summary>
-        public static async Task Run(Func<Task> method, Action<Exception> handleError = null)
+        public static async Task RunAsync(Func<Task> method)
         {
-            await Run(int.MaxValue, 1000, method, handleError);
+            await Run(int.MaxValue, 1000, method);
         }
 
         /// <summary>
@@ -28,11 +30,9 @@ namespace Pingfan.Kit
         /// <param name="count">重试次数</param>
         /// <param name="delay">失败后等待毫秒数</param>
         /// <param name="method"></param>
-        /// <param name="handleError"></param>
         /// <exception cref="Exception"></exception>
-        public static void Run(int count, int delay, Action method, Action<Exception> handleError = null)
+        public static void Run(int count, int delay, Action method)
         {
-            Exception exception = null;
             for (var i = 0; i < count; i++)
             {
                 try
@@ -42,14 +42,14 @@ namespace Pingfan.Kit
                 }
                 catch (Exception e)
                 {
-                    exception = e;
-                    handleError?.Invoke(e);
+                    OnError?.Invoke(e);
                     if (delay > 0)
                         Thread.Sleep(delay);
                 }
             }
 
-            throw exception;
+            // 抛出未完成的异常
+            throw new Exception("Retry failed");
         }
 
         /// <summary>
@@ -58,13 +58,11 @@ namespace Pingfan.Kit
         /// <param name="count">重试次数</param>
         /// <param name="delay">失败后等待毫秒数</param>
         /// <param name="method"></param>
-        /// <param name="handleError"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static T Run<T>(int count, int delay, Func<T> method, Action<Exception> handleError = null)
+        public static T Run<T>(int count, int delay, Func<T> method)
         {
-            Exception exception = null;
             for (var i = 0; i < count; i++)
             {
                 try
@@ -73,14 +71,14 @@ namespace Pingfan.Kit
                 }
                 catch (Exception e)
                 {
-                    exception = e;
-                    handleError?.Invoke(e);
+                    OnError?.Invoke(e);
                     if (delay > 0)
                         Thread.Sleep(delay);
                 }
             }
 
-            throw exception;
+            // 抛出未完成的异常
+            throw new Exception("Retry failed");
         }
 
         /// <summary>
@@ -89,11 +87,9 @@ namespace Pingfan.Kit
         /// <param name="count">重试次数</param>
         /// <param name="delay">失败后等待毫秒数</param>
         /// <param name="method"></param>
-        /// <param name="handleError"></param>
         /// <exception cref="Exception"></exception>
-        public static async Task Run(int count, int delay, Func<Task> method, Action<Exception> handleError = null)
+        public static async Task RunAsync(int count, int delay, Func<Task> method)
         {
-            Exception exception = null;
             for (var i = 0; i < count; i++)
             {
                 try
@@ -103,14 +99,14 @@ namespace Pingfan.Kit
                 }
                 catch (Exception e)
                 {
-                    exception = e;
-                    handleError?.Invoke(e);
+                    OnError?.Invoke(e);
                     if (delay > 0)
                         await Task.Delay(delay);
                 }
             }
 
-            throw exception;
+            // 抛出未完成的异常
+            throw new Exception("Retry failed");
         }
 
         /// <summary>
@@ -119,14 +115,11 @@ namespace Pingfan.Kit
         /// <param name="count">重试次数</param>
         /// <param name="delay">失败后等待毫秒数</param>
         /// <param name="method"></param>
-        /// <param name="handleError"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static async Task<T> Run<T>(int count, int delay, Func<Task<T>> method,
-            Action<Exception> handleError = null)
+        public static async Task<T> Run<T>(int count, int delay, Func<Task<T>> method)
         {
-            Exception exception = null;
             for (var i = 0; i < count; i++)
             {
                 try
@@ -135,17 +128,16 @@ namespace Pingfan.Kit
                 }
                 catch (Exception e)
                 {
-                    exception = e;
-                    handleError?.Invoke(e);
+                    OnError?.Invoke(e);
                     if (delay > 0)
                         await Task.Delay(delay);
                 }
             }
 
-            throw exception;
+            // 抛出未完成的异常
+            throw new Exception("Retry failed");
         }
 
-        
 
         /// <summary>
         /// 失败重试
@@ -175,8 +167,6 @@ namespace Pingfan.Kit
                             break;
                         case RetryKind.Wait:
                             break;
-                        default:
-                            break;
                     }
 
                     Thread.Sleep(delay);
@@ -184,13 +174,13 @@ namespace Pingfan.Kit
 
                 return RetryKind.Wait;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return RetryKind.Exception;
             }
         }
-        
-        
+
+
         /// <summary>
         /// 失败重试
         /// </summary>
@@ -199,7 +189,8 @@ namespace Pingfan.Kit
         /// <param name="executeMethod">执行的方法</param>
         /// <param name="reTryMethod">判断超时的方法</param>
         /// <returns></returns>
-        public static async Task<RetryKind> Until(int count, int delay, Func<Task> executeMethod, Func<int, RetryKind> reTryMethod)
+        public static async Task<RetryKind> UntilAsync(int count, int delay, Func<Task> executeMethod,
+            Func<int, RetryKind> reTryMethod)
         {
             try
             {
@@ -219,8 +210,6 @@ namespace Pingfan.Kit
                             break;
                         case RetryKind.Wait:
                             break;
-                        default:
-                            break;
                     }
 
                     await Task.Delay(delay);
@@ -228,12 +217,12 @@ namespace Pingfan.Kit
 
                 return RetryKind.Wait;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return RetryKind.Exception;
             }
         }
-        
+
         /// <summary>
         /// 失败重试
         /// </summary>
@@ -242,7 +231,8 @@ namespace Pingfan.Kit
         /// <param name="executeMethod">执行的方法</param>
         /// <param name="reTryMethod">判断超时的方法</param>
         /// <returns></returns>
-        public static async Task<RetryKind> Until(int count, int delay, Action executeMethod, Func<int, Task<RetryKind>> reTryMethod)
+        public static async Task<RetryKind> Until(int count, int delay, Action executeMethod,
+            Func<int, Task<RetryKind>> reTryMethod)
         {
             try
             {
@@ -262,8 +252,6 @@ namespace Pingfan.Kit
                             break;
                         case RetryKind.Wait:
                             break;
-                        default:
-                            break;
                     }
 
                     await Task.Delay(delay);
@@ -271,12 +259,12 @@ namespace Pingfan.Kit
 
                 return RetryKind.Wait;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return RetryKind.Exception;
             }
         }
-        
+
         /// <summary>
         /// 失败重试
         /// </summary>
@@ -285,7 +273,8 @@ namespace Pingfan.Kit
         /// <param name="executeMethod">执行的方法</param>
         /// <param name="reTryMethod">判断超时的方法</param>
         /// <returns></returns>
-        public static async Task<RetryKind> Until(int count, int delay,  Func<Task> executeMethod, Func<int, Task<RetryKind>> reTryMethod)
+        public static async Task<RetryKind> Until(int count, int delay, Func<Task> executeMethod,
+            Func<int, Task<RetryKind>> reTryMethod)
         {
             try
             {
@@ -305,8 +294,6 @@ namespace Pingfan.Kit
                             break;
                         case RetryKind.Wait:
                             break;
-                        default:
-                            break;
                     }
 
                     await Task.Delay(delay);
@@ -314,7 +301,7 @@ namespace Pingfan.Kit
 
                 return RetryKind.Wait;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return RetryKind.Exception;
             }
@@ -324,16 +311,24 @@ namespace Pingfan.Kit
 
     public enum RetryKind
     {
-        // 完成
+        /// <summary>
+        /// 完成
+        /// </summary>
         Complete,
 
-        // 重试
+        /// <summary>
+        /// 重试执行方法
+        /// </summary>
         Retry,
 
-        // 异常
+        /// <summary>
+        /// 发生异常
+        /// </summary>
         Exception,
 
-        // 正常等待
+        /// <summary>
+        /// 正常等待
+        /// </summary>
         Wait,
     }
 }

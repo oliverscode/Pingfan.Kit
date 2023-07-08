@@ -3,36 +3,35 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-
+using System.Threading;
 
 namespace Pingfan.Kit
 {
     /// <summary>
-    /// 读写配置类, 默认1秒缓存
+    /// 读写配置类, 支持缓存
     /// </summary>
     public static class Config
     {
-        private static readonly object locker = new object();
-
-        /// <summary>
-        /// 默认时间, 单位秒, 默认1秒
-        /// </summary>
-        public static int CacheSeconds { get; set; } = 1;
-
-        private const string cacheKey = "PingFan.Config.Cache";
+        private static readonly object Locker = new object();
+        private static readonly ReaderWriterLockSlim CacheLock = new ReaderWriterLockSlim();
+        private const string CachePrefixKey = "PingFan.Config.Cache";
 
         public static string MainConfigFilePath =>
             Path.Combine(PathEx.CurrentDirectory, "app.ini");
 
+        /// <summary>
+        /// 缓存时间, 单位秒
+        /// </summary>
+        public static int CacheSeconds { get; set; } = 1;
 
         /// <summary>
         /// 写入配置
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <param name="key">配置键</param>
+        /// <param name="value">配置值</param>
         public static void Set(string key, string value)
         {
-            lock (locker)
+            lock (Locker)
             {
                 key = Regex.Escape(key);
                 var lines = ReadLinesCache();
@@ -55,42 +54,41 @@ namespace Pingfan.Kit
                     sb.Append(key).Append('=').AppendLine(value);
 
                 FileEx.WriteAllText(MainConfigFilePath, sb.ToString());
-                CacheMemory<string[]>.Clear(cacheKey);
+                ClearCache();
             }
         }
 
         /// <summary>
         /// 读取配置, 环境变量->命令行->配置文件->默认值
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
+        /// <param name="key">配置键</param>
+        /// <param name="defaultValue">默认值</param>
+        /// <returns>配置值</returns>
         public static string Get(string key, string defaultValue = "")
         {
-            key = Regex.Escape(key);
-            // 如果有环境变量, 则使用环境变量
-            var value = Environment.GetEnvironmentVariable(key);
-            if (value?.IsNullOrEmpty() == false)
+            CacheLock.EnterReadLock();
+            try
             {
-                return value;
-            }
+                key = Regex.Escape(key);
 
-            // 如果有命令行参数, 则使用命令行参数
-            value = GetByCmd(key);
-            if (!value.IsNullOrEmpty())
-            {
-                return value;
-            }
+                var value = Environment.GetEnvironmentVariable(key);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    return value;
+                }
 
-            // 没有配置文件, 默认写入有一个配置文件
-            if (!File.Exists(MainConfigFilePath))
-            {
-                Set(key, defaultValue);
-                return defaultValue;
-            }
+                value = GetByCmd(key);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    return value;
+                }
 
-            lock (locker)
-            {
+                if (!File.Exists(MainConfigFilePath))
+                {
+                    Set(key, defaultValue);
+                    return defaultValue;
+                }
+
                 var lines = ReadLinesCache();
                 foreach (var line in lines)
                 {
@@ -99,19 +97,21 @@ namespace Pingfan.Kit
                         return line.Substring(key.Length + 1);
                     }
                 }
+                Set(key, defaultValue);
+                return defaultValue;
             }
-
-            Set(key, defaultValue);
-            return defaultValue;
+            finally
+            {
+                CacheLock.ExitReadLock();
+            }
         }
-
 
         /// <summary>
         /// 从命令行中取参数, 格式为: key=value
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
+        /// <param name="key">参数名</param>
+        /// <param name="defaultValue">默认值</param>
+        /// <returns>参数值</returns>
         public static string GetByCmd(string key, string defaultValue = "")
         {
             var m = Regex.Match(Environment.CommandLine, $@"{key}=(\S+)");
@@ -126,53 +126,76 @@ namespace Pingfan.Kit
         /// <summary>
         /// 判断命令行字符串中是否有指定的参数
         /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="key">参数名</param>
+        /// <returns>是否存在该参数</returns>
         public static bool Has(string key)
         {
-            key = Regex.Escape(key);
-            // 如果有环境变量, 则使用环境变量
-            var value = Environment.GetEnvironmentVariable(key);
-            if (value?.IsNullOrEmpty() == false)
+            CacheLock.EnterReadLock();
+            try
             {
-                return true;
-            }
+                key = Regex.Escape(key);
 
-            // 如果有命令行参数, 则使用命令行参数
-            value = GetByCmd(key);
-            if (!value.IsNullOrEmpty())
-            {
-                return true;
-            }
-
-            // 没有配置文件
-            if (!File.Exists(MainConfigFilePath))
-            {
-                return false;
-            }
-
-            lock (locker)
-            {
-                var lines = ReadLinesCache();
-                if (lines.Any(line => line.StartsWith(key + "=")))
+                var value = Environment.GetEnvironmentVariable(key);
+                if (!string.IsNullOrEmpty(value))
                 {
                     return true;
                 }
-            }
 
-            return false;
+                value = GetByCmd(key);
+                if (!string.IsNullOrEmpty(value))
+                {
+                    return true;
+                }
+
+                if (!File.Exists(MainConfigFilePath))
+                {
+                    return false;
+                }
+
+                var lines = ReadLinesCache();
+                return lines.Any(line => line.StartsWith(key + "="));
+            }
+            finally
+            {
+                CacheLock.ExitReadLock();
+            }
         }
 
         private static string[] ReadLinesCache()
         {
-            return CacheMemory<string[]>.GetOrSet(cacheKey,
-                () => { return FileEx.ReadLines(MainConfigFilePath).ToArray(); },
-                CacheSeconds);
+            CacheLock.EnterUpgradeableReadLock();
+            try
+            {
+                return CacheMemory<string[]>.GetOrSet(CachePrefixKey,
+                    () => { return FileEx.ReadLines(MainConfigFilePath).ToArray(); },
+                    CacheSeconds);
+            }
+            finally
+            {
+                CacheLock.ExitUpgradeableReadLock();
+            }
         }
 
+        private static void ClearCache()
+        {
+            CacheLock.EnterWriteLock();
+            try
+            {
+                CacheMemory<string[]>.Clear(CachePrefixKey);
+            }
+            finally
+            {
+                CacheLock.ExitWriteLock();
+            }
+        }
+
+        /// <summary>
+        /// 清理缓存和配置文件
+        /// </summary>
+        /// <returns>配置文件是否删除成功</returns>
         public static bool Clear()
         {
-            CacheMemory<string[]>.Clear(cacheKey);
+            ClearCache();
             return FileEx.Delete(MainConfigFilePath);
         }
     }

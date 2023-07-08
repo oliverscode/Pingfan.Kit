@@ -8,18 +8,18 @@ namespace Pingfan.Kit
     /// </summary>
     public class IniFile
     {
-        private readonly string filePath; // 配置文件路径
-        private readonly Dictionary<string, Dictionary<string, string>> data; // 配置数据
+        private readonly string _filePath; // 配置文件路径
+        private readonly Dictionary<string, Dictionary<string, string>> _data; // 配置数据
 
         /// <summary>
         /// 获取所有Sections
         /// </summary>
-        public List<string> Sections => new List<string>(data.Keys);
+        public List<string> Sections => new List<string>(_data.Keys);
 
         public IniFile(string filePath)
         {
-            this.filePath = filePath;
-            this.data = new Dictionary<string, Dictionary<string, string>>();
+            this._filePath = filePath;
+            this._data = new Dictionary<string, Dictionary<string, string>>();
             ReLoad();
         }
 
@@ -32,9 +32,9 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public string GetValue(string section, string key, string defaultValue = "")
         {
-            if (data.ContainsKey(section) && data[section].ContainsKey(key))
+            if (_data.ContainsKey(section) && _data[section].ContainsKey(key))
             {
-                return data[section][key];
+                return _data[section][key];
             }
             else
             {
@@ -45,17 +45,14 @@ namespace Pingfan.Kit
         /// <summary>
         /// 设置指定值
         /// </summary>
-        /// <param name="section"></param>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
         public void SetValue(string section, string key, string value, bool isSave = true)
         {
-            if (!data.ContainsKey(section))
+            if (!_data.ContainsKey(section))
             {
-                data[section] = new Dictionary<string, string>();
+                _data[section] = new Dictionary<string, string>();
             }
 
-            data[section][key] = value;
+            _data[section][key] = value;
             if (isSave)
                 Save();
         }
@@ -66,7 +63,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public List<string> GetSections()
         {
-            return new List<string>(data.Keys);
+            return new List<string>(_data.Keys);
         }
 
         /// <summary>
@@ -76,9 +73,9 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public List<string> GetKeys(string section)
         {
-            if (data.ContainsKey(section))
+            if (_data.ContainsKey(section))
             {
-                return new List<string>(data[section].Keys);
+                return new List<string>(_data[section].Keys);
             }
             else
             {
@@ -91,14 +88,14 @@ namespace Pingfan.Kit
         /// </summary>
         public void ReLoad()
         {
-            if (!File.Exists(filePath))
+            if (!File.Exists(_filePath))
             {
                 return;
             }
 
-            data.Clear();
+            _data.Clear();
             // 读取配置文件数据
-            string[] lines = File.ReadAllLines(filePath);
+            string[] lines = File.ReadAllLines(_filePath);
             string currentSection = "";
             foreach (string line in lines)
             {
@@ -114,12 +111,12 @@ namespace Pingfan.Kit
                 {
                     string key = trimmedLine.Substring(0, index).Trim();
                     string value = trimmedLine.Substring(index + 1).Trim();
-                    if (!data.ContainsKey(currentSection))
+                    if (!_data.ContainsKey(currentSection))
                     {
-                        data[currentSection] = new Dictionary<string, string>();
+                        _data[currentSection] = new Dictionary<string, string>();
                     }
 
-                    data[currentSection][key] = value;
+                    _data[currentSection][key] = value;
                 }
             }
         }
@@ -128,7 +125,7 @@ namespace Pingfan.Kit
         public void Save()
         {
             List<string> lines = new List<string>();
-            foreach (KeyValuePair<string, Dictionary<string, string>> section in data)
+            foreach (KeyValuePair<string, Dictionary<string, string>> section in _data)
             {
                 lines.Add($"[{section.Key}]");
                 foreach (KeyValuePair<string, string> kv in section.Value)
@@ -138,14 +135,14 @@ namespace Pingfan.Kit
             }
 
             // 判断目录是否存在, 不存在的话, 创建目录
-            string dir = Path.GetDirectoryName(filePath);
+            string dir = Path.GetDirectoryName(_filePath);
             if (!Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);
             }
 
 
-            File.WriteAllLines(filePath, lines);
+            File.WriteAllLines(_filePath, lines);
         }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace Pingfan.Kit
 {
@@ -11,187 +12,204 @@ namespace Pingfan.Kit
     /// </summary>
     public static class FileEx
     {
+        private static readonly ConcurrentDictionary<string, object> Locks = new ConcurrentDictionary<string, object>();
+
         /// <summary>
         /// 重试次数
         /// </summary>
-        public static int retryCount = 10;
+        public static int RetryCount { get; set; } = 10;
 
         /// <summary>
         /// 重试间隔, 单位毫秒
         /// </summary>
-        public static int retryInterval = 100;
+        public static int RetryInterval { get; set; } = 100;
 
-        /// <summary>
-        /// 读取一个文件, 如果文件不存在会返回null
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
-        public static string ReadAllText(string path, Encoding encoding = null)
+        private static void RunWithRetry(Action action)
         {
-            if (encoding == null)
-                encoding = Encoding.UTF8;
-            return Read(path, () => File.ReadAllText(path, encoding));
-        }
+            var attempts = 0;
 
-
-        /// <summary>
-        /// 读取一个文件, 如果文件不存在会返回string[]
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
-        public static string[] ReadAllLines(string path, Encoding encoding = null)
-        {
-            if (encoding == null)
-                encoding = Encoding.UTF8;
-            return Read(path, () => File.ReadAllLines(path, encoding)) ?? Array.Empty<string>();
-        }
-
-        /// <summary>
-        /// 读取一个文件, 如果文件不存在会返回string[]
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="encoding"></param>
-        /// <returns></returns>
-        public static IEnumerable<string> ReadLines(string path, Encoding encoding = null)
-        {
-            if (encoding == null)
-                encoding = Encoding.UTF8;
-            return Read(path, () => File.ReadLines(path, encoding)) ?? Array.Empty<string>();
-        }
-
-        /// <summary>
-        /// 写入文件, 如果文件不存在则创建
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="contents"></param>
-        /// <param name="encoding"></param>
-        public static void AppendAllText(string path, string contents, Encoding encoding = null)
-        {
-            if (encoding == null)
-                encoding = Encoding.UTF8;
-
-            Write(path, () => File.AppendAllText(path, contents, encoding));
-        }
-
-        /// <summary>
-        /// 写入文件, 如果文件不存在则创建
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="contents"></param>
-        /// <param name="encoding"></param>
-        public static void AppendAllLines(string path, IEnumerable<string> contents, Encoding encoding = null)
-        {
-            if (encoding == null)
-                encoding = Encoding.UTF8;
-            Write(path, () => File.AppendAllLines(path, contents, encoding));
-        }
-
-
-        /// <summary>
-        /// 写入文件, 如果文件不存在则创建
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="contents"></param>
-        /// <param name="encoding"></param>
-        public static void WriteAllText(string path, string contents, Encoding encoding = null)
-        {
-            if (encoding == null)
-                encoding = Encoding.UTF8;
-            Write(path, () => File.WriteAllText(path, contents, encoding));
-        }
-
-        /// <summary>
-        /// 写入文件, 如果文件不存在则创建
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="contents"></param>
-        /// <param name="encoding"></param>
-        public static void WriteAllLines(string path, IEnumerable<string> contents, Encoding encoding = null)
-        {
-            if (encoding == null)
-                encoding = Encoding.UTF8;
-            Write(path, () => File.WriteAllLines(path, contents, encoding));
-        }
-
-
-        /// <summary>
-        /// 读取一个文件, 如果文件不存在会返回byte[0]
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static byte[] ReadAllBytes(string path)
-        {
-            return Read(path, () => File.ReadAllBytes(path)) ?? Array.Empty<byte>();
-        }
-
-        /// <summary>
-        /// 写入文件, 如果文件不存在则创建
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="buffer"></param>
-        public static void WriteAllBytes(string path, byte[] buffer)
-        {
-            Write(path, () => File.WriteAllBytes(path, buffer));
-        }
-
-        private static void Write(string path, Action fn)
-        {
-            // 获取Path的目录
-            lock (path)
+            while (true)
             {
-                var dir = Path.GetDirectoryName(path);
-                Retry.Run(retryCount, retryInterval, () =>
+                try
                 {
-                    if (!Directory.Exists(dir))
-                    {
-                        Directory.CreateDirectory(dir);
-                    }
-                });
+                    action();
+                    return;
+                }
+                catch
+                {
+                    if (++attempts == RetryCount)
+                        throw;
 
-                Retry.Run(retryCount, retryInterval, fn);
+                    Thread.Sleep(RetryInterval);
+                }
+            }
+        }
+
+        private static T RunWithRetry<T>(Func<T> action)
+        {
+            var attempts = 0;
+
+            while (true)
+            {
+                try
+                {
+                    return action();
+                }
+                catch
+                {
+                    if (++attempts == RetryCount)
+                        throw;
+
+                    Thread.Sleep(RetryInterval);
+                }
             }
         }
 
         /// <summary>
-        /// 删除一个文件, 或者目录
+        /// 读取一个文件
+        /// </summary>
+        public static string ReadAllText(string path, Encoding encoding = null)
+        {
+            encoding = encoding ?? Encoding.UTF8;
+            var lockObject = Locks.GetOrAdd(path, _ => new object());
+
+            lock (lockObject)
+            {
+                return RunWithRetry(() => File.ReadAllText(path, encoding));
+            }
+        }
+
+        /// <summary>
+        /// 读取一个文件的所有行
+        /// </summary>
+        public static string[] ReadAllLines(string path, Encoding encoding = null)
+        {
+            encoding = encoding ?? Encoding.UTF8;
+            var lockObject = Locks.GetOrAdd(path, _ => new object());
+
+            lock (lockObject)
+            {
+                return RunWithRetry(() => File.ReadAllLines(path, encoding));
+            }
+        }
+
+        /// <summary>
+        /// 读取一个文件的所有行
+        /// </summary>
+        public static IEnumerable<string> ReadLines(string path, Encoding encoding = null)
+        {
+            encoding = encoding ?? Encoding.UTF8;
+            var lockObject = Locks.GetOrAdd(path, _ => new object());
+
+            lock (lockObject)
+            {
+                return RunWithRetry(() => File.ReadLines(path, encoding));
+            }
+        }
+
+        /// <summary>
+        /// 写入文本到一个文件
+        /// </summary>
+        public static void WriteAllText(string path, string contents, Encoding encoding = null)
+        {
+            encoding = encoding ?? Encoding.UTF8;
+            var lockObject = Locks.GetOrAdd(path, _ => new object());
+
+            lock (lockObject)
+            {
+                RunWithRetry(() =>
+                {
+                    PathEx.CreateDirectoryIfNotExists(path);
+                    File.WriteAllText(path, contents, encoding);
+                });
+            }
+        }
+
+        /// <summary>
+        /// 写入多行文本到一个文件
+        /// </summary>
+        public static void WriteAllLines(string path, IEnumerable<string> contents, Encoding encoding = null)
+        {
+            encoding = encoding ?? Encoding.UTF8;
+            var lockObject = Locks.GetOrAdd(path, _ => new object());
+
+            lock (lockObject)
+            {
+                RunWithRetry(() =>
+                {
+                    PathEx.CreateDirectoryIfNotExists(path);
+                    File.WriteAllLines(path, contents, encoding);
+                });
+            }
+        }
+
+        /// <summary>
+        /// 读取一个文件的所有字节
+        /// </summary>
+        public static byte[] ReadAllBytes(string path)
+        {
+            var lockObject = Locks.GetOrAdd(path, _ => new object());
+
+            lock (lockObject)
+            {
+                return RunWithRetry(() => File.ReadAllBytes(path));
+            }
+        }
+
+        /// <summary>
+        /// 写入字节数组到一个文件
+        /// </summary>
+        public static void WriteAllBytes(string path, byte[] bytes)
+        {
+            var lockObject = Locks.GetOrAdd(path, _ => new object());
+
+            lock (lockObject)
+            {
+                RunWithRetry(() =>
+                {
+                    PathEx.CreateDirectoryIfNotExists(path);
+                    File.WriteAllBytes(path, bytes);
+                });
+            }
+        }
+
+        /// <summary>
+        /// 追加文本到一个文件
+        /// </summary>
+        public static void AppendAllText(string path, string contents, Encoding encoding = null)
+        {
+            encoding = encoding ?? Encoding.UTF8;
+            var lockObject = Locks.GetOrAdd(path, _ => new object());
+
+            lock (lockObject)
+            {
+                RunWithRetry(() =>
+                {
+                    PathEx.CreateDirectoryIfNotExists(path);
+                    File.AppendAllText(path, contents, encoding);
+                });
+            }
+        }
+
+        /// <summary>
+        /// 删除一个文件
         /// </summary>
         /// <param name="path"></param>
         public static bool Delete(string path)
         {
-            lock (path)
+            var lockObject = Locks.GetOrAdd(path, _ => new object());
+            lock (lockObject)
             {
-                return Retry.Run(retryCount, retryInterval, () =>
+                RunWithRetry(() =>
                 {
                     if (File.Exists(path))
                     {
                         File.Delete(path);
-                        return true;
                     }
-
-                    if (Directory.Exists(path))
-                    {
-                        Directory.Delete(path, true);
-                        return true;
-                    }
-
-                    return false;
                 });
             }
-        }
 
-        private static T Read<T>(string path, Func<T> fn) where T : class
-        {
-            if (!File.Exists(path))
-            {
-                return null;
-            }
-
-            lock (path)
-            {
-                return Retry.Run(retryCount, retryInterval, fn);
-            }
+            return File.Exists(path);
         }
     }
 }

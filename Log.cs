@@ -5,6 +5,7 @@ namespace Pingfan.Kit
     /// <summary>
     /// 日志级别
     /// </summary>
+    [Flags]
     public enum LogLevel
     {
         /// <summary>
@@ -60,17 +61,19 @@ namespace Pingfan.Kit
     /// </summary>
     public class Log : ILog
     {
-        /// <summary>
-        /// 日志文件名, /日期/{*}.log
-        /// </summary>
-        public string LogFileName { get; set; }
-
-        private static readonly string _RootPath = PathEx.CombineFromCurrentDirectory("log");
+        private static readonly string RootPath = PathEx.CombineFromCurrentDirectory("log");
 
         /// <summary>
         /// 默认的日志记录对象
         /// </summary>
         public static Log Default { get; } = new Log("");
+        
+        
+        
+        /// <summary>
+        /// 日志文件名, /日期/{*}.log
+        /// </summary>
+        public string LogFileName { get; set; }
 
         public Log()
         {
@@ -202,7 +205,7 @@ namespace Pingfan.Kit
                     // 判断是否要输出到磁盘
                     if ((logLevel & this.FileLevel) != 0)
                     {
-                        var logPath = PathEx.Combine(_RootPath, $"{DateTime.Now:yyyy-MM-dd}{LogFileName}.log");
+                        var logPath = PathEx.Combine(RootPath, $"{DateTime.Now:yyyy-MM-dd}{LogFileName}.log");
                         FileEx.AppendAllText(logPath, str);
                     }
                 }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pingfan.Kit
@@ -66,13 +64,14 @@ namespace Pingfan.Kit
         /// <summary>
         /// 随机取一个元素
         /// </summary>
-        /// <param name="list"></param>
+        /// <param name="collection"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T RandomOne<T>(this IEnumerable<T> list)
+        public static T RandomOne<T>(this IEnumerable<T> collection)
         {
-            var index = RandomEx.Next(0, list.Count());
-            return list.ElementAt(index);
+            var enumerable = collection as T[] ?? collection.ToArray();
+            var index = RandomEx.Next(0, enumerable.Count());
+            return enumerable.ElementAt(index);
         }
 
         /// <summary>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pingfan.Kit
@@ -14,9 +13,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 获取结果
         /// </summary>
-        public T Result => task.Result;
+        public T Result => _task.Result;
 
-        private readonly Task<T> task = null;
+        private readonly Task<T> _task;
 
         /// <summary>
         /// 类似js的Promise
@@ -25,12 +24,9 @@ namespace Pingfan.Kit
         public Promise(Action<Action<T>> resolve)
         {
             var tcs = new TaskCompletionSource<T>();
-
             var p = new Action<T>((o) => tcs.SetResult(o));
-
             resolve(p);
-
-            task = tcs.Task;
+            _task = tcs.Task;
         }
 
         /// <summary>
@@ -40,10 +36,8 @@ namespace Pingfan.Kit
         public Promise(Func<Action<T>, Task> resolve)
         {
             var tcs = new TaskCompletionSource<T>();
-
             var p = new Action<T>((o) => tcs.SetResult(o));
-
-            task = Task.Run(async () =>
+            _task = Task.Run(async () =>
             {
                 await resolve(p).ConfigureAwait(false);
                 await tcs.Task.ConfigureAwait(false);
@@ -53,7 +47,7 @@ namespace Pingfan.Kit
 
         public TaskAwaiter<T> GetAwaiter()
         {
-            return task.GetAwaiter();
+            return _task.GetAwaiter();
         }
 
     }

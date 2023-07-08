@@ -2,6 +2,9 @@
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// DateTime扩展类
+    /// </summary>
     public static class DateTimeEx
     {
         /// <summary>

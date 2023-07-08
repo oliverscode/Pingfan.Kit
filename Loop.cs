@@ -48,7 +48,7 @@ namespace Pingfan.Kit
         /// 死循环运行一个方法
         /// </summary>
         /// <param name="action"></param>
-        public static Task Run(Func<Task> action)
+        public static Task RunAsync(Func<Task> action)
         {
             return Task.Run(async () =>
             {
@@ -63,7 +63,7 @@ namespace Pingfan.Kit
         /// 死循环运行一个方法
         /// </summary>
         /// <param name="action"></param>
-        public static Task RunWithTry(Func<Task> action)
+        public static Task RunAsyncWithTry(Func<Task> action)
         {
             return Task.Run(async () =>
             {
@@ -100,6 +100,9 @@ namespace Pingfan.Kit
             thread.Join();
         }
 
+        /// <summary>
+        /// 重复执行指定次数的方法
+        /// </summary>
         public static void Run(int count, Action method)
         {
             for (var i = 0; i < count; i++)
@@ -111,8 +114,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 重复执行指定次数的方法, i从1开始
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="method"></param>
         public static void Run(int count, Action<int> method)
         {
             for (var i = 1; i <= count; i++)
@@ -121,7 +122,12 @@ namespace Pingfan.Kit
             }
         }
 
-        public static async Task Run(int count, Func<Task> method)
+        /// <summary>
+        /// 重复执行指定次数的方法
+        /// </summary>
+        /// <param name="count"></param>
+        /// <param name="method"></param>
+        public static async Task RunAsync(int count, Func<Task> method)
         {
             for (var i = 0; i < count; i++)
             {
@@ -134,7 +140,7 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="count"></param>
         /// <param name="method"></param>
-        public static async Task Run(int count, Func<int, Task> method)
+        public static async Task RunAsync(int count, Func<int, Task> method)
         {
             for (var i = 1; i <= count; i++)
             {

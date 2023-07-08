@@ -8,16 +8,16 @@ namespace Pingfan.Kit
     public class Progress : IDisposable
     {
 
-        private DateTime startTime = DateTime.Now;
-        private DateTime endTime;
+        private DateTime _startTime = DateTime.Now;
+        private DateTime _endTime;
 
         //每秒处理
-        private double perSecondsCount;
+        private double _perSecondsCount;
 
         /// <summary>
         /// 已用时间
         /// </summary>
-        public TimeSpan Elapsed => ((endTime.Ticks > 0) ? endTime : DateTime.Now) - startTime;
+        public TimeSpan Elapsed => ((_endTime.Ticks > 0) ? _endTime : DateTime.Now) - _startTime;
 
 
         private long _total;
@@ -41,8 +41,8 @@ namespace Pingfan.Kit
         public bool IsComplete => Index >= _total;
 
         // 最近的速率
-        private readonly List<long> speedSum = new List<long>();
-        private const int maxSpeedSum = 20; // 取最近10条的平均值
+        private readonly List<long> _speedSum = new List<long>();
+        private const int MaxSpeedSum = 20; // 取最近10条的平均值
 
         /// <summary>
         /// 预计剩余秒数
@@ -96,23 +96,23 @@ namespace Pingfan.Kit
                 lock (this)
                 {
                     var ticks = DateTime.Now.Ticks;
-                    var timeCount = ticks - startTime.Ticks;
+                    var timeCount = ticks - _startTime.Ticks;
 
                     if (timeCount < 100 * 10000)
                     {
-                        return perSecondsCount;
+                        return _perSecondsCount;
                     }
 
                     var avg = 0d;
-                    if (speedSum.Count > 0)
-                        avg = speedSum.Average();
+                    if (_speedSum.Count > 0)
+                        avg = _speedSum.Average();
 
                     // var speed = 10000000.0d * avg / timeCount;
                     // _perSecondsCount = Math.Round(speed, 2);
 
-                    perSecondsCount = avg;
+                    _perSecondsCount = avg;
 
-                    return perSecondsCount;
+                    return _perSecondsCount;
                 }
             }
         }
@@ -128,10 +128,10 @@ namespace Pingfan.Kit
             // 增加每秒处理量
             lock (this)
             {
-                speedSum.Add(count);
-                if (speedSum.Count > maxSpeedSum)
+                _speedSum.Add(count);
+                if (_speedSum.Count > MaxSpeedSum)
                 {
-                    speedSum.RemoveAt(0);
+                    _speedSum.RemoveAt(0);
                 }
             }
         }
@@ -147,10 +147,10 @@ namespace Pingfan.Kit
                 // 增加每秒处理量
                 lock (this)
                 {
-                    speedSum.Add(index - _currentIndex);
-                    if (speedSum.Count > maxSpeedSum)
+                    _speedSum.Add(index - _currentIndex);
+                    if (_speedSum.Count > MaxSpeedSum)
                     {
-                        speedSum.RemoveAt(0);
+                        _speedSum.RemoveAt(0);
                     }
                 }
             }
@@ -158,7 +158,7 @@ namespace Pingfan.Kit
             Interlocked.Exchange(ref _currentIndex, index);
             if (index >= _total)
             {
-                endTime = DateTime.Now;
+                _endTime = DateTime.Now;
             }
         }
 
@@ -171,7 +171,7 @@ namespace Pingfan.Kit
             Interlocked.Exchange(ref _total, total);
             if (Index >= _total)
             {
-                endTime = DateTime.Now;
+                _endTime = DateTime.Now;
             }
         }
 
@@ -186,7 +186,7 @@ namespace Pingfan.Kit
             Interlocked.Exchange(ref _total, total);
             if (_currentIndex >= _total)
             {
-                endTime = DateTime.Now;
+                _endTime = DateTime.Now;
             }
         }
 
@@ -197,8 +197,8 @@ namespace Pingfan.Kit
         {
             _total = 0L;
             _currentIndex = 0L;
-            startTime = DateTime.Now;
-            endTime = DateTime.MinValue;
+            _startTime = DateTime.Now;
+            _endTime = DateTime.MinValue;
         }
 
         public override string ToString()
