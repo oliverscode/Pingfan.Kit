@@ -16,7 +16,9 @@ namespace Pingfan.Kit
 
         protected static ulong[] Crc32Table;
 
-        //生成CRC32码表
+        /// <summary>
+        /// 生成CRC32码表
+        /// </summary>
         private static void GetCrc32Table()
         {
             ulong crc;
@@ -37,6 +39,11 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 计算CRC32哈希值
+        /// </summary>
+        /// <param name="buffer">要计算哈希的字节数组</param>
+        /// <returns>返回CRC32哈希值</returns>
         public static string Crc32(byte[] buffer)
         {
             int len = buffer.Length;
@@ -49,6 +56,11 @@ namespace Pingfan.Kit
             return (value ^ 0xffffffff).ToString("x2");
         }
 
+        /// <summary>
+        /// 计算CRC32哈希值
+        /// </summary>
+        /// <param name="stream">要计算哈希的数据流</param>
+        /// <returns>返回CRC32哈希值</returns>
         public static string Crc32(Stream stream)
         {
             var len = stream.Length;
@@ -61,6 +73,11 @@ namespace Pingfan.Kit
             return (value ^ 0xffffffff).ToString("x2");
         }
 
+        /// <summary>
+        /// 计算CRC32哈希值
+        /// </summary>
+        /// <param name="data">要计算哈希的字符串</param>
+        /// <returns>返回CRC32哈希值</returns>
         public static string Crc32(string data)
         {
             var buffer = Encoding.ASCII.GetBytes(data);
@@ -74,90 +91,131 @@ namespace Pingfan.Kit
             return (value ^ 0xffffffff).ToString("x2");
         }
 
+        /// <summary>
+        /// 计算SHA256哈希值
+        /// </summary>
+        /// <param name="data">要计算哈希的字符串</param>
+        /// <returns>返回SHA256哈希值</returns>
         public static string Sha256(string data)
         {
-            var bytes = Encoding.ASCII.GetBytes(data);
-            var hash = SHA256.Create().ComputeHash(bytes);
-
-            var sb = new StringBuilder();
-            foreach (var b in hash)
+            using (var sha256 = SHA256.Create())
             {
-                sb.Append(b.ToString("x2"));
+                return Sha256(Encoding.ASCII.GetBytes(data), sha256);
             }
-
-            return sb.ToString();
         }
 
+        /// <summary>
+        /// 计算SHA256哈希值
+        /// </summary>
+        /// <param name="stream">要计算哈希的数据流</param>
+        /// <returns>返回SHA256哈希值</returns>
         public static string Sha256(Stream stream)
         {
-            var hash = SHA256.Create().ComputeHash(stream);
-            var sb = new StringBuilder();
-            foreach (var b in hash)
+            using (var sha256 = SHA256.Create())
             {
-                sb.Append(b.ToString("x2"));
+                return Sha256(stream, sha256);
             }
-
-            return sb.ToString();
         }
+
+        /// <summary>
+        /// 计算SHA256哈希值
+        /// </summary>
+        /// <param name="data">要计算哈希的字节数组</param>
+        /// <returns>返回SHA256哈希值</returns>
         public static string Sha256(byte[] data)
         {
-            var hash = SHA256.Create().ComputeHash(data);
-
-            var sb = new StringBuilder();
-            foreach (var b in hash)
+            using (var sha256 = SHA256.Create())
             {
-                sb.Append(b.ToString("x2"));
+                return Sha256(data, sha256);
             }
-
-            return sb.ToString();
         }
 
+        private static string Sha256(byte[] data, HashAlgorithm sha256)
+        {
+            var hash = sha256.ComputeHash(data);
+            return ToHexString(hash);
+        }
+
+        private static string Sha256(Stream stream, HashAlgorithm sha256)
+        {
+            var hash = sha256.ComputeHash(stream);
+            return ToHexString(hash);
+        }
+
+        /// <summary>
+        /// 计算MD5哈希值
+        /// </summary>
+        /// <param name="data">要计算哈希的字符串</param>
+        /// <returns>返回MD5哈希值</returns>
         public static string Md5(string data)
         {
-            var bytes = Encoding.ASCII.GetBytes(data);
-            return Md5(bytes);
+            using (var md5 = MD5.Create())
+            {
+                return Md5(Encoding.ASCII.GetBytes(data), md5);
+            }
         }
 
+        /// <summary>
+        /// 计算MD5哈希值
+        /// </summary>
+        /// <param name="stream">要计算哈希的数据流</param>
+        /// <returns>返回MD5哈希值</returns>
         public static string Md5(Stream stream)
         {
-            var md5 = MD5.Create();
-            var hash = md5.ComputeHash(stream);
-            var sb = new StringBuilder();
-            foreach (var b in hash)
+            using (var md5 = MD5.Create())
             {
-                sb.Append(b.ToString("x2"));
+                return Md5(stream, md5);
             }
-
-            return sb.ToString();
         }
 
+        /// <summary>
+        /// 计算MD5哈希值
+        /// </summary>
+        /// <param name="data">要计算哈希的字节数组</param>
+        /// <returns>返回MD5哈希值</returns>
         public static string Md5(byte[] data)
         {
-            var md5 = MD5.Create();
+            using (var md5 = MD5.Create())
+            {
+                return Md5(data, md5);
+            }
+        }
+
+        private static string Md5(byte[] data, HashAlgorithm md5)
+        {
             var hash = md5.ComputeHash(data);
+            return ToHexString(hash);
+        }
+
+        private static string Md5(Stream stream, HashAlgorithm md5)
+        {
+            var hash = md5.ComputeHash(stream);
+            return ToHexString(hash);
+        }
+        
+        private static string ToHexString(byte[] hash)
+        {
             var sb = new StringBuilder();
             foreach (var b in hash)
             {
                 sb.Append(b.ToString("x2"));
             }
-
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 对参数进行签名
+        /// </summary>
+        /// <param name="args">要签名的参数</param>
+        /// <returns>签名结果</returns>
         public static string Signature(params object[] args)
         {
-            var sb = new StringBuilder();
-            foreach (var data in args)
+            var toEncryptArray = Encoding.ASCII.GetBytes(string.Join("", args));
+            using (var sha256 = SHA256.Create())
             {
-                sb.Append("[");
-                var key = data.GetType().ToString();
-                sb.Append(key);
-                sb.Append("]");
-                sb.Append("=");
-                sb.Append(data);
+                var resultArray = sha256.ComputeHash(toEncryptArray);
+                return ToHexString(resultArray);
             }
-
-            return Sha256(sb.ToString());
         }
     }
 }

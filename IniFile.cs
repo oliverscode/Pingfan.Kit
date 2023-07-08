@@ -1,20 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace Pingfan.Kit
 {
     /// <summary>
-    /// 根据组名键名的方式读取配置文件
+    /// 提供根据组名键名的方式读取配置文件的功能。
     /// </summary>
     public class IniFile
     {
         private readonly string _filePath; // 配置文件路径
         private readonly Dictionary<string, Dictionary<string, string>> _data; // 配置数据
-
-        /// <summary>
-        /// 获取所有Sections
-        /// </summary>
-        public List<string> Sections => new List<string>(_data.Keys);
 
         public IniFile(string filePath)
         {
@@ -24,17 +20,13 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 读取配置
+        /// 从配置文件中获取指定的值。
         /// </summary>
-        /// <param name="section"></param>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
         public string GetValue(string section, string key, string defaultValue = "")
         {
-            if (_data.ContainsKey(section) && _data[section].ContainsKey(key))
+            if (_data.TryGetValue(section, out var sectionData) && sectionData.TryGetValue(key, out var value))
             {
-                return _data[section][key];
+                return value;
             }
             else
             {
@@ -43,7 +35,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 设置指定值
+        /// 将指定的值设置到配置文件中。
         /// </summary>
         public void SetValue(string section, string key, string value, bool isSave = true)
         {
@@ -58,24 +50,21 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 读取所有section
+        /// 获取配置文件的所有sections。
         /// </summary>
-        /// <returns></returns>
         public List<string> GetSections()
         {
             return new List<string>(_data.Keys);
         }
 
         /// <summary>
-        /// 获取section下所有键
+        /// 获取指定section下的所有keys。
         /// </summary>
-        /// <param name="section"></param>
-        /// <returns></returns>
         public List<string> GetKeys(string section)
         {
-            if (_data.ContainsKey(section))
+            if (_data.TryGetValue(section, out var sectionData))
             {
-                return new List<string>(_data[section].Keys);
+                return new List<string>(sectionData.Keys);
             }
             else
             {
@@ -84,7 +73,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 刷新配置文件
+        /// 重新加载配置文件。
         /// </summary>
         public void ReLoad()
         {
@@ -94,23 +83,24 @@ namespace Pingfan.Kit
             }
 
             _data.Clear();
+
             // 读取配置文件数据
-            string[] lines = File.ReadAllLines(_filePath);
-            string currentSection = "";
-            foreach (string line in lines)
+            var lines = File.ReadAllLines(_filePath);
+            var currentSection = "";
+            foreach (var line in lines)
             {
-                string trimmedLine = line.Trim();
+                var trimmedLine = line.Trim();
                 if (trimmedLine.StartsWith("[") && trimmedLine.EndsWith("]"))
                 {
                     currentSection = trimmedLine.Substring(1, trimmedLine.Length - 2);
                     continue;
                 }
 
-                int index = trimmedLine.IndexOf("=");
+                var index = trimmedLine.IndexOf("=", StringComparison.Ordinal);
                 if (index >= 0)
                 {
-                    string key = trimmedLine.Substring(0, index).Trim();
-                    string value = trimmedLine.Substring(index + 1).Trim();
+                    var key = trimmedLine.Substring(0, index).Trim();
+                    var value = trimmedLine.Substring(index + 1).Trim();
                     if (!_data.ContainsKey(currentSection))
                     {
                         _data[currentSection] = new Dictionary<string, string>();
@@ -121,27 +111,23 @@ namespace Pingfan.Kit
             }
         }
 
-
+        /// <summary>
+        /// 保存配置文件。
+        /// </summary>
         public void Save()
         {
-            List<string> lines = new List<string>();
-            foreach (KeyValuePair<string, Dictionary<string, string>> section in _data)
+            var lines = new List<string>();
+            foreach (var section in _data)
             {
                 lines.Add($"[{section.Key}]");
-                foreach (KeyValuePair<string, string> kv in section.Value)
+                foreach (var kv in section.Value)
                 {
                     lines.Add($"{kv.Key}={kv.Value}");
                 }
             }
 
             // 判断目录是否存在, 不存在的话, 创建目录
-            string dir = Path.GetDirectoryName(_filePath);
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-
-
+            PathEx.CreateDirectoryIfNotExists(_filePath);
             File.WriteAllLines(_filePath, lines);
         }
     }
