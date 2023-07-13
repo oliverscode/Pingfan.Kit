@@ -45,14 +45,53 @@ namespace Pingfan.Kit
     }
 
 
+    /// <summary>
+    /// 日志记录器接口
+    /// </summary>
     public interface ILog
     {
+        /// <summary>
+        /// 写一个调试日志
+        /// </summary>
+        /// <param name="logString"></param>
         void Debug(string logString);
+        
+        /// <summary>
+        /// 写一个错误日志
+        /// </summary>
+        /// <param name="logString"></param>
+        /// <param name="e"></param>
         void Error(string logString, Exception e = null);
+        
+        /// <summary>
+        /// 写一个宕机的日志
+        /// </summary>
+        /// <param name="logString"></param>
         void Fatal(string logString);
+        
+        /// <summary>
+        /// 写一个关键日志
+        /// </summary>
+        /// <param name="logString"></param>
         void Info(string logString);
+        
+        /// <summary>
+        /// 写一个成功日志
+        /// </summary>
+        /// <param name="logString"></param>
         void Success(string logString);
+        
+        /// <summary>
+        /// 写一个警告日志
+        /// </summary>
+        /// <param name="logString"></param>
         void Warning(string logString);
+        
+        /// <summary>
+        /// 写一行日志
+        /// </summary>
+        /// <param name="logLevel"></param>
+        /// <param name="logString"></param>
         void WriteLine(LogLevel logLevel, string logString);
     }
 
