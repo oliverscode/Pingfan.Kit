@@ -66,44 +66,36 @@ namespace Pingfan.Kit
         /// <returns>配置值</returns>
         public static string Get(string key, string defaultValue = "")
         {
-            CacheLock.EnterReadLock();
-            try
+            key = Regex.Escape(key);
+
+            var value = Environment.GetEnvironmentVariable(key);
+            if (!string.IsNullOrEmpty(value))
             {
-                key = Regex.Escape(key);
+                return value;
+            }
 
-                var value = Environment.GetEnvironmentVariable(key);
-                if (!string.IsNullOrEmpty(value))
-                {
-                    return value;
-                }
+            value = GetByCmd(key);
+            if (!string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
 
-                value = GetByCmd(key);
-                if (!string.IsNullOrEmpty(value))
-                {
-                    return value;
-                }
-
-                if (!File.Exists(MainConfigFilePath))
-                {
-                    Set(key, defaultValue);
-                    return defaultValue;
-                }
-
-                var lines = ReadLinesCache();
-                foreach (var line in lines)
-                {
-                    if (line.StartsWith(key + "="))
-                    {
-                        return line.Substring(key.Length + 1);
-                    }
-                }
+            if (!File.Exists(MainConfigFilePath))
+            {
                 Set(key, defaultValue);
                 return defaultValue;
             }
-            finally
+
+            var lines = ReadLinesCache();
+            foreach (var line in lines)
             {
-                CacheLock.ExitReadLock();
+                if (line.StartsWith(key + "="))
+                {
+                    return line.Substring(key.Length + 1);
+                }
             }
+            Set(key, defaultValue);
+            return defaultValue;
         }
 
         /// <summary>
@@ -130,35 +122,27 @@ namespace Pingfan.Kit
         /// <returns>是否存在该参数</returns>
         public static bool Has(string key)
         {
-            CacheLock.EnterReadLock();
-            try
+            key = Regex.Escape(key);
+
+            var value = Environment.GetEnvironmentVariable(key);
+            if (!string.IsNullOrEmpty(value))
             {
-                key = Regex.Escape(key);
-
-                var value = Environment.GetEnvironmentVariable(key);
-                if (!string.IsNullOrEmpty(value))
-                {
-                    return true;
-                }
-
-                value = GetByCmd(key);
-                if (!string.IsNullOrEmpty(value))
-                {
-                    return true;
-                }
-
-                if (!File.Exists(MainConfigFilePath))
-                {
-                    return false;
-                }
-
-                var lines = ReadLinesCache();
-                return lines.Any(line => line.StartsWith(key + "="));
+                return true;
             }
-            finally
+
+            value = GetByCmd(key);
+            if (!string.IsNullOrEmpty(value))
             {
-                CacheLock.ExitReadLock();
+                return true;
             }
+
+            if (!File.Exists(MainConfigFilePath))
+            {
+                return false;
+            }
+
+            var lines = ReadLinesCache();
+            return lines.Any(line => line.StartsWith(key + "="));
         }
 
         private static string[] ReadLinesCache()
