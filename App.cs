@@ -8,11 +8,37 @@ namespace Pingfan.Kit
 
     public class App
     {
-        private static IServiceContainer _container = new ServiceContainer();
+        private static readonly IServiceContainer Container = new ServiceContainer();
 
+        static App()
+        {
+            Container.SetDefaultLifetime<PerContainerLifetime>();
+        }
+        
+        public static void ConfigDefaultService()
+        {
+            // 注册日志服务
+            Container.Register<ILog, Log>();
+
+
+        } 
+        
+        
+        /// <summary>
+        /// 配置默认注入
+        /// </summary>
+        /// <param name="action"></param>
         public static void ConfigServices(Action<IServiceContainer> action)
         {
-            action(_container);
+            action(Container);
+        }
+
+        /// <summary>
+        /// 运行
+        /// </summary>
+        public static void Run()
+        {
+            Loop.Wait();
         }
     }
 #endif
