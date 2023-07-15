@@ -6,6 +6,9 @@ namespace Pingfan.Kit
 #if net48 || NETCOREAPP
     using LightInject;
 
+    /// <summary>
+    /// 默认单例注入
+    /// </summary>
     public class App
     {
         private static readonly IServiceContainer Container = new ServiceContainer();
@@ -13,13 +16,17 @@ namespace Pingfan.Kit
         static App()
         {
             Container.SetDefaultLifetime<PerContainerLifetime>();
+
+            ConfigDefaultService();
         }
         
-        public static void ConfigDefaultService()
+        private static void ConfigDefaultService()
         {
             // 注册日志服务
             Container.Register<ILog, Log>();
 
+            // 注册这个容器
+            Container.RegisterInstance(Container);
 
         } 
         
@@ -36,8 +43,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 运行
         /// </summary>
-        public static void Run()
+        public static void Run(Action action)
         {
+            action();
             Loop.Wait();
         }
     }
