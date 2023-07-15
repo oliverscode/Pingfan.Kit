@@ -48,6 +48,15 @@ namespace Pingfan.Kit
             action();
             Loop.Wait();
         }
+        
+        /// <summary>
+        /// 运行
+        /// </summary>
+        public static void Run(Action<IServiceContainer> action)
+        {
+            action(Container);
+            Loop.Wait();
+        }
     }
 #endif
 }
