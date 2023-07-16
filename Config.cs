@@ -94,7 +94,7 @@ namespace Pingfan.Kit
                     return line.Substring(key.Length + 1);
                 }
             }
-            Set(key, defaultValue);
+
             return defaultValue;
         }
 
@@ -151,7 +151,12 @@ namespace Pingfan.Kit
             try
             {
                 return CacheMemory<string[]>.GetOrSet(CachePrefixKey,
-                    () => { return FileEx.ReadLines(MainConfigFilePath).ToArray(); },
+                    () =>
+                    {
+                        if (File.Exists(MainConfigFilePath) == false)
+                            return Array.Empty<string>();
+                        return FileEx.ReadLines(MainConfigFilePath).ToArray();
+                    },
                     CacheSeconds);
             }
             finally
