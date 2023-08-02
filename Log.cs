@@ -212,31 +212,31 @@ namespace Pingfan.Kit
                     {
                         if (logLevel == LogLevel.DBG)
                         {
-                            ConsoleEx.WriteLine(logString, ConsoleColor.Cyan);
+                            ConsoleEx.Write(str, ConsoleColor.Cyan);
                         }
                         else if (logLevel == LogLevel.SUC)
                         {
-                            ConsoleEx.WriteLine(logString, ConsoleColor.Green);
+                            ConsoleEx.Write(str, ConsoleColor.Green);
                         }
                         else if (logLevel == LogLevel.INF)
                         {
-                            ConsoleEx.WriteLine(logString, ConsoleColor.Blue);
+                            ConsoleEx.Write(str, ConsoleColor.Blue);
                         }
                         else if (logLevel == LogLevel.WAR)
                         {
-                            ConsoleEx.WriteLine(logString, ConsoleColor.Yellow);
+                            ConsoleEx.Write(str, ConsoleColor.Yellow);
                         }
                         else if (logLevel == LogLevel.ERR)
                         {
-                            ConsoleEx.WriteLine(logString, ConsoleColor.Red);
+                            ConsoleEx.Write(str, ConsoleColor.Red);
                         }
                         else if (logLevel == LogLevel.FAL)
                         {
-                            ConsoleEx.WriteLine(logString, ConsoleColor.DarkMagenta);
+                            ConsoleEx.Write(str, ConsoleColor.DarkMagenta);
                         }
                         else
                         {
-                            Console.WriteLine(logString);
+                            Console.Write(str);
                         }
                     }
 
