@@ -6,7 +6,7 @@ namespace Pingfan.Kit
     /// 日志级别
     /// </summary>
     [Flags]
-    public enum LogLevel
+    public enum EnumLogLevel
     {
         /// <summary>
         /// 不记录日志
@@ -55,44 +55,43 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="logString"></param>
         void Debug(string logString);
-        
+
         /// <summary>
         /// 写一个错误日志
         /// </summary>
         /// <param name="logString"></param>
-        /// <param name="e"></param>
-        void Error(string logString, Exception e = null);
-        
+        void Error(string logString);
+
         /// <summary>
         /// 写一个宕机的日志
         /// </summary>
         /// <param name="logString"></param>
         void Fatal(string logString);
-        
+
         /// <summary>
         /// 写一个关键日志
         /// </summary>
         /// <param name="logString"></param>
         void Info(string logString);
-        
+
         /// <summary>
         /// 写一个成功日志
         /// </summary>
         /// <param name="logString"></param>
         void Success(string logString);
-        
+
         /// <summary>
         /// 写一个警告日志
         /// </summary>
         /// <param name="logString"></param>
         void Warning(string logString);
-        
+
         /// <summary>
         /// 写一行日志
         /// </summary>
-        /// <param name="logLevel"></param>
+        /// <param name="enumLogLevel"></param>
         /// <param name="logString"></param>
-        void WriteLine(LogLevel logLevel, string logString);
+        void WriteLine(EnumLogLevel enumLogLevel, string logString);
     }
 
     /// <summary>
@@ -105,56 +104,61 @@ namespace Pingfan.Kit
         /// <summary>
         /// 默认的日志记录对象
         /// </summary>
-        public static Log Default { get; } = new Log("");
-        
-        
-        
+        public static readonly Log Default = new Log("");
+
+
         /// <summary>
         /// 日志文件名, /日期/{*}.log
         /// </summary>
-        public string LogFileName { get; set; }
+        public string LogFileName;
 
-        public Log()
+        public Log() : this("")
         {
         }
 
         public Log(string logFileName)
         {
             LogFileName = logFileName;
+            ConsoleLevel = Config.Get("ConsoleLevel",
+                string.Join(",", EnumLogLevel.DBG,
+                    EnumLogLevel.SUC, EnumLogLevel.INF, EnumLogLevel.WAR, EnumLogLevel.ERR, EnumLogLevel.FAL));
+
+            FileLevel = Config.Get("FileLevel",
+                string.Join(",", EnumLogLevel.SUC, EnumLogLevel.INF, EnumLogLevel.WAR, EnumLogLevel.ERR,
+                    EnumLogLevel.FAL));
         }
+
 
         /// <summary>
         /// 输出到控制台的级别
         /// </summary>
-        public LogLevel ConsoleLevel { get; set; } =
-            LogLevel.DBG | LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL;
+        public string ConsoleLevel;
 
         /// <summary>
         /// 输出到磁盘的级别
         /// </summary>
-        public LogLevel FileLevel { get; set; } = (LogLevel)(Config.Get("LogLevel",
-            (LogLevel.SUC | LogLevel.INF | LogLevel.WAR | LogLevel.ERR | LogLevel.FAL).ToString()).ToInt());
+        public string FileLevel;
 
 
         /// <summary>
         /// 日志回调, 如果返回true, 则不再输出到控制台以及磁盘
         /// </summary>
-        public Func<LogLevel, string, bool> OnHandler;
+        public Func<EnumLogLevel, string, bool> OnHandler;
 
         /// <summary>
         /// 写一个调试日志
         /// </summary>
         public void Debug(string logString)
         {
-            WriteLine(LogLevel.DBG, logString);
+            WriteLine(EnumLogLevel.DBG, logString);
         }
 
         /// <summary>
         /// 写一个错入日志
         /// </summary>
-        public void Error(string logString, Exception e = null)
+        public void Error(string logString)
         {
-            WriteLine(LogLevel.ERR, logString + Environment.NewLine + e);
+            WriteLine(EnumLogLevel.ERR, logString);
         }
 
         /// <summary>
@@ -162,7 +166,7 @@ namespace Pingfan.Kit
         /// </summary>
         public void Fatal(string logString)
         {
-            WriteLine(LogLevel.FAL, logString);
+            WriteLine(EnumLogLevel.FAL, logString);
         }
 
         /// <summary>
@@ -170,7 +174,7 @@ namespace Pingfan.Kit
         /// </summary>
         public void Info(string logString)
         {
-            WriteLine(LogLevel.INF, logString);
+            WriteLine(EnumLogLevel.INF, logString);
         }
 
         /// <summary>
@@ -178,7 +182,7 @@ namespace Pingfan.Kit
         /// </summary>
         public void Success(string logString)
         {
-            WriteLine(LogLevel.SUC, logString);
+            WriteLine(EnumLogLevel.SUC, logString);
         }
 
         /// <summary>
@@ -186,51 +190,51 @@ namespace Pingfan.Kit
         /// </summary>
         public void Warning(string logString)
         {
-            WriteLine(LogLevel.WAR, logString);
+            WriteLine(EnumLogLevel.WAR, logString);
         }
 
         /// <summary>
         /// 写一行日志
         /// </summary>
-        /// <param name="logLevel">日志级别</param>
+        /// <param name="enumLogLevel">日志级别</param>
         /// <param name="logString">日志内容</param>
-        public void WriteLine(LogLevel logLevel, string logString)
+        public void WriteLine(EnumLogLevel enumLogLevel, string logString)
         {
             if (!string.IsNullOrWhiteSpace(logString))
             {
-                lock (this)
+                lock (Locker.Get(LogFileName))
                 {
                     // 先全局处理
-                    var result = this.OnHandler?.Invoke(logLevel, logString);
+                    var result = this.OnHandler?.Invoke(enumLogLevel, logString);
                     if (result == true)
                         return;
 
-                    var str = $"[{logLevel.ToString()}]{DateTime.Now:yyyy-MM-dd HH:mm:ss} {logString}\n";
+                    var str = $"[{enumLogLevel.ToString()}]{DateTime.Now:yyyy-MM-dd HH:mm:ss} {logString}\n";
 
                     // 判断是否要输出到控制台
-                    if ((logLevel & this.ConsoleLevel) != 0)
+                    if (ConsoleLevel.Contains(enumLogLevel.ToString()))
                     {
-                        if (logLevel == LogLevel.DBG)
+                        if (enumLogLevel == EnumLogLevel.DBG)
                         {
                             ConsoleEx.Write(str, ConsoleColor.Cyan);
                         }
-                        else if (logLevel == LogLevel.SUC)
+                        else if (enumLogLevel == EnumLogLevel.SUC)
                         {
                             ConsoleEx.Write(str, ConsoleColor.Green);
                         }
-                        else if (logLevel == LogLevel.INF)
+                        else if (enumLogLevel == EnumLogLevel.INF)
                         {
                             ConsoleEx.Write(str, ConsoleColor.Blue);
                         }
-                        else if (logLevel == LogLevel.WAR)
+                        else if (enumLogLevel == EnumLogLevel.WAR)
                         {
                             ConsoleEx.Write(str, ConsoleColor.Yellow);
                         }
-                        else if (logLevel == LogLevel.ERR)
+                        else if (enumLogLevel == EnumLogLevel.ERR)
                         {
                             ConsoleEx.Write(str, ConsoleColor.Red);
                         }
-                        else if (logLevel == LogLevel.FAL)
+                        else if (enumLogLevel == EnumLogLevel.FAL)
                         {
                             ConsoleEx.Write(str, ConsoleColor.DarkMagenta);
                         }
@@ -242,7 +246,7 @@ namespace Pingfan.Kit
 
 
                     // 判断是否要输出到磁盘
-                    if ((logLevel & this.FileLevel) != 0)
+                    if (FileLevel.Contains(enumLogLevel.ToString()))
                     {
                         var logPath = PathEx.Combine(RootPath, $"{DateTime.Now:yyyy-MM-dd}{LogFileName}.log");
                         FileEx.AppendAllText(logPath, str);

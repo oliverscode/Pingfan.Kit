@@ -22,7 +22,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 缓存时间, 单位秒
         /// </summary>
-        public static int CacheSeconds { get; set; } = 1;
+        public static int CacheSeconds = 1;
 
         /// <summary>
         /// 写入配置
@@ -87,6 +87,7 @@ namespace Pingfan.Kit
             }
 
             var lines = ReadLinesCache();
+
             foreach (var line in lines)
             {
                 if (line.StartsWith(key + "="))
@@ -95,6 +96,7 @@ namespace Pingfan.Kit
                 }
             }
 
+            Set(key, defaultValue);
             return defaultValue;
         }
 

@@ -13,7 +13,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 保存锁的并发字典，键为string类型，值为SemaphoreSlim对象。
         /// </summary>
-        private static ConcurrentDictionary<string, SemaphoreSlim> _lockers =
+        private static readonly ConcurrentDictionary<string, SemaphoreSlim> lockers =
             new ConcurrentDictionary<string, SemaphoreSlim>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Run(string key, Action action)
         {
-            var locker = _lockers.GetOrAdd(key, new SemaphoreSlim(1,1));
+            var locker = lockers.GetOrAdd(key, new SemaphoreSlim(1,1));
             locker.Wait();
             try
             {
@@ -38,7 +38,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static async Task RunAsync(string key, Func<Task> action)
         {
-            var locker = _lockers.GetOrAdd(key, new SemaphoreSlim(1,1));
+            var locker = lockers.GetOrAdd(key, new SemaphoreSlim(1,1));
             await locker.WaitAsync();
             try
             {
@@ -48,6 +48,16 @@ namespace Pingfan.Kit
             {
                 locker.Release();
             }
+        }
+
+        /// <summary>
+        /// 获取Key为名的锁
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static object Get(string key)
+        {
+            return lockers.GetOrAdd(key, new SemaphoreSlim(1,1));
         }
     }
 
