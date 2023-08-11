@@ -8,48 +8,26 @@ namespace Pingfan.Kit
     /// <summary>
     /// 锁管理器
     /// </summary>
-    public class Locker
+    public static class Locker
     {
         /// <summary>
         /// 保存锁的并发字典，键为string类型，值为SemaphoreSlim对象。
         /// </summary>
-        private static readonly ConcurrentDictionary<string, SemaphoreSlim> lockers =
-            new ConcurrentDictionary<string, SemaphoreSlim>(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, object> Lockers =
+            new ConcurrentDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// 以key为锁名, 不需区分大小写，执行action
         /// </summary>
         public static void Run(string key, Action action)
         {
-            var locker = lockers.GetOrAdd(key, new SemaphoreSlim(1,1));
-            locker.Wait();
-            try
+            var locker = Lockers.GetOrAdd(key, new object());
+            lock (locker)
             {
-                action.Invoke();
-            }
-            finally
-            {
-                locker.Release();
+                action();
             }
         }
-
-        /// <summary>
-        /// 以key为锁名, 不需区分大小写，异步执行action
-        /// </summary>
-        public static async Task RunAsync(string key, Func<Task> action)
-        {
-            var locker = lockers.GetOrAdd(key, new SemaphoreSlim(1,1));
-            await locker.WaitAsync();
-            try
-            {
-                await action.Invoke();
-            }
-            finally
-            {
-                locker.Release();
-            }
-        }
-
+        
         /// <summary>
         /// 获取Key为名的锁
         /// </summary>
@@ -57,8 +35,7 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static object Get(string key)
         {
-            return lockers.GetOrAdd(key, new SemaphoreSlim(1,1));
+            return Lockers.GetOrAdd(key, new object());
         }
     }
-
 }

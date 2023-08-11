@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// IEnumerable扩展方法
+    /// </summary>
     public static class EnumerableEx
     {
         /// <summary>

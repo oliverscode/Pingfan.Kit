@@ -5,6 +5,9 @@ using System.Threading;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 进度处理
+    /// </summary>
     public class Progress : IDisposable
     {
 
