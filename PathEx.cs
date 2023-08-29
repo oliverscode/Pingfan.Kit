@@ -22,8 +22,7 @@ namespace Pingfan.Kit
                 
                 // 如果没有, 则从启动程序的Assembly目录中取
                 if (string.IsNullOrWhiteSpace(path))
-                    path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-                           + Path.DirectorySeparatorChar;
+                    path = AppDomain.CurrentDomain.BaseDirectory;
 
                 return path;
             }
