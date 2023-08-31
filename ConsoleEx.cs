@@ -79,7 +79,7 @@ namespace Pingfan.Kit
             }
         }
 
-        public static void WriteLine(string text, ConsoleColor outColor = ConsoleColor.DarkGray)
+        public static void WriteLine(string text = null, ConsoleColor outColor = ConsoleColor.DarkGray)
         {
             lock (Locker)
             {
