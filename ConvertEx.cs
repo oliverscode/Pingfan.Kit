@@ -18,12 +18,10 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static byte[] ToBytes(object obj)
         {
-            using (var ms = new MemoryStream())
-            {
-                var formatter = GetFormatter();
-                formatter.Serialize(ms, obj);
-                return ms.GetBuffer();
-            }
+            using var ms = new MemoryStream();
+            var formatter = GetFormatter();
+            formatter.Serialize(ms, obj);
+            return ms.GetBuffer();
         }
 
         /// <summary>
@@ -33,11 +31,9 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static object ToObject(byte[] bytes)
         {
-            using (var ms = new MemoryStream(bytes))
-            {
-                var formatter = GetFormatter();
-                return formatter.Deserialize(ms);
-            }
+            using var ms = new MemoryStream(bytes);
+            var formatter = GetFormatter();
+            return formatter.Deserialize(ms);
         }
 
         /// <summary>
@@ -48,11 +44,9 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static T ToObject<T>(byte[] bytes)
         {
-            using (var ms = new MemoryStream(bytes))
-            {
-                var formatter = GetFormatter();
-                return (T)ChangeType(formatter.Deserialize(ms), typeof(T));
-            }
+            using var ms = new MemoryStream(bytes);
+            var formatter = GetFormatter();
+            return (T)ChangeType(formatter.Deserialize(ms), typeof(T));
         }
 
         private static IFormatter GetFormatter()
