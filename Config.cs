@@ -16,8 +16,11 @@ namespace Pingfan.Kit
         private static readonly ReaderWriterLockSlim CacheLock = new ReaderWriterLockSlim();
         private const string CachePrefixKey = "PingFan.Config.Cache";
 
+        /// <summary>
+        /// 当前配置文件绝对目录
+        /// </summary>
         public static string MainConfigFilePath =>
-            Path.Combine(PathEx.CurrentDirectory, "app.ini");
+            PathEx.CombineFromCurrentDirectory("app.ini");
 
         /// <summary>
         /// 缓存时间, 单位秒

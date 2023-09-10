@@ -6,6 +6,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// Convert扩展类
+    /// </summary>
     public static class ConvertEx
     {
         /// <summary>
@@ -57,6 +60,12 @@ namespace Pingfan.Kit
             return new BinaryFormatter { Binder = new VersionDeserializer() };
         }
 
+        /// <summary>
+        /// 强转类型
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static object ChangeType(object value, Type type)
         {
             if (value == null && type.IsGenericType) return Activator.CreateInstance(type);

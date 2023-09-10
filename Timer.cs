@@ -4,8 +4,14 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 定时器封装
+    /// </summary>
     public static class Timer
     {
+        /// <summary>
+        /// 错误事件
+        /// </summary>
         public static event Action<Exception> OnError;
 
         /// <summary>

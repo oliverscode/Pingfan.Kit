@@ -2,6 +2,9 @@
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 数字扩展
+    /// </summary>
     public static class NumberEx
     {
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Pingfan.Kit
@@ -14,6 +15,19 @@ namespace Pingfan.Kit
         private readonly Func<T, Task> _asyncCallback;
         private readonly int _threadCount;
         private readonly Task[] _tasks;
+
+
+        /// <summary>
+        /// 队列是否已经完成
+        /// </summary>
+        public bool IsCompleted => _queue.IsCompleted;
+
+
+        /// <summary>
+        /// 完成进度百分比
+        /// </summary>
+        public int ProgressPercent => (int)(_queue.Count * 100.0 / _queue.BoundedCapacity);
+
 
         /// <summary>
         /// 构造方法（同步回调）
@@ -47,6 +61,18 @@ namespace Pingfan.Kit
         public void Add(T item)
         {
             _queue.Add(item);
+        }
+
+        /// <summary>
+        /// 添加一组元素到队列并进行处理
+        /// </summary>
+        /// <param name="items"></param>
+        public void AddRange(IEnumerable<T> items)
+        {
+            foreach (var item in items)
+            {
+                _queue.Add(item);
+            }
         }
 
         /// <summary>

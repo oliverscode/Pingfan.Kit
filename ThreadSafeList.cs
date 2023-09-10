@@ -15,6 +15,10 @@ namespace Pingfan.Kit
         private readonly List<T> _list = new List<T>();
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
+        /// <summary>
+        /// 添加一个元素
+        /// </summary>
+        /// <param name="item"></param>
         public void Add(T item)
         {
             _lock.EnterWriteLock();
@@ -28,6 +32,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 移除一个元素
+        /// </summary>
         public bool Remove(T item)
         {
             _lock.EnterWriteLock();
@@ -41,6 +48,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 是否包含一个元素
+        /// </summary>
         public bool Contains(T item)
         {
             _lock.EnterReadLock();
@@ -54,6 +64,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 查找一个元素
+        /// </summary>
         public int IndexOf(T item)
         {
             _lock.EnterReadLock();
@@ -67,6 +80,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 插入一个元素
+        /// </summary>
         public void Insert(int index, T item)
         {
             _lock.EnterWriteLock();
@@ -80,6 +96,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 从指定位置移除一个元素
+        /// </summary>
         public void RemoveAt(int index)
         {
             _lock.EnterWriteLock();
@@ -93,6 +112,10 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 获取或设置指定位置的元素
+        /// </summary>
+        /// <param name="index"></param>
         public T this[int index]
         {
             get
@@ -121,6 +144,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 获取元素数量
+        /// </summary>
         public int Count
         {
             get
@@ -137,6 +163,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 清空所有元素
+        /// </summary>
         public void Clear()
         {
             _lock.EnterWriteLock();
@@ -150,6 +179,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 转换为数组
+        /// </summary>
         public T[] ToArray()
         {
             _lock.EnterReadLock();
@@ -163,6 +195,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 获取迭代器
+        /// </summary>
         public IEnumerator<T> GetEnumerator()
         {
             _lock.EnterReadLock();
@@ -181,8 +216,12 @@ namespace Pingfan.Kit
             return GetEnumerator();
         }
 
+        /// <summary>
+        /// 销毁
+        /// </summary>
         public void Dispose()
         {
+            _list.Clear();
             _lock.Dispose();
         }
     }

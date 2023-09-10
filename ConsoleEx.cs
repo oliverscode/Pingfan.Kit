@@ -10,6 +10,9 @@ namespace Pingfan.Kit
     {
         private static readonly object Locker = new object();
 
+        /// <summary>
+        /// 输入文本
+        /// </summary>
         public static string Input(string text,
             ConsoleColor outColor = ConsoleColor.Cyan,
             ConsoleColor inColor = ConsoleColor.Yellow)
@@ -31,6 +34,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 要求输入密码
+        /// </summary>
         public static string InputPassword(string text, ConsoleColor outColor = ConsoleColor.Cyan)
         {
             lock (Locker)
@@ -68,6 +74,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 当前行输出
+        /// </summary>
         public static void Write(string text, ConsoleColor outColor = ConsoleColor.DarkGray)
         {
             lock (Locker)
@@ -79,6 +88,11 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 输出一行
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="outColor"></param>
         public static void WriteLine(string text = null, ConsoleColor outColor = ConsoleColor.DarkGray)
         {
             lock (Locker)

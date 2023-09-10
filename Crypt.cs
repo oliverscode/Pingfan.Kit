@@ -173,6 +173,11 @@ namespace Pingfan.Kit
             return buffer;
         }
 
+        /// <summary>
+        /// AES 加密字符串
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public static string Encrypt(string str)
         {
             var buffer = Encoding.UTF8.GetBytes(str);

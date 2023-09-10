@@ -10,10 +10,12 @@ namespace Pingfan.Kit
     /// <typeparam name="TValue"></typeparam>
     public class ThreadSafeDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TValue>
     {
+        /// <inheritdoc />
         public ThreadSafeDictionary()
         {
         }
 
+        /// <inheritdoc />
         public ThreadSafeDictionary(IEqualityComparer<TKey> comparer)
             : base(comparer)
         {

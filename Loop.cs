@@ -4,8 +4,14 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 循环封装
+    /// </summary>
     public static class Loop
     {
+        /// <summary>
+        /// 错误事件
+        /// </summary>
         public static event Action<Exception> OnError; 
         /// <summary>
         /// 死循环运行一个方法
@@ -82,7 +88,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 一直等待, 通常用于控制台程序等待执行完成, 又不需要从流中读取数据
+        /// 一直等待, 通常用于等待执行完成, 又不需要从流中读取数据
         /// </summary>
         public static void Wait()
         {
@@ -90,7 +96,7 @@ namespace Pingfan.Kit
             {
                 while (true)
                 {
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
                 }
             })
             {

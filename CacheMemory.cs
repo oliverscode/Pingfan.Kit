@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Pingfan.Kit
 {
     /// <summary>
-    /// 缓存类
+    /// 进程缓存类
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public static class CacheMemory<T>
