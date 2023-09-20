@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Pingfan.Kit
 {
@@ -106,11 +107,37 @@ namespace Pingfan.Kit
         /// </summary>
         public static readonly Log Default = new Log("");
 
+        /// <summary>
+        /// 日志保留天数
+        /// </summary>
+        public static int LogKeepDays = Config.Get("LogKeepDays", "365").ToInt(365);
+
 
         /// <summary>
         /// 日志文件名, /日期/{*}.log
         /// </summary>
-        public string LogFileName;
+        public string LogFileName { get; set; }
+
+        static Log()
+        {
+            Timer.SetIntervalWithTry(1000 * 60 * 30, () =>
+            {
+                var now = DateTime.Now;
+                var dir = PathEx.CombineFromCurrentDirectory("log");
+                var paths = Directory.GetFiles(dir, "*.log", SearchOption.AllDirectories);
+                foreach (var path in paths)
+                {
+                    var date = path.Substring(path.LastIndexOfAny(new[] { '\\', '/' })+1, 10);
+                    if (DateTime.TryParse(date, out var dt))
+                    {
+                        if (now.Subtract(dt).TotalDays >= LogKeepDays)
+                        {
+                            File.Delete(path);
+                        }
+                    }
+                }
+            });
+        }
 
         public Log() : this("")
         {

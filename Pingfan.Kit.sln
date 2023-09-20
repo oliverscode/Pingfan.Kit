@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.001.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pingfan.Kit", "Pingfan.Kit.csproj", "{B6DF7BE4-AEBE-4C9A-814E-CA6C8F86F75A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pingfan.Kit", "src\Pingfan.Kit.csproj", "{C7D82DF8-080C-46CF-8D81-FDF98FC19812}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "test\Test\Test.csproj", "{E85B7F4D-DD43-45F6-AD2C-2734B99B6FC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B6DF7BE4-AEBE-4C9A-814E-CA6C8F86F75A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6DF7BE4-AEBE-4C9A-814E-CA6C8F86F75A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6DF7BE4-AEBE-4C9A-814E-CA6C8F86F75A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B6DF7BE4-AEBE-4C9A-814E-CA6C8F86F75A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7D82DF8-080C-46CF-8D81-FDF98FC19812}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7D82DF8-080C-46CF-8D81-FDF98FC19812}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7D82DF8-080C-46CF-8D81-FDF98FC19812}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7D82DF8-080C-46CF-8D81-FDF98FC19812}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E85B7F4D-DD43-45F6-AD2C-2734B99B6FC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E85B7F4D-DD43-45F6-AD2C-2734B99B6FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E85B7F4D-DD43-45F6-AD2C-2734B99B6FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E85B7F4D-DD43-45F6-AD2C-2734B99B6FC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
