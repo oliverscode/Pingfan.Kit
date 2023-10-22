@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Pingfan.Kit
 {
     /// <summary>
-    /// 并行处理器
+    /// 并行处理器, 支持动态添加数据
     /// </summary>
     public class ParallelProcessor<T>
     {
@@ -105,6 +105,14 @@ namespace Pingfan.Kit
         public Task WhenAll()
         {
             return Task.WhenAll(_tasks);
+        }
+
+        /// <summary>
+        /// 等待所有任务完成
+        /// </summary>
+        public void WaitAll()
+        {
+            Task.WaitAll(_tasks);
         }
     }
 }

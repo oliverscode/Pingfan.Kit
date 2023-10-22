@@ -68,5 +68,71 @@ namespace Pingfan.Kit
             var adjustedSize = Math.Round(size / Math.Pow(1024, mag), digits) + decimalPlaces[mag];
             return adjustedSize;
         }
+        
+        /// <summary>
+        /// 固定在一个范围内
+        /// </summary>
+        public static int Clamp(this int value, int min, int max)
+        {
+            return Math.Min(Math.Max(value, min), max);
+        }
+        
+        /// <summary>
+        /// 固定在一个范围内
+        /// </summary>
+        public static uint Clamp(this uint value, uint min, uint max)
+        {
+            return Math.Min(Math.Max(value, min), max);
+        }
+        
+        /// <summary>
+        /// 固定在一个范围内
+        /// </summary>
+        public static long Clamp(this long value, long min, long max)
+        {
+            return Math.Min(Math.Max(value, min), max);
+        }
+        
+        /// <summary>
+        /// 固定在一个范围内
+        /// </summary>
+        public static ulong Clamp(this ulong value, ulong min, ulong max)
+        {
+            return Math.Min(Math.Max(value, min), max);
+        }
+        
+        /// <summary>
+        /// 固定在一个范围内
+        /// </summary>
+        public static short Clamp(this short value, short min, short max)
+        {
+            return Math.Min(Math.Max(value, min), max);
+        }
+        
+        /// <summary>
+        /// 固定在一个范围内
+        /// </summary>
+        public static ushort Clamp(this ushort value, ushort min, ushort max)
+        {
+            return Math.Min(Math.Max(value, min), max);
+        }
+        
+        /// <summary>
+        /// 将数字转换成枚举, 如果失败, 则返回第一个枚举值
+        /// </summary>
+        /// <param name="value"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T ToEnum<T>(this int value) where T : Enum
+        {
+            if (Enum.IsDefined(typeof(T), value))
+            {
+                return (T)Enum.ToObject(typeof(T), value);
+            }
+            else
+            {
+                return (T)Enum.GetValues(typeof(T)).GetValue(0);
+            }
+        }
     }
 }
