@@ -23,7 +23,7 @@ namespace Pingfan.Kit
             PathEx.CombineFromCurrentDirectory("app.ini");
 
         /// <summary>
-        /// 缓存时间, 单位秒
+        /// 缓存时间, 单位秒, 默认1秒
         /// </summary>
         public static int CacheSeconds = 1;
 
