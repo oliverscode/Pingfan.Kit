@@ -62,6 +62,21 @@ namespace Pingfan.Kit
             return string.IsNullOrWhiteSpace(s1);
         }
 
+        /// <summary>
+        /// 是否为数字, 包含浮点数
+        /// </summary>
+        public static bool IsNumber(this string s1)
+        {
+            return Regex.IsMatch(s1, @"^[-+]?[0-9]*\.?[0-9]+$");
+        }
+        
+        /// <summary>
+        /// 是否为整数, 包含负数, 以及大数
+        /// </summary>
+        public static bool IsInt(this string s1)
+        {
+            return Regex.IsMatch(s1, @"^[-+]?[0-9]+$");
+        }
 
         /// <summary>
         /// 格式化一个字符串
@@ -199,10 +214,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 正则匹配
         /// </summary>
-        /// <param name="input"></param>
-        /// <param name="pattern"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
         public static bool IsMatch(this string input, string pattern, RegexOptions options = RegexOptions.None)
         {
             return Regex.IsMatch(input, pattern, options);
@@ -211,10 +222,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 正则匹配一个字符串
         /// </summary>
-        /// <param name="input"></param>
-        /// <param name="pattern"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
         public static List<string> Match(this string input, string pattern, RegexOptions options = RegexOptions.None)
         {
             var list = new List<string>();
@@ -234,10 +241,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 正则匹配一个字符串
         /// </summary>
-        /// <param name="input"></param>
-        /// <param name="pattern"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
         public static List<List<string>> Matches(this string input, string pattern,
             RegexOptions options = RegexOptions.None)
         {
@@ -268,9 +271,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 拆分字符串
         /// </summary>
-        /// <param name="str"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
         public static string[] Split(this string str, params string[] args)
         {
             return str.Split(args, StringSplitOptions.RemoveEmptyEntries);
@@ -279,9 +279,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 拆分字符串
         /// </summary>
-        /// <param name="str"></param>
-        /// <param name="args"></param>
-        /// <returns></returns>
         public static string[] Split(this string str, params char[] args)
         {
             return str.Split(args, StringSplitOptions.RemoveEmptyEntries);
