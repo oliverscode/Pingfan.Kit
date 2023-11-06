@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pingfan.Kit", "src\Pingfan.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "test\Test\Test.csproj", "{E85B7F4D-DD43-45F6-AD2C-2734B99B6FC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestInConsole", "TestInConsole\TestInConsole.csproj", "{58AB84B7-497C-4933-BFBA-AF6A537F06F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{E85B7F4D-DD43-45F6-AD2C-2734B99B6FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E85B7F4D-DD43-45F6-AD2C-2734B99B6FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E85B7F4D-DD43-45F6-AD2C-2734B99B6FC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58AB84B7-497C-4933-BFBA-AF6A537F06F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58AB84B7-497C-4933-BFBA-AF6A537F06F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58AB84B7-497C-4933-BFBA-AF6A537F06F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58AB84B7-497C-4933-BFBA-AF6A537F06F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

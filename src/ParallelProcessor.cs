@@ -8,7 +8,7 @@ namespace Pingfan.Kit
     /// <summary>
     /// 并行处理器, 支持动态添加数据
     /// </summary>
-    public class ParallelProcessor<T>
+    public class ParallelProcessor<T> : IDisposable
     {
         private readonly BlockingCollection<T> _queue = new BlockingCollection<T>(new ConcurrentQueue<T>());
         private readonly Action<T> _syncCallback;
@@ -76,6 +76,14 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
+        /// 清理队列
+        /// </summary>
+        public void Clear()
+        {
+            _queue.Dispose();
+        }
+
+        /// <summary>
         /// 开始工作线程
         /// </summary>
         private void StartWorkers(bool isAsync)
@@ -113,6 +121,16 @@ namespace Pingfan.Kit
         public void WaitAll()
         {
             Task.WaitAll(_tasks);
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Clear();
+            foreach (var task in _tasks)
+            {
+                task.Dispose();
+            }
         }
     }
 }
