@@ -4,16 +4,28 @@ using System.Text;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 随机数扩展
+    /// </summary>
     public class RandomEx
     {
         private double _probability;
         private double _step;
-        public RandomEx(double probability, double step = 0.1)
+      
+        /// <summary>
+        /// 概率随机数
+        /// </summary>
+        /// <param name="probability">最终概率</param>
+        /// <param name="step">有偏差时,调整大小</param>
+        public RandomEx(double probability, double step = 0.05)
         {
             this._probability = probability;
             this._step = step;
         }
 
+        /// <summary>
+        /// 生成一个随机数
+        /// </summary>
         public bool Next()
         {
             var isSuccessful = Rd.NextDouble() < _probability;
@@ -43,7 +55,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 生成一个密码
+        /// 生成一个密码, 会排除容易混淆的字符
         /// </summary>
         /// <param name="length"></param>
         /// <param name="isNumber">是否包含数字, 默认包含</param>

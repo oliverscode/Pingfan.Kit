@@ -13,9 +13,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 可以超时的方法
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="seconds"></param>
-        /// <exception cref="TimeoutException"></exception>
         public static void Run(Action action, double seconds)
         {
             var cts = new CancellationTokenSource();
@@ -40,11 +37,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 可以超时的异步方法
         /// </summary>
-        /// <param name="func"></param>
-        /// <param name="seconds"></param>
-        /// <returns></returns>
-        /// <exception cref="TimeoutException"></exception>
-        public static async Task Run(Func<Task> func, double seconds)
+        public static async Task RunAsync(Func<Task> func, double seconds)
         {
             CancellationTokenSource cts = new CancellationTokenSource();
             CancellationToken token = cts.Token;

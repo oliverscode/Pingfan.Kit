@@ -55,7 +55,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 创建一个定时器，但只执行1次, 同时不抛出异常
         /// </summary>
-        public static Task SetTimeoutWithTry(int milliSecond,
+        public static Task SetTimeoutWithTryAsync(int milliSecond,
             Func<Task> action,
             CancellationToken cancellationToken = default)
         {
@@ -123,7 +123,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 创建一个定时器
         /// </summary>
-        public static Task SetInterval(int milliSecond,
+        public static Task SetIntervalAsync(int milliSecond,
             Func<Task> action,
             CancellationToken cancellationToken = default)
         {
@@ -143,7 +143,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 创建一个定时器, 同时不抛出异常
         /// </summary>
-        public static Task SetIntervalWithTry(int milliSecond,
+        public static Task SetIntervalWithTryAsync(int milliSecond,
             Func<Task> action,
             CancellationToken cancellationToken = default)
         {
@@ -227,7 +227,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 创建一个定时器
         /// </summary>
-        public static Task SetInterval(int milliSecond,
+        public static Task SetIntervalAsync(int milliSecond,
             Func<Task<bool>> action,
             CancellationToken cancellationToken = default)
         {
@@ -252,7 +252,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 创建一个定时器, 如果返回false, 将终止定时器, 同时不抛出异常
         /// </summary>
-        public static Task SetIntervalWithTry(int milliSecond,
+        public static Task SetIntervalWithTryAsync(int milliSecond,
             Func<Task<bool>> action,
             CancellationToken cancellationToken = default)
         {

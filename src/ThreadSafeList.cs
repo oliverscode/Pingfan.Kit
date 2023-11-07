@@ -9,7 +9,6 @@ namespace Pingfan.Kit
     /// <summary>
     /// 封装的线程安全集合
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class ThreadSafeList<T> : IDisposable, IEnumerable<T>
     {
         private readonly List<T> _list = new List<T>();
@@ -18,7 +17,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 添加一个元素
         /// </summary>
-        /// <param name="item"></param>
         public void Add(T item)
         {
             _lock.EnterWriteLock();
@@ -115,7 +113,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 获取或设置指定位置的元素
         /// </summary>
-        /// <param name="index"></param>
         public T this[int index]
         {
             get

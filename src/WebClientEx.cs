@@ -11,11 +11,13 @@ namespace Pingfan.Kit
     {
         public int Timeout { get; set; }
 
+        /// <inheritdoc />
         public WebClientEx(int timeout = 30 * 1000)
         {
             Timeout = timeout;
         }
 
+        /// <inheritdoc />
         protected override WebRequest GetWebRequest(Uri uri)
         {
             var wr = base.GetWebRequest(uri);

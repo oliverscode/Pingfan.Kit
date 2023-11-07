@@ -49,7 +49,7 @@ namespace Pingfan.Kit
     /// <summary>
     /// 日志记录器接口
     /// </summary>
-    public interface ILog
+    public interface ILogger
     {
         /// <summary>
         /// 写一个调试日志
@@ -98,15 +98,10 @@ namespace Pingfan.Kit
     /// <summary>
     /// 日志记录器
     /// </summary>
-    public class Log : ILog
+    public class Logger : ILogger
     {
-        private static readonly string RootPath = PathEx.CombineFromCurrentDirectory("log");
-
-        /// <summary>
-        /// 默认的日志记录对象
-        /// </summary>
-        public static readonly Log Default = new Log("");
-
+        internal static readonly string RootPath = PathEx.CombineFromCurrentDirectory("log");
+        
         /// <summary>
         /// 日志保留天数
         /// </summary>
@@ -118,7 +113,7 @@ namespace Pingfan.Kit
         /// </summary>
         public string LogFileName { get; set; }
 
-        static Log()
+        static Logger()
         {
             Timer.SetIntervalWithTry(1000 * 60 * 30, () =>
             {
@@ -127,7 +122,7 @@ namespace Pingfan.Kit
                 var paths = Directory.GetFiles(dir, "*.log", SearchOption.AllDirectories);
                 foreach (var path in paths)
                 {
-                    var date = path.Substring(path.LastIndexOfAny(new[] { '\\', '/' })+1, 10);
+                    var date = path.Substring(path.LastIndexOfAny(new[] { '\\', '/' }) + 1, 10);
                     if (DateTime.TryParse(date, out var dt))
                     {
                         if (now.Subtract(dt).TotalDays >= LogKeepDays)
@@ -139,11 +134,11 @@ namespace Pingfan.Kit
             });
         }
 
-        public Log() : this("")
+        public Logger() : this("")
         {
         }
 
-        public Log(string logFileName)
+        public Logger(string logFileName)
         {
             LogFileName = logFileName;
             ConsoleLevel = Config.Get("ConsoleLevel",
@@ -170,7 +165,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 日志回调, 如果返回true, 则不再输出到控制台以及磁盘
         /// </summary>
-        public Func<EnumLogLevel, string, bool> OnHandler;
+        public Func<EnumLogLevel, string, bool> OnHandler { get; set; }
 
         /// <summary>
         /// 写一个调试日志
@@ -280,6 +275,65 @@ namespace Pingfan.Kit
                     }
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// 默认的日志记录器
+    /// </summary>
+    public static class Log
+    {
+        /// <summary>
+        /// 默认的日志记录对象
+        /// </summary>
+        public static readonly Logger Default = new Logger("");
+
+        /// <summary>
+        /// 写一个调试日志
+        /// </summary>
+        public static void Debug(string logString)
+        {
+            Default.Debug(logString);
+        }
+
+        /// <summary>
+        /// 写一个错入日志
+        /// </summary>
+        public static void Error(string logString)
+        {
+            Default.Error(logString);
+        }
+
+        /// <summary>
+        /// 写一个宕机日志
+        /// </summary>
+        public static void Fatal(string logString)
+        {
+            Default.Fatal(logString);
+        }
+
+        /// <summary>
+        /// 写一个关键信息日志
+        /// </summary>
+        public static void Info(string logString)
+        {
+            Default.Fatal(logString);
+        }
+
+        /// <summary>
+        /// 写一个成功日志
+        /// </summary>
+        public static void Success(string logString)
+        {
+            Default.Success(logString);
+        }
+
+        /// <summary>
+        /// 写一个警告日志
+        /// </summary>
+        public static void Warning(string logString)
+        {
+            Default.Warning(logString);
         }
     }
 }

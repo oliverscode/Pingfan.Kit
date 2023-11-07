@@ -38,7 +38,7 @@ namespace Pingfan.Kit
             var manifest = Http.Get(url);
             if (manifest.IsNullOrWhiteSpace())
             {
-                Log.Default.Error("无法获取到更新信息");
+                Log.Error("无法获取到更新信息");
                 return false;
             }
 
