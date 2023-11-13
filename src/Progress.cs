@@ -10,12 +10,17 @@ namespace Pingfan.Kit
     /// </summary>
     public class Progress
     {
+        private long _current;
+        private DateTime _lastSpeedTime = DateTime.Now;
+        private long _lastSpeedCurrent = 0;
+        private double _lastSpeed = 0;
+        private List<double> _speedBuffer = new List<double>(10);
+
         /// <summary>
         /// 任务总量
         /// </summary>
         public long Total { get; set; }
 
-        private long _current;
 
         /// <summary>
         /// 当前进度
@@ -47,10 +52,7 @@ namespace Pingfan.Kit
             Interlocked.Add(ref this._current, count);
         }
 
-        private DateTime _lastSpeedTime = DateTime.Now;
-        private long _lastSpeedCurrent = 0;
-        private double _lastSpeed = 0;
-        private List<double> _speedBuffer = new List<double>(10);
+
 
         /// <summary>
         /// 当前每秒处理的数据量

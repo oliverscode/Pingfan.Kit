@@ -22,7 +22,6 @@ namespace Pingfan.Kit
         /// </summary>
         public bool IsCompleted => _queue.IsCompleted;
 
-
         /// <summary>
         /// 完成进度百分比
         /// </summary>
@@ -58,7 +57,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 添加一个元素到队列并进行处理
         /// </summary>
-        public void Add(T item)
+        public void Push(T item)
         {
             _queue.Add(item);
         }
@@ -67,7 +66,7 @@ namespace Pingfan.Kit
         /// 添加一组元素到队列并进行处理
         /// </summary>
         /// <param name="items"></param>
-        public void AddRange(IEnumerable<T> items)
+        public void Push(IEnumerable<T> items)
         {
             foreach (var item in items)
             {

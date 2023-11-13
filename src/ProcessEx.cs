@@ -45,18 +45,18 @@ namespace Pingfan.Kit
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
+                    Process process = new Process();
+                    ProcessStartInfo startInfo = new ProcessStartInfo
+                    {
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        FileName = "cmd.exe",
+                        Arguments = "/C net session",
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
                     try
                     {
-                        Process process = new Process();
-                        ProcessStartInfo startInfo = new ProcessStartInfo
-                        {
-                            WindowStyle = ProcessWindowStyle.Hidden,
-                            FileName = "cmd.exe",
-                            Arguments = "/C net session",
-                            RedirectStandardOutput = true,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
                         process.StartInfo = startInfo;
                         process.Start();
                         process.WaitForExit();
@@ -65,6 +65,10 @@ namespace Pingfan.Kit
                     catch
                     {
                         return false;
+                    }
+                    finally
+                    {
+                        process.Kill();
                     }
                 }
                 else

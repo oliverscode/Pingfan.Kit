@@ -3,6 +3,9 @@ using System.IO.Compression;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// GZip 压缩工具类
+    /// </summary>
     public static class GZip
     {
         /// <summary>
@@ -29,10 +32,8 @@ namespace Pingfan.Kit
         /// <returns>包含解压数据的字节数组。</returns>
         public static byte[] Decompress(byte[] data)
         {
-            using (var stream = new MemoryStream(data))
-            {
-                return Decompress(stream).ToArray();
-            }
+            using var stream = new MemoryStream(data);
+            return Decompress(stream).ToArray();
         }
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace Pingfan.Kit
         public static MemoryStream Compress(Stream stream)
         {
             stream.Position = 0L;
-            MemoryStream memoryStream = new MemoryStream();
+            var memoryStream = new MemoryStream();
             using (var destination = new GZipStream(memoryStream, CompressionMode.Compress, leaveOpen: true))
             {
                 stream.CopyTo(destination);
@@ -60,10 +61,8 @@ namespace Pingfan.Kit
         /// <returns>包含压缩数据的字节数组。</returns>
         public static byte[] Compress(byte[] data)
         {
-            using (var stream = new MemoryStream(data))
-            {
-                return Compress(stream).ToArray();
-            }
+            using var stream = new MemoryStream(data);
+            return Compress(stream).ToArray();
         }
     }
 }
