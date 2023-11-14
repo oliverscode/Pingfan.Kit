@@ -86,6 +86,9 @@ namespace Pingfan.Kit
             return string.Format(s1, values);
         }
 
+        /// <summary>
+        /// 转成整数, 如果转换失败, 返回默认值
+        /// </summary>
         public static int ToInt(this string str, int defaultValue = 0)
         {
             if (int.TryParse(str, out var result))
@@ -96,6 +99,9 @@ namespace Pingfan.Kit
             return defaultValue;
         }
 
+        /// <summary>
+        /// 转成无符号整数, 如果转换失败, 返回默认值
+        /// </summary>
         public static uint ToUInt(this string str, uint defaultValue = 0)
         {
             if (uint.TryParse(str, out var result))
@@ -106,6 +112,9 @@ namespace Pingfan.Kit
             return defaultValue;
         }
 
+        /// <summary>
+        /// 转成长整数, 如果转换失败, 返回默认值
+        /// </summary>
         public static long ToLong(this string str, long defaultValue = 0)
         {
             if (long.TryParse(str, out var result))
@@ -116,6 +125,9 @@ namespace Pingfan.Kit
             return defaultValue;
         }
 
+        /// <summary>
+        /// 转成无符号长整数, 如果转换失败, 返回默认值
+        /// </summary>
         public static ulong ToULong(this string str, ulong defaultValue = 0)
         {
             if (ulong.TryParse(str, out var result))
@@ -126,6 +138,9 @@ namespace Pingfan.Kit
             return defaultValue;
         }
 
+        /// <summary>
+        /// 转成单精度浮点数, 如果转换失败, 返回默认值
+        /// </summary>
         public static float ToFloat(this string str, float defaultValue = 0)
         {
             if (float.TryParse(str, out var result))
@@ -135,7 +150,10 @@ namespace Pingfan.Kit
 
             return defaultValue;
         }
-
+        
+        /// <summary>
+        /// 转成双精度浮点数, 如果转换失败, 返回默认值
+        /// </summary>
         public static double ToDouble(this string str, double defaultValue = 0)
         {
             if (double.TryParse(str, out var result))
@@ -145,7 +163,10 @@ namespace Pingfan.Kit
 
             return defaultValue;
         }
-
+      
+        /// <summary>
+        /// 转成decimal, 如果转换失败, 返回默认值
+        /// </summary>
         public static decimal ToDecimal(this string str, decimal defaultValue = 0)
         {
             if (decimal.TryParse(str, out var result))
@@ -156,6 +177,9 @@ namespace Pingfan.Kit
             return defaultValue;
         }
 
+        /// <summary>
+        /// 转成布尔值, 如果转换失败, 返回默认值, 如果是字符串, 则判断是否为null, false, 0, undefined, NaN, 这些字符串都会返回false
+        /// </summary>
         public static bool ToBool(this string str)
         {
             if (str.IsNullOrWhiteSpace())
@@ -166,6 +190,18 @@ namespace Pingfan.Kit
             }
 
             return true;
+        }
+        
+        /// <summary>
+        /// 转成时间, 如果转换失败, 返回默认值
+        /// </summary>
+        public static DateTime ToDatetime(this string str, DateTime defaultValue = default)
+        {
+            if (DateTime.TryParse(str, out var result))
+            {
+                return result;
+            }
+            return defaultValue;
         }
 
         /// <summary>
