@@ -14,7 +14,7 @@ namespace Pingfan.Kit
         private DateTime _lastSpeedTime = DateTime.Now;
         private long _lastSpeedCurrent = 0;
         private double _lastSpeed = 0;
-        private List<double> _speedBuffer = new List<double>(10);
+        private readonly List<double> _speedBuffer = new List<double>(10);
 
         /// <summary>
         /// 任务总量
@@ -46,7 +46,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 增加进度
         /// </summary>
-        /// <param name="count"></param>
         public void Next(long count = 1)
         {
             Interlocked.Add(ref this._current, count);

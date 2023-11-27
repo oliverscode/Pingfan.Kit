@@ -25,15 +25,15 @@ namespace Pingfan.Kit
         }
         private class DataItem
         {
-            public Task Timer;
-            public CancellationTokenSource Cts;
+            public Task Timer = null!;
+            public CancellationTokenSource Cts = null!;
         }
         
         
         private static readonly ConcurrentDictionary<string, DataItem> List =
             new ConcurrentDictionary<string, DataItem>(StringComparer.OrdinalIgnoreCase);
 
-        private static void Fn(string key, int delay, FnKind fnKind, Delegate action, params object[] args)
+        private static void Fn(string key, int delay, FnKind fnKind, Delegate action, params object?[]? args)
         {
             // var key = action.GetMethodInfo().Name;
             if (List.TryGetValue(key, out var item))

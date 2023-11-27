@@ -12,7 +12,7 @@ namespace Pingfan.Kit
     public static class ProcessEx
     {
         private static readonly string MutexName = $"{Assembly.GetEntryAssembly()!.FullName}_{Environment.UserInteractive}";
-        private static Mutex _mutex;
+        private static Mutex? _mutex;
 
         /// <summary>
         /// 本程序是否运行过

@@ -42,11 +42,11 @@ namespace Pingfan.Kit
         /// <param name="bytes"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T ToObject<T>(byte[] bytes)
+        public static T ToObject<T>(byte[] bytes) 
         {
             using var ms = new MemoryStream(bytes);
             var formatter = GetFormatter();
-            return (T)ChangeType(formatter.Deserialize(ms), typeof(T));
+            return ((T)ChangeType(formatter.Deserialize(ms), typeof(T))!)!;
         }
 
         private static IFormatter GetFormatter()
@@ -60,7 +60,7 @@ namespace Pingfan.Kit
         /// <param name="value"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static object ChangeType(object value, Type type)
+        public static object? ChangeType(object? value, Type type)
         {
             if (value == null && type.IsGenericType) return Activator.CreateInstance(type);
             if (value == null) return null;
@@ -68,7 +68,7 @@ namespace Pingfan.Kit
             if (type.IsEnum)
             {
                 if (value is string)
-                    return Enum.Parse(type, value as string);
+                    return Enum.Parse(type, (value as string)!);
                 else
                     return Enum.ToObject(type, value);
             }
@@ -76,12 +76,12 @@ namespace Pingfan.Kit
             if (!type.IsInterface && type.IsGenericType)
             {
                 Type innerType = type.GetGenericArguments()[0];
-                object innerValue = ChangeType(value, innerType);
-                return Activator.CreateInstance(type, new object[] { innerValue });
+                object? innerValue = ChangeType(value, innerType);
+                return Activator.CreateInstance(type, new object?[] { innerValue });
             }
 
-            if (value is string && type == typeof(Guid)) return new Guid(value as string);
-            if (value is string && type == typeof(Version)) return new Version(value as string);
+            if (value is string && type == typeof(Guid)) return new Guid((value as string)!);
+            if (value is string && type == typeof(Version)) return new Version((value as string)!);
             if (!(value is IConvertible)) return value;
             return Convert.ChangeType(value, type);
         }
@@ -89,12 +89,12 @@ namespace Pingfan.Kit
 
     internal sealed class VersionDeserializer : SerializationBinder
     {
-        private static string _thisAssembly;
+        private static string? _thisAssembly;
 
         public override Type BindToType(string assemblyName, string typeName)
         {
             _thisAssembly = Assembly.GetEntryAssembly()?.FullName;
-            return Type.GetType($"{typeName}, {_thisAssembly}");
+            return Type.GetType($"{typeName}, {_thisAssembly}")!;
         }
     }
 }

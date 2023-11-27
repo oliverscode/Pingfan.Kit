@@ -6,7 +6,7 @@ namespace Pingfan.Kit
 {
     public class Retry
     {
-        public static event Action<Exception> OnError;
+        public static event Action<Exception>? OnError;
 
         /// <summary>
         /// 间隔1秒一直重试1个任务

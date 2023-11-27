@@ -10,7 +10,7 @@ namespace Pingfan.Kit
     public class RandomEx
     {
         private double _probability;
-        private double _step;
+        private readonly double _step;
       
         /// <summary>
         /// 概率随机数

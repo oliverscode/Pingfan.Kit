@@ -12,28 +12,34 @@ namespace Pingfan.Kit
         /// <summary>
         /// 错误事件
         /// </summary>
-        public static event Action<Exception> OnError;
+        public static event Action<Exception>? OnError;
 
         /// <summary>
         /// 创建一个定时器，但只执行1次
         /// </summary>
-        public static Task SetTimeout(int milliSecond, Action action, CancellationToken cancellationToken = default)
+        public static Task SetTimeout(
+            int milliSecond,
+            Action method,
+            CancellationToken cancellationToken = default
+        )
         {
             return Task.Factory.StartNew(async () =>
             {
                 await Task.Delay(milliSecond, cancellationToken);
                 if (cancellationToken.IsCancellationRequested)
                     return;
-                action();
+                method();
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
 
         /// <summary>
         /// 创建一个定时器，但只执行1次, 同时不抛出异常
         /// </summary>
-        public static Task SetTimeoutWithTry(int milliSecond,
-            Action action,
-            CancellationToken cancellationToken = default)
+        public static Task SetTimeoutWithTry(
+            int milliSecond,
+            Action method,
+            CancellationToken cancellationToken = default
+        )
         {
             return Task.Factory.StartNew(async () =>
             {
@@ -43,7 +49,7 @@ namespace Pingfan.Kit
 
                 try
                 {
-                    action();
+                    method();
                 }
                 catch (Exception e)
                 {
@@ -55,9 +61,11 @@ namespace Pingfan.Kit
         /// <summary>
         /// 创建一个定时器，但只执行1次, 同时不抛出异常
         /// </summary>
-        public static Task SetTimeoutWithTryAsync(int milliSecond,
-            Func<Task> action,
-            CancellationToken cancellationToken = default)
+        public static Task SetTimeoutWithTryAsync(
+            int milliSecond,
+            Func<Task> method,
+            CancellationToken cancellationToken = default
+        )
         {
             return Task.Factory.StartNew(async () =>
             {
@@ -66,7 +74,7 @@ namespace Pingfan.Kit
                     return;
                 try
                 {
-                    await action();
+                    await method();
                 }
                 catch (Exception e)
                 {
@@ -78,13 +86,17 @@ namespace Pingfan.Kit
         /// <summary>
         /// 创建一个定时器
         /// </summary>
-        public static Task SetInterval(int milliSecond, Action action, CancellationToken cancellationToken = default)
+        public static Task SetInterval(
+            int milliSecond,
+            Action method,
+            CancellationToken cancellationToken = default
+        )
         {
             return Task.Factory.StartNew(async () =>
             {
                 while (cancellationToken.IsCancellationRequested == false)
                 {
-                    action();
+                    method();
                     if (cancellationToken.IsCancellationRequested)
                         return;
                     await Task.Delay(milliSecond, cancellationToken);
@@ -95,10 +107,11 @@ namespace Pingfan.Kit
         /// <summary>
         /// 创建一个定时器, 同时不抛出异常
         /// </summary>
-        public static Task SetIntervalWithTry(int milliSecond,
-            Action action,
-            Action<Exception> errAction = null,
-            CancellationToken cancellationToken = default)
+        public static Task SetIntervalWithTry(
+            int milliSecond,
+            Action method,
+            CancellationToken cancellationToken = default
+        )
         {
             return Task.Factory.StartNew(async () =>
             {
@@ -106,11 +119,11 @@ namespace Pingfan.Kit
                 {
                     try
                     {
-                        action();
+                        method();
                     }
                     catch (Exception e)
                     {
-                        errAction?.Invoke(e);
+                        OnError?.Invoke(e);
                     }
 
                     if (cancellationToken.IsCancellationRequested)
@@ -123,15 +136,17 @@ namespace Pingfan.Kit
         /// <summary>
         /// 创建一个定时器
         /// </summary>
-        public static Task SetIntervalAsync(int milliSecond,
-            Func<Task> action,
-            CancellationToken cancellationToken = default)
+        public static Task SetIntervalAsync(
+            int milliSecond,
+            Func<Task> method,
+            CancellationToken cancellationToken = default
+        )
         {
             return Task.Factory.StartNew(async () =>
             {
                 while (cancellationToken.IsCancellationRequested == false)
                 {
-                    await action();
+                    await method();
                     if (cancellationToken.IsCancellationRequested)
                         return;
                     await Task.Delay(milliSecond, cancellationToken);
@@ -144,7 +159,7 @@ namespace Pingfan.Kit
         /// 创建一个定时器, 同时不抛出异常
         /// </summary>
         public static Task SetIntervalWithTryAsync(int milliSecond,
-            Func<Task> action,
+            Func<Task> method,
             CancellationToken cancellationToken = default)
         {
             return Task.Factory.StartNew(async () =>
@@ -153,121 +168,7 @@ namespace Pingfan.Kit
                 {
                     try
                     {
-                        await action();
-                    }
-                    catch (Exception e)
-                    {
-                        OnError?.Invoke(e);
-                    }
-
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-                    await Task.Delay(milliSecond, cancellationToken);
-                }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        }
-
-        /// <summary>
-        /// 创建一个定时器, 如果返回false, 将终止定时器
-        /// </summary>
-        public static Task SetInterval(int milliSecond,
-            Func<bool> action,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Factory.StartNew(async () =>
-            {
-                while (cancellationToken.IsCancellationRequested == false)
-                {
-                    var result = action();
-                    //判断是否返回的false
-                    if (result == false)
-                    {
-                        return;
-                    }
-
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-                    await Task.Delay(milliSecond, cancellationToken);
-                }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        }
-
-        /// <summary>
-        /// 创建一个定时器, 如果返回false, 将终止定时器, 同时不抛出异常
-        /// </summary>
-        public static Task SetIntervalWithTry(int milliSecond,
-            Func<bool> action,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Factory.StartNew(async () =>
-            {
-                while (cancellationToken.IsCancellationRequested == false)
-                {
-                    try
-                    {
-                        var result = action();
-                        //判断是否返回的false
-                        if (result == false)
-                        {
-                            return;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        OnError?.Invoke(e);
-                    }
-
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-                    await Task.Delay(milliSecond, cancellationToken);
-                }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        }
-
-        /// <summary>
-        /// 创建一个定时器
-        /// </summary>
-        public static Task SetIntervalAsync(int milliSecond,
-            Func<Task<bool>> action,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Factory.StartNew(async () =>
-            {
-                while (cancellationToken.IsCancellationRequested == false)
-                {
-                    var result = await action();
-                    //判断是否返回的false
-                    if (result == false)
-                    {
-                        return;
-                    }
-
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-                    await Task.Delay(milliSecond, cancellationToken);
-                }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-        }
-
-        /// <summary>
-        /// 创建一个定时器, 如果返回false, 将终止定时器, 同时不抛出异常
-        /// </summary>
-        public static Task SetIntervalWithTryAsync(int milliSecond,
-            Func<Task<bool>> action,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Factory.StartNew(async () =>
-            {
-                while (cancellationToken.IsCancellationRequested == false)
-                {
-                    try
-                    {
-                        var result = await action();
-                        //判断是否返回的false
-                        if (result == false)
-                        {
-                            return;
-                        }
+                        await method();
                     }
                     catch (Exception e)
                     {

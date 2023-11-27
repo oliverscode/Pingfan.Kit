@@ -12,18 +12,18 @@ namespace Pingfan.Kit
         /// <summary>
         /// 错误事件
         /// </summary>
-        public static event Action<Exception> OnError; 
+        public static event Action<Exception>? OnError; 
+        
         /// <summary>
         /// 死循环运行一个方法
         /// </summary>
-        /// <param name="action"></param>
-        public static Task Run(Action action)
+        public static Task Run(Action method)
         {
             return Task.Run(() =>
             {
                 while (true)
                 {
-                    action();
+                    method();
                 }
             });
         }
@@ -31,8 +31,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 死循环运行一个方法
         /// </summary>
-        /// <param name="action"></param>
-        public static Task RunWithTry(Action action)
+        public static Task RunWithTry(Action method)
         {
             return Task.Run(() =>
             {
@@ -40,7 +39,7 @@ namespace Pingfan.Kit
                 {
                     try
                     {
-                        action();
+                        method();
                     }
                     catch(Exception e)
                     {
@@ -53,14 +52,13 @@ namespace Pingfan.Kit
         /// <summary>
         /// 死循环运行一个方法
         /// </summary>
-        /// <param name="action"></param>
-        public static Task RunAsync(Func<Task> action)
+        public static Task RunAsync(Func<Task> method)
         {
             return Task.Run(async () =>
             {
                 while (true)
                 {
-                    await action();
+                    await method();
                 }
             });
         }
@@ -68,8 +66,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 死循环运行一个方法
         /// </summary>
-        /// <param name="action"></param>
-        public static Task RunAsyncWithTry(Func<Task> action)
+        public static Task RunAsyncWithTry(Func<Task> method)
         {
             return Task.Run(async () =>
             {
@@ -77,7 +74,7 @@ namespace Pingfan.Kit
                 {
                     try
                     {
-                        await action();
+                        await method();
                     }
                     catch(Exception e)
                     {
@@ -131,8 +128,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 重复执行指定次数的方法
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="method"></param>
         public static async Task RunAsync(int count, Func<Task> method)
         {
             for (var i = 0; i < count; i++)
@@ -144,8 +139,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 重复执行指定次数的方法, i从1开始
         /// </summary>
-        /// <param name="count"></param>
-        /// <param name="method"></param>
         public static async Task RunAsync(int count, Func<int, Task> method)
         {
             for (var i = 1; i <= count; i++)

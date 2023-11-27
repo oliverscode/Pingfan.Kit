@@ -30,7 +30,7 @@ namespace Pingfan.Kit
                 Console.ForegroundColor = inColor;
                 var result = Console.ReadLine();
                 Console.ForegroundColor = foregroundColor;
-                return result;
+                return result!;
             }
         }
 
@@ -93,7 +93,7 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="text"></param>
         /// <param name="outColor"></param>
-        public static void WriteLine(string text = null, ConsoleColor outColor = ConsoleColor.DarkGray)
+        public static void WriteLine(string? text = null, ConsoleColor outColor = ConsoleColor.DarkGray)
         {
             lock (Locker)
             {

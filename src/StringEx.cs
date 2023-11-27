@@ -5,6 +5,9 @@ using System.Text.RegularExpressions;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 字符串扩展
+    /// </summary>
     public static class StringEx
     {
         /// <summary>
@@ -69,7 +72,7 @@ namespace Pingfan.Kit
         {
             return Regex.IsMatch(s1, @"^[-+]?[0-9]*\.?[0-9]+$");
         }
-        
+
         /// <summary>
         /// 是否为整数, 包含负数, 以及大数
         /// </summary>
@@ -150,7 +153,7 @@ namespace Pingfan.Kit
 
             return defaultValue;
         }
-        
+
         /// <summary>
         /// 转成双精度浮点数, 如果转换失败, 返回默认值
         /// </summary>
@@ -163,7 +166,7 @@ namespace Pingfan.Kit
 
             return defaultValue;
         }
-      
+
         /// <summary>
         /// 转成decimal, 如果转换失败, 返回默认值
         /// </summary>
@@ -191,7 +194,7 @@ namespace Pingfan.Kit
 
             return true;
         }
-        
+
         /// <summary>
         /// 转成时间, 如果转换失败, 返回默认值
         /// </summary>
@@ -201,6 +204,7 @@ namespace Pingfan.Kit
             {
                 return result;
             }
+
             return defaultValue;
         }
 
@@ -210,8 +214,9 @@ namespace Pingfan.Kit
         /// <param name="str"></param>
         /// <param name="startIndex">开始位置</param>
         /// <param name="count">隐藏个数</param>
+        /// <param name="defaultChar">默认*</param>
         /// <returns></returns>
-        public static string Hide(this string str, int startIndex, int count)
+        public static string Hide(this string str, int startIndex, int count, char defaultChar = '*')
         {
             if (string.IsNullOrEmpty(str))
             {
@@ -241,7 +246,7 @@ namespace Pingfan.Kit
             var sb = new StringBuilder(str);
             for (var i = 0; i < count; i++)
             {
-                sb[startIndex + i] = '*';
+                sb[startIndex + i] = defaultChar;
             }
 
             return sb.ToString();
@@ -265,13 +270,21 @@ namespace Pingfan.Kit
             if (!m.Success)
                 return list;
 
-            // 除了第一个元素全部返回
-            for (var i = 1; i < m.Groups.Count; i++)
+            // 除了第一个元素全部返回, 除非只有一个元素
+            if (m.Groups.Count == 1)
             {
-                list.Add(m.Groups[i].Value);
+                list.Add(m.Groups[0].Value);
+                return list;
             }
+            else
+            {
+                for (var i = 1; i < m.Groups.Count; i++)
+                {
+                    list.Add(m.Groups[i].Value);
+                }
 
-            return list;
+                return list;
+            }
         }
 
         /// <summary>
@@ -292,13 +305,18 @@ namespace Pingfan.Kit
                 }
 
                 var item = new List<string>();
-                // 除了第一个元素全部返回
-                for (var i = 1; i < m.Groups.Count; i++)
+                // 除了第一个元素全部返回, 除非只有一个元素
+                if (m.Groups.Count == 1)
                 {
-                    item.Add(m.Groups[i].Value);
+                    item.Add(m.Groups[0].Value);
                 }
-
-                list.Add(item);
+                else
+                {
+                    for (var i = 1; i < m.Groups.Count; i++)
+                    {
+                        item.Add(m.Groups[i].Value);
+                    }
+                }
             }
 
             return list;

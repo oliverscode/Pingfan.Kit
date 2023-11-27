@@ -310,7 +310,7 @@ namespace Pingfan.Kit
             eventsActions.Add(eventsAction);
         }
 
-        private static void RemoveAction(object obj, string eventName)
+        private static void RemoveAction(object obj, string? eventName)
         {
             if (string.IsNullOrEmpty(eventName))
             {
@@ -328,7 +328,7 @@ namespace Pingfan.Kit
                 List<EventsAction> eventActions;
                 lock (Actions)
                 {
-                    if (!EventEx.Actions.TryGetValue(eventName, out eventActions))
+                    if (!EventEx.Actions.TryGetValue(eventName!, out eventActions))
                     {
                         // 如果在给定的事件名称下找不到动作，直接返回
                         return;
@@ -349,14 +349,13 @@ namespace Pingfan.Kit
             /// <summary>
             /// 绑定的对象,方便做识别
             /// </summary>
-            public object Obj;
+            public object Obj { get; set; }
+            public string EventName { get; set; }
+            public bool IsOnce { get; set; }
 
-            public string EventName;
-            public bool IsOnce;
 
-
-            private Delegate _action;
-            private ParameterInfo[] _parameterInfos;
+            private readonly Delegate _action;
+            private readonly ParameterInfo[] _parameterInfos;
 
 
             public EventsAction(object obj, string eventName, Delegate action, bool isOnce)

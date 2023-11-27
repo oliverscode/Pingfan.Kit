@@ -14,7 +14,7 @@ namespace Pingfan.Kit
             GetCrc32Table();
         }
 
-        protected static ulong[] Crc32Table;
+        protected static ulong[] Crc32Table = null!;
 
         /// <summary>
         /// 生成CRC32码表
@@ -192,7 +192,7 @@ namespace Pingfan.Kit
             var hash = md5.ComputeHash(stream);
             return ToHexString(hash);
         }
-        
+
         private static string ToHexString(byte[] hash)
         {
             var sb = new StringBuilder();
@@ -200,6 +200,7 @@ namespace Pingfan.Kit
             {
                 sb.Append(b.ToString("x2"));
             }
+
             return sb.ToString();
         }
 

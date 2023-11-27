@@ -11,8 +11,8 @@ namespace Pingfan.Kit
     public class ParallelProcessor<T> : IDisposable
     {
         private readonly BlockingCollection<T> _queue = new BlockingCollection<T>(new ConcurrentQueue<T>());
-        private readonly Action<T> _syncCallback;
-        private readonly Func<T, Task> _asyncCallback;
+        private readonly Action<T>? _syncMethod;
+        private readonly Func<T, Task>? _asyncMethod;
         private readonly int _threadCount;
         private readonly Task[] _tasks;
 
@@ -31,11 +31,11 @@ namespace Pingfan.Kit
         /// <summary>
         /// 构造方法（同步回调）
         /// </summary>
-        /// <param name="callback">处理每个元素的同步回调</param>
+        /// <param name="method">处理每个元素的同步回调</param>
         /// <param name="threadCount">线程数量，默认为处理器核心数的两倍</param>
-        public ParallelProcessor(Action<T> callback, int threadCount = 0)
+        public ParallelProcessor(Action<T>? method, int threadCount = 0)
         {
-            _syncCallback = callback ?? throw new ArgumentNullException(nameof(callback));
+            _syncMethod = method ?? throw new ArgumentNullException(nameof(method));
             _threadCount = threadCount <= 0 ? Environment.ProcessorCount * 2 : threadCount;
             _tasks = new Task[_threadCount];
             StartWorkers(false);
@@ -48,7 +48,7 @@ namespace Pingfan.Kit
         /// <param name="threadCount">线程数量，默认为处理器核心数的两倍</param>
         public ParallelProcessor(Func<T, Task> callback, int threadCount = 0)
         {
-            _asyncCallback = callback ?? throw new ArgumentNullException(nameof(callback));
+            _asyncMethod = callback ?? throw new ArgumentNullException(nameof(callback));
             _threadCount = threadCount <= 0 ? Environment.ProcessorCount * 2 : threadCount;
             _tasks = new Task[_threadCount];
             StartWorkers(true);
@@ -95,11 +95,11 @@ namespace Pingfan.Kit
                     {
                         if (isAsync)
                         {
-                            await _asyncCallback(item);
+                            await _asyncMethod!(item);
                         }
                         else
                         {
-                            _syncCallback(item);
+                            _syncMethod!(item);
                         }
                     }
                 });

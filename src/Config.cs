@@ -25,7 +25,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 缓存时间, 单位秒, 默认1秒
         /// </summary>
-        public static int CacheSeconds = 1;
+        public static int CacheSeconds { get; set; } = 1;
 
         /// <summary>
         /// 写入配置
@@ -40,7 +40,7 @@ namespace Pingfan.Kit
                 var lines = ReadLinesCache();
                 var sb = new StringBuilder();
                 var success = false;
-                foreach (var line in lines)
+                foreach (var line in lines!)
                 {
                     if (line.StartsWith(key + "="))
                     {
@@ -91,7 +91,7 @@ namespace Pingfan.Kit
 
             var lines = ReadLinesCache();
 
-            foreach (var line in lines)
+            foreach (var line in lines!)
             {
                 if (line.StartsWith(key + "="))
                 {
@@ -147,10 +147,10 @@ namespace Pingfan.Kit
             }
 
             var lines = ReadLinesCache();
-            return lines.Any(line => line.StartsWith(key + "="));
+            return lines!.Any(line => line.StartsWith(key + "="));
         }
 
-        private static string[] ReadLinesCache()
+        private static string[]? ReadLinesCache()
         {
             CacheLock.EnterUpgradeableReadLock();
             try

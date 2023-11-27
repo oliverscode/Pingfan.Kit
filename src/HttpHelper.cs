@@ -19,6 +19,11 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
+// ReSharper disable All
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+
 
 namespace Pingfan.Kit
 {

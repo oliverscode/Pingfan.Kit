@@ -101,7 +101,7 @@ namespace Pingfan.Kit
     public class Logger : ILogger
     {
         internal static readonly string RootPath = PathEx.CombineFromCurrentDirectory("log");
-        
+
         /// <summary>
         /// 日志保留天数
         /// </summary>
@@ -115,11 +115,12 @@ namespace Pingfan.Kit
 
         static Logger()
         {
-            Timer.SetIntervalWithTry(1000 * 60 * 30, () =>
+            // 每60分钟清理一次日志
+            Timer.SetIntervalWithTry(1000 * 60 * 60, () =>
             {
                 var now = DateTime.Now;
                 var dir = PathEx.CombineFromCurrentDirectory("log");
-                var paths = Directory.GetFiles(dir, "*.log", SearchOption.AllDirectories);
+                var paths = DirectoryEx.GetFiles(dir, "*.log");
                 foreach (var path in paths)
                 {
                     var date = path.Substring(path.LastIndexOfAny(new[] { '\\', '/' }) + 1, 10);
@@ -127,27 +128,43 @@ namespace Pingfan.Kit
                     {
                         if (now.Subtract(dt).TotalDays >= LogKeepDays)
                         {
-                            File.Delete(path);
+                            FileEx.Delete(path);
                         }
                     }
                 }
             });
         }
 
+        /// <inheritdoc />
         public Logger() : this("")
         {
         }
 
+        /// <summary>
+        /// 日志文件名
+        /// </summary>
+        /// <param name="logFileName">{DateTime.Now:yyyy-MM-dd}{logFileName}.log</param>
         public Logger(string logFileName)
         {
             LogFileName = logFileName;
             ConsoleLevel = Config.Get("ConsoleLevel",
-                string.Join(",", EnumLogLevel.DBG,
-                    EnumLogLevel.SUC, EnumLogLevel.INF, EnumLogLevel.WAR, EnumLogLevel.ERR, EnumLogLevel.FAL));
+                string.Join(",",
+                    EnumLogLevel.DBG,
+                    EnumLogLevel.SUC,
+                    EnumLogLevel.INF,
+                    EnumLogLevel.WAR,
+                    EnumLogLevel.ERR,
+                    EnumLogLevel.FAL
+                ));
 
             FileLevel = Config.Get("FileLevel",
-                string.Join(",", EnumLogLevel.SUC, EnumLogLevel.INF, EnumLogLevel.WAR, EnumLogLevel.ERR,
-                    EnumLogLevel.FAL));
+                string.Join(",",
+                    EnumLogLevel.SUC,
+                    EnumLogLevel.INF,
+                    EnumLogLevel.WAR,
+                    EnumLogLevel.ERR,
+                    EnumLogLevel.FAL
+                ));
         }
 
 
@@ -165,7 +182,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 日志回调, 如果返回true, 则不再输出到控制台以及磁盘
         /// </summary>
-        public Func<EnumLogLevel, string, bool> OnHandler { get; set; }
+        public Func<EnumLogLevel, string, bool>? OnHandler { get; set; }
 
         /// <summary>
         /// 写一个调试日志

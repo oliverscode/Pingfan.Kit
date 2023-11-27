@@ -15,6 +15,11 @@ namespace Pingfan.Kit
         private static readonly ConcurrentDictionary<string, object> Locks = new ConcurrentDictionary<string, object>();
 
         /// <summary>
+        /// 错误事件
+        /// </summary>
+        public static event Action<Exception>? OnError;
+
+        /// <summary>
         /// 重试次数
         /// </summary>
         public static int RetryCount { get; set; } = 10;
@@ -35,10 +40,10 @@ namespace Pingfan.Kit
                     action();
                     return;
                 }
-                catch
+                catch (Exception e)
                 {
                     if (++attempts == RetryCount)
-                        throw;
+                        OnError?.Invoke(e);
 
                     Thread.Sleep(RetryInterval);
                 }
@@ -55,10 +60,10 @@ namespace Pingfan.Kit
                 {
                     return action();
                 }
-                catch
+                catch (Exception e)
                 {
                     if (++attempts == RetryCount)
-                        throw;
+                        OnError?.Invoke(e);
 
                     Thread.Sleep(RetryInterval);
                 }
@@ -68,9 +73,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 读取一个文件
         /// </summary>
-        public static string ReadAllText(string path, Encoding encoding = null)
+        public static string ReadAllText(string path, Encoding? encoding = null)
         {
-            encoding = encoding ?? Encoding.UTF8;
+            encoding ??= Encoding.UTF8;
             var lockObject = Locks.GetOrAdd(path, _ => new object());
 
             lock (lockObject)
@@ -82,9 +87,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 读取一个文件的所有行
         /// </summary>
-        public static string[] ReadAllLines(string path, Encoding encoding = null)
+        public static string[] ReadAllLines(string path, Encoding? encoding = null)
         {
-            encoding = encoding ?? Encoding.UTF8;
+            encoding ??= Encoding.UTF8;
             var lockObject = Locks.GetOrAdd(path, _ => new object());
 
             lock (lockObject)
@@ -96,9 +101,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 读取一个文件的所有行
         /// </summary>
-        public static IEnumerable<string> ReadLines(string path, Encoding encoding = null)
+        public static IEnumerable<string> ReadLines(string path, Encoding? encoding = null)
         {
-            encoding = encoding ?? Encoding.UTF8;
+            encoding ??= Encoding.UTF8;
             var lockObject = Locks.GetOrAdd(path, _ => new object());
 
             lock (lockObject)
@@ -110,9 +115,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 写入文本到一个文件
         /// </summary>
-        public static void WriteAllText(string path, string contents, Encoding encoding = null)
+        public static void WriteAllText(string path, string contents, Encoding? encoding = null)
         {
-            encoding = encoding ?? Encoding.UTF8;
+            encoding ??= Encoding.UTF8;
             var lockObject = Locks.GetOrAdd(path, _ => new object());
 
             lock (lockObject)
@@ -128,9 +133,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 写入多行文本到一个文件
         /// </summary>
-        public static void WriteAllLines(string path, IEnumerable<string> contents, Encoding encoding = null)
+        public static void WriteAllLines(string path, IEnumerable<string> contents, Encoding? encoding = null)
         {
-            encoding = encoding ?? Encoding.UTF8;
+            encoding ??= Encoding.UTF8;
             var lockObject = Locks.GetOrAdd(path, _ => new object());
 
             lock (lockObject)
@@ -176,7 +181,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 追加文本到一个文件
         /// </summary>
-        public static void AppendAllText(string path, string contents, Encoding encoding = null)
+        public static void AppendAllText(string path, string contents, Encoding? encoding = null)
         {
             encoding = encoding ?? Encoding.UTF8;
             var lockObject = Locks.GetOrAdd(path, _ => new object());

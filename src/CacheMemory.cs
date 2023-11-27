@@ -8,8 +8,8 @@ namespace Pingfan.Kit
     /// <summary>
     /// 进程缓存类
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public static class CacheMemory<T>
+    /// <typeparam name="T">可以为Null</typeparam>
+    public static class CacheMemory<T> where T : class
     {
         private static readonly ConcurrentDictionary<string, CachedItem> CacheMap =
             new ConcurrentDictionary<string, CachedItem>(StringComparer.OrdinalIgnoreCase);
@@ -17,12 +17,12 @@ namespace Pingfan.Kit
         private class CachedItem
         {
             public DateTime ExpireDateTime { get; set; }
-            public T Data { get; set; }
+            public T? Data { get; set; }
         }
 
         static CacheMemory()
         {
-            Task.Run(async () => 
+            Task.Run(async () =>
             {
                 while (true)
                 {
@@ -33,9 +33,9 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 获取缓存数据。如果缓存中不存在该键，则返回默认值。
+        /// 获取缓存数据
         /// </summary>
-        public static T Get(string key, T defaultValue = default)
+        public static T? Get(string key, T? defaultValue = null)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
@@ -43,7 +43,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 检查指定的键是否在缓存中。
+        /// 检查指定的键是否在缓存中
         /// </summary>
         public static bool HasKey(string key)
         {
@@ -55,7 +55,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 尝试从缓存中获取值。如果缓存中存在该键，则返回值和true；否则返回默认值和false。
         /// </summary>
-        public static bool TryGet(string key, out T result, T defaultValue = default)
+        public static bool TryGet(string key, out T? result, T? defaultValue = null)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
@@ -72,12 +72,12 @@ namespace Pingfan.Kit
         /// <summary>
         /// 设置缓存的值和过期时间。
         /// </summary>
-        public static void Set(string key, T data, double seconds)
+        public static void Set(string key, T? data, double seconds)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
             var expirationDate = DateTime.UtcNow.AddSeconds(seconds);
-            var cacheItem = new CachedItem { Data = data, ExpireDateTime = expirationDate };
+            CachedItem cacheItem = new CachedItem { Data = data, ExpireDateTime = expirationDate };
 
             CacheMap.AddOrUpdate(key, cacheItem, (k, v) => cacheItem);
         }
@@ -117,7 +117,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 尝试移除缓存项。如果成功移除，返回被移除的项和true；否则返回默认值和false。
         /// </summary>
-        public static bool TryRemove(string key, out T result, T defaultValue = default)
+        public static bool TryRemove(string key, out T? result, T? defaultValue = null)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
@@ -174,7 +174,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 获取或设置缓存项。如果缓存中存在该键，则直接返回值；否则使用valueFactory生成值，并设置缓存和过期时间，然后返回该值。
         /// </summary>
-        public static T GetOrSet(string key, Func<T> valueFactory, double seconds = 1)
+        public static T? GetOrSet(string key, Func<T> valueFactory, double seconds = 1)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
             if (valueFactory == null) throw new ArgumentNullException(nameof(valueFactory));
@@ -192,7 +192,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 异步获取或设置缓存项。如果缓存中存在该键，则直接返回值；否则使用valueFactory生成值，并设置缓存和过期时间，然后返回该值。
         /// </summary>
-        public static async Task<T> GetOrSetAsync(string key, Func<Task<T>> valueFactory, double seconds = 1)
+        public static async Task<T?> GetOrSetAsync(string key, Func<Task<T>> valueFactory, double seconds = 1)
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
             if (valueFactory == null) throw new ArgumentNullException(nameof(valueFactory));
@@ -207,7 +207,7 @@ namespace Pingfan.Kit
             return item;
         }
 
-        private static bool _TryGet(string key, out T data)
+        private static bool _TryGet(string key, out T? data)
         {
             data = default;
             if (CacheMap.TryGetValue(key, out var item) && item.ExpireDateTime > DateTime.UtcNow)

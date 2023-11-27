@@ -16,13 +16,11 @@ namespace Pingfan.Kit
         public static MemoryStream Decompress(Stream stream)
         {
             stream.Position = 0L;
-            using (var gZipStream = new GZipStream(stream, CompressionMode.Decompress, leaveOpen: true))
-            {
-                var memoryStream = new MemoryStream();
-                gZipStream.CopyTo(memoryStream);
-                memoryStream.Position = 0L; // 重置位置以便进一步读取
-                return memoryStream;
-            }
+            using var gZipStream = new GZipStream(stream, CompressionMode.Decompress, leaveOpen: true);
+            var memoryStream = new MemoryStream();
+            gZipStream.CopyTo(memoryStream);
+            memoryStream.Position = 0L; // 重置位置以便进一步读取
+            return memoryStream;
         }
 
         /// <summary>
