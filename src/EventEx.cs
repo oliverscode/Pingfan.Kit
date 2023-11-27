@@ -11,237 +11,237 @@ namespace Pingfan.Kit
     /// </summary>
     public static class EventEx
     {
-        private static readonly ConcurrentDictionary<string, List<EventsAction>> Actions =
-            new ConcurrentDictionary<string, List<EventsAction>>();
+        private static readonly ConcurrentDictionary<string, List<EventAction>> Actions =
+            new ConcurrentDictionary<string, List<EventAction>>();
 
         #region 监听事件
 
-        public static void On(object obj, string eventName, Action action)
+        public static void On(object obj, string eventName, Action method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
-        public static void On<T1>(object obj, string eventName, Action<T1> action)
+        public static void On<T1>(object obj, string eventName, Action<T1> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
-        public static void On<T1, T2>(object obj, string eventName, Action<T1, T2> action)
+        public static void On<T1, T2>(object obj, string eventName, Action<T1, T2> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
-        public static void On<T1, T2, T3>(object obj, string eventName, Action<T1, T2, T3> action)
+        public static void On<T1, T2, T3>(object obj, string eventName, Action<T1, T2, T3> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
-        public static void On<T1, T2, T3, T4>(object obj, string eventName, Action<T1, T2, T3, T4> action)
+        public static void On<T1, T2, T3, T4>(object obj, string eventName, Action<T1, T2, T3, T4> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
-        public static void On<T1, T2, T3, T4, T5>(object obj, string eventName, Action<T1, T2, T3, T4, T5> action)
+        public static void On<T1, T2, T3, T4, T5>(object obj, string eventName, Action<T1, T2, T3, T4, T5> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
         public static void On<T1, T2, T3, T4, T5, T6>(object obj, string eventName,
-            Action<T1, T2, T3, T4, T5, T6> action)
+            Action<T1, T2, T3, T4, T5, T6> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
         public static void On<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName,
-            Action<T1, T2, T3, T4, T5, T6, T7> action)
+            Action<T1, T2, T3, T4, T5, T6, T7> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
         public static void On<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName,
-            Action<T1, T2, T3, T4, T5, T6, T7, T8> action)
+            Action<T1, T2, T3, T4, T5, T6, T7, T8> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
         public static void On<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName,
-            Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action)
+            Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
         #endregion
 
         #region 监听一次事件
 
-        public static void Once(object obj, string eventName, Action action)
+        public static void Once(object obj, string eventName, Action method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
-        public static void Once<T1>(object obj, string eventName, Action<T1> action)
+        public static void Once<T1>(object obj, string eventName, Action<T1> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
-        public static void Once<T1, T2>(object obj, string eventName, Action<T1, T2> action)
+        public static void Once<T1, T2>(object obj, string eventName, Action<T1, T2> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
-        public static void Once<T1, T2, T3>(object obj, string eventName, Action<T1, T2, T3> action)
+        public static void Once<T1, T2, T3>(object obj, string eventName, Action<T1, T2, T3> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
-        public static void Once<T1, T2, T3, T4>(object obj, string eventName, Action<T1, T2, T3, T4> action)
+        public static void Once<T1, T2, T3, T4>(object obj, string eventName, Action<T1, T2, T3, T4> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
-        public static void Once<T1, T2, T3, T4, T5>(object obj, string eventName, Action<T1, T2, T3, T4, T5> action)
+        public static void Once<T1, T2, T3, T4, T5>(object obj, string eventName, Action<T1, T2, T3, T4, T5> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
         public static void Once<T1, T2, T3, T4, T5, T6>(object obj, string eventName,
-            Action<T1, T2, T3, T4, T5, T6> action)
+            Action<T1, T2, T3, T4, T5, T6> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
         public static void Once<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName,
-            Action<T1, T2, T3, T4, T5, T6, T7> action)
+            Action<T1, T2, T3, T4, T5, T6, T7> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
         public static void Once<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName,
-            Action<T1, T2, T3, T4, T5, T6, T7, T8> action)
+            Action<T1, T2, T3, T4, T5, T6, T7, T8> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
         public static void Once<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName,
-            Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> action)
+            Action<T1, T2, T3, T4, T5, T6, T7, T8, T9> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
         #endregion
 
         #region 监听事件,支持异步方法
 
-        public static void On(object obj, string eventName, Func<Task> action)
+        public static void On(object obj, string eventName, Func<Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
-        public static void On<T1>(object obj, string eventName, Func<T1, Task> action)
+        public static void On<T1>(object obj, string eventName, Func<T1, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
-        public static void On<T1, T2>(object obj, string eventName, Func<T1, T2, Task> action)
+        public static void On<T1, T2>(object obj, string eventName, Func<T1, T2, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
-        public static void On<T1, T2, T3>(object obj, string eventName, Func<T1, T2, T3, Task> action)
+        public static void On<T1, T2, T3>(object obj, string eventName, Func<T1, T2, T3, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
-        public static void On<T1, T2, T3, T4>(object obj, string eventName, Func<T1, T2, T3, T4, Task> action)
+        public static void On<T1, T2, T3, T4>(object obj, string eventName, Func<T1, T2, T3, T4, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
-        public static void On<T1, T2, T3, T4, T5>(object obj, string eventName, Func<T1, T2, T3, T4, T5, Task> action)
+        public static void On<T1, T2, T3, T4, T5>(object obj, string eventName, Func<T1, T2, T3, T4, T5, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
         public static void On<T1, T2, T3, T4, T5, T6>(object obj, string eventName,
-            Func<T1, T2, T3, T4, T5, T6, Task> action)
+            Func<T1, T2, T3, T4, T5, T6, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
         public static void On<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName,
-            Func<T1, T2, T3, T4, T5, T6, T7, Task> action)
+            Func<T1, T2, T3, T4, T5, T6, T7, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
         public static void On<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName,
-            Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> action)
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
         public static void On<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName,
-            Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> action)
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, false));
+            AddAction(new EventAction(obj, eventName, method, false));
         }
 
         #endregion
 
         #region 监听事件,支持异步方法,单次执行
 
-        public static void Once(object obj, string eventName, Func<Task> action)
+        public static void Once(object obj, string eventName, Func<Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
-        public static void Once<T1>(object obj, string eventName, Func<T1, Task> action)
+        public static void Once<T1>(object obj, string eventName, Func<T1, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
-        public static void Once<T1, T2>(object obj, string eventName, Func<T1, T2, Task> action)
+        public static void Once<T1, T2>(object obj, string eventName, Func<T1, T2, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
-        public static void Once<T1, T2, T3>(object obj, string eventName, Func<T1, T2, T3, Task> action)
+        public static void Once<T1, T2, T3>(object obj, string eventName, Func<T1, T2, T3, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
-        public static void Once<T1, T2, T3, T4>(object obj, string eventName, Func<T1, T2, T3, T4, Task> action)
+        public static void Once<T1, T2, T3, T4>(object obj, string eventName, Func<T1, T2, T3, T4, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
-        public static void Once<T1, T2, T3, T4, T5>(object obj, string eventName, Func<T1, T2, T3, T4, T5, Task> action)
+        public static void Once<T1, T2, T3, T4, T5>(object obj, string eventName, Func<T1, T2, T3, T4, T5, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
         public static void Once<T1, T2, T3, T4, T5, T6>(object obj, string eventName,
-            Func<T1, T2, T3, T4, T5, T6, Task> action)
+            Func<T1, T2, T3, T4, T5, T6, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
         public static void Once<T1, T2, T3, T4, T5, T6, T7>(object obj, string eventName,
-            Func<T1, T2, T3, T4, T5, T6, T7, Task> action)
+            Func<T1, T2, T3, T4, T5, T6, T7, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
         public static void Once<T1, T2, T3, T4, T5, T6, T7, T8>(object obj, string eventName,
-            Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> action)
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
         public static void Once<T1, T2, T3, T4, T5, T6, T7, T8, T9>(object obj, string eventName,
-            Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> action)
+            Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, Task> method)
         {
-            AddAction(new EventsAction(obj, eventName, action, true));
+            AddAction(new EventAction(obj, eventName, method, true));
         }
 
         #endregion
@@ -250,10 +250,10 @@ namespace Pingfan.Kit
 
         public static void Emit(string eventName, params object[] args)
         {
-            if (!EventEx.Actions.TryGetValue(eventName, out List<EventsAction> eventsActions))
+            if (!EventEx.Actions.TryGetValue(eventName, out List<EventAction> eventsActions))
                 return;
 
-            var removeList = new List<EventsAction>();
+            var removeList = new List<EventAction>();
 
             foreach (var eventsAction in eventsActions)
             {
@@ -303,11 +303,11 @@ namespace Pingfan.Kit
 
         #region 静态处理方法
 
-        private static void AddAction(EventsAction eventsAction)
+        private static void AddAction(EventAction eventAction)
         {
-            EventEx.Actions.GetOrAdd(eventsAction.EventName, _ => new List<EventsAction>());
-            var eventsActions = EventEx.Actions[eventsAction.EventName];
-            eventsActions.Add(eventsAction);
+            EventEx.Actions.GetOrAdd(eventAction.EventName, _ => new List<EventAction>());
+            var eventsActions = EventEx.Actions[eventAction.EventName];
+            eventsActions.Add(eventAction);
         }
 
         private static void RemoveAction(object obj, string? eventName)
@@ -319,13 +319,13 @@ namespace Pingfan.Kit
                     // 删除obj对象的所有事件
                     foreach (var pair in Actions)
                     {
-                        pair.Value.RemoveAll(action => action.Obj == obj);
+                        pair.Value.RemoveAll(method => method.Obj == obj);
                     }
                 }
             }
             else
             {
-                List<EventsAction> eventActions;
+                List<EventAction> eventActions;
                 lock (Actions)
                 {
                     if (!EventEx.Actions.TryGetValue(eventName!, out eventActions))
@@ -337,19 +337,20 @@ namespace Pingfan.Kit
 
                 lock (eventActions)
                 {
-                    eventActions.RemoveAll(action => action.Obj == obj);
+                    eventActions.RemoveAll(method => method.Obj == obj);
                 }
             }
         }
 
         #endregion
 
-        private class EventsAction
+        private class EventAction
         {
             /// <summary>
             /// 绑定的对象,方便做识别
             /// </summary>
             public object Obj { get; set; }
+
             public string EventName { get; set; }
             public bool IsOnce { get; set; }
 
@@ -358,13 +359,13 @@ namespace Pingfan.Kit
             private readonly ParameterInfo[] _parameterInfos;
 
 
-            public EventsAction(object obj, string eventName, Delegate action, bool isOnce)
+            public EventAction(object obj, string eventName, Delegate method, bool isOnce)
             {
                 this.Obj = obj;
                 this.EventName = eventName;
                 this.IsOnce = isOnce;
-                this._action = action;
-                this._parameterInfos = action.Method.GetParameters();
+                this._action = method;
+                this._parameterInfos = method.Method.GetParameters();
             }
 
             /// <summary>
