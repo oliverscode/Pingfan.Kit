@@ -181,5 +181,189 @@ namespace Pingfan.Kit
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
+
+        /// <summary>
+        /// 准点执行, 不能在夏令时地区使用, hour, minute, second为-1时, 则会忽略该参数
+        /// </summary>
+        public static Task SetTime(
+            int hour,
+            int minute,
+            int second,
+            Action method,
+            CancellationToken cancellationToken = default
+        )
+        {
+            return Task.Factory.StartNew(async () =>
+            {
+                while (cancellationToken.IsCancellationRequested == false)
+                {
+                    var now = DateTime.Now;
+                    if (hour != -1 && now.Hour != hour)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    if (minute != -1 && now.Minute != minute)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    if (second != -1 && now.Second != second)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    method();
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    await Task.Delay(1000, cancellationToken);
+                }
+            }, cancellationToken);
+        }
+
+        /// <summary>
+        /// 准点执行, 不能在夏令时地区使用, hour, minute, second为-1时, 则会忽略该参数
+        /// </summary>
+        public static Task SetTimeAsync(
+            int hour,
+            int minute,
+            int second,
+            Func<Task> method,
+            CancellationToken cancellationToken = default
+        )
+        {
+            return Task.Factory.StartNew(async () =>
+            {
+                while (cancellationToken.IsCancellationRequested == false)
+                {
+                    var now = DateTime.Now;
+                    if (hour != -1 && now.Hour != hour)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    if (minute != -1 && now.Minute != minute)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    if (second != -1 && now.Second != second)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    await method();
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    await Task.Delay(1000, cancellationToken);
+                }
+            }, cancellationToken);
+        }
+
+        /// <summary>
+        /// 准点执行, 不能在夏令时地区使用, hour, minute, second为-1时, 则会忽略该参数
+        /// </summary>
+        public static Task SetTimeWithTry(
+            int hour,
+            int minute,
+            int second,
+            Action method,
+            CancellationToken cancellationToken = default
+        )
+        {
+            return Task.Factory.StartNew(async () =>
+            {
+                while (cancellationToken.IsCancellationRequested == false)
+                {
+                    var now = DateTime.Now;
+                    if (hour != -1 && now.Hour != hour)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    if (minute != -1 && now.Minute != minute)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    if (second != -1 && now.Second != second)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    try
+                    {
+                        method();
+                    }
+                    catch (Exception e)
+                    {
+                        OnError?.Invoke(e);
+                    }
+
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    await Task.Delay(1000, cancellationToken);
+                }
+            }, cancellationToken);
+        }
+
+        /// <summary>
+        /// 准点执行, 不能在夏令时地区使用, hour, minute, second为-1时, 则会忽略该参数
+        /// </summary>
+        public static Task SetTimeWithTryAsync(
+            int hour,
+            int minute,
+            int second,
+            Func<Task> method,
+            CancellationToken cancellationToken = default
+        )
+        {
+            return Task.Factory.StartNew(async () =>
+            {
+                while (cancellationToken.IsCancellationRequested == false)
+                {
+                    var now = DateTime.Now;
+                    if (hour != -1 && now.Hour != hour)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    if (minute != -1 && now.Minute != minute)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    if (second != -1 && now.Second != second)
+                    {
+                        await Task.Delay(1000, cancellationToken);
+                        continue;
+                    }
+
+                    try
+                    {
+                        await method();
+                    }
+                    catch (Exception e)
+                    {
+                        OnError?.Invoke(e);
+                    }
+
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    await Task.Delay(1000, cancellationToken);
+                }
+            }, cancellationToken);
+        }
     }
 }

@@ -2,14 +2,11 @@
 
 using System.Diagnostics;
 using Pingfan.Kit;
+using Timer = Pingfan.Kit.Timer;
 
-Stopwatch sw = new Stopwatch();
-sw.Start();
 
-var ip = IpEx.GetWanIpLocation("94.103.4.121");
-
- ip = IpEx.GetWanIpLocation("61.144.142.165");
-
-sw.Start();
-
-Console.WriteLine(ip + " " + sw.ElapsedMilliseconds);
+Timer.SetTime(-1, 16, -1, () =>
+{
+    Console.WriteLine("当前时间是: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+});
+Console.ReadLine();
