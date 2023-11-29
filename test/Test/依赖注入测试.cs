@@ -100,7 +100,8 @@ public class 依赖注入测试
 
         public string Name { get; set; }
 
-        public IAnimal BB { get; set; }
+      
+        public IAnimal BB { get; set; } = new Dog();
 
         public AA(string name)
         {
@@ -113,6 +114,7 @@ public class 依赖注入测试
 
             this.Container.Push("BB");
             this.Container.Push<BB>();
+            this.Container.Root.OnNotFound = type => new BB();
 
             this.BB = this.Container.Get<BB>();
         }
@@ -120,7 +122,7 @@ public class 依赖注入测试
 
     class BB : IAnimal
     {
-        public string Name => "BB";
+        [Inject] public string Name { get; set; }
     }
 
 
@@ -244,7 +246,7 @@ public class 依赖注入测试
         child.Dispose();
 
         var ex = Assert.Throws<Exception>(() => child.Get<Person>());
-        Assert.Equal("无法创建实例", ex.Message);
+        Assert.Equal($"无法创建实例 {typeof(Person)}", ex.Message);
     }
 
     [Fact] // 注入字符串

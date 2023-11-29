@@ -15,13 +15,33 @@ namespace Pingfan.Kit.Inject
         private readonly Container? _parent;
         private readonly List<Container> _children;
         private readonly List<PushItem> _objectItems = new List<PushItem>();
+        private Func<Type, object> _onNotFound = type => throw new Exception($"无法创建实例 {type}");
 
         /// <summary>
         /// 每次注入的最大深度, 防止循环依赖
         /// </summary>
         public int MaxDeep { get; set; } = 20;
 
-        public int CurrentDeep { get; set; }
+        protected int CurrentDeep { get; set; }
+
+
+        /// <summary>
+        /// 没有找到对象时, 手动注入
+        /// </summary>
+        /// <returns></returns>
+        public Func<Type, object> OnNotFound
+        {
+            get => _onNotFound;
+            set
+            {
+                if (IsRoot == false)
+                {
+                    throw new Exception("因为找不到会向上搜索, 所有只有根容器才能设置OnNotFound");
+                }
+
+                _onNotFound = value;
+            }
+        }
 
 
         /// <summary>
@@ -196,7 +216,7 @@ namespace Pingfan.Kit.Inject
                             popItem.Deep++;
                             var parameterInfo = parameterInfos[i];
                             if (parameterInfo.ParameterType == this.GetType())
-                                throw new Exception("无法注入容器, 请使用属性注入");
+                                throw new Exception("无法在构造参数中注入容器, 请使用属性注入");
 
                             // 获取特性上的名字
                             var name = popItem.Name;
@@ -210,27 +230,7 @@ namespace Pingfan.Kit.Inject
                         pushItem.Instance = constructorInfo.Invoke(parameters);
 
                         // 判断是否有属性注入
-                        var properties = popItem.Type.GetProperties().Where(p => p.IsDefined(typeof(InjectAttribute)));
-                        foreach (var property in properties)
-                        {
-                            popItem.Deep++;
-                            var propertyType = property.PropertyType;
-                            // 如果是注入自己, 则注入当前实例
-                            if (propertyType == this.GetType())
-                            {
-                                property.SetValue(pushItem.Instance, this);
-                            }
-                            else
-                            {
-                                // 获取特性上的名字
-                                var name = popItem.Name;
-                                if (name.IsNullOrEmpty())
-                                    name = property.GetCustomAttribute<InjectAttribute>()?.Name;
-                                var propertyValue =
-                                    Get(new PopItem(propertyType, name, popItem.Deep));
-                                property.SetValue(pushItem.Instance, propertyValue);
-                            }
-                        }
+                        InjectProperty(popItem, pushItem.Instance);
 
                         // 注入完成 是否继承IContainerReady
                         if (pushItem.Instance is IContainerReady containerReady)
@@ -247,12 +247,41 @@ namespace Pingfan.Kit.Inject
                 if (_parent != null)
                 {
                     // 如果没有找到, 则从父容器中寻找
-                    return _parent.Get(popItem);
+                    var obj = _parent.Get(popItem);
+                    // 判断是否有属性注入
+                    InjectProperty(popItem, obj);
+                    return obj;
                 }
             }
 
 
-            throw new Exception("无法创建实例");
+            return this.OnNotFound(popItem.Type);
+        }
+
+        // 属性注入
+        private void InjectProperty(PopItem popItem, object instance)
+        {
+            var properties = popItem.Type.GetProperties().Where(p => p.IsDefined(typeof(InjectAttribute)));
+            foreach (var property in properties)
+            {
+                popItem.Deep++;
+                var propertyType = property.PropertyType;
+                // 如果是注入自己, 则注入当前实例
+                if (propertyType == this.GetType())
+                {
+                    property.SetValue(instance, this);
+                }
+                else
+                {
+                    // 获取特性上的名字
+                    var name = popItem.Name;
+                    if (name.IsNullOrEmpty())
+                        name = property.GetCustomAttribute<InjectAttribute>()?.Name;
+                    var propertyValue =
+                        Get(new PopItem(propertyType, name, popItem.Deep));
+                    property.SetValue(instance, propertyValue);
+                }
+            }
         }
 
 
