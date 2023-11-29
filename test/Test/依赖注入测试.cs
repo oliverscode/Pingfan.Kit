@@ -49,6 +49,10 @@ public class 依赖注入测试
         [Inject("f2")] public int Size { get; set; }
     }
 
+    class Bear<T> where T : IAnimal
+    {
+        [Inject] public T Animal { get; set; }
+    }
 
     class Car
     {
@@ -252,7 +256,7 @@ public class 依赖注入测试
         var result = container.Get<Pig>();
         Assert.Equal("123 456", result.Name);
     }
-    
+
     [Fact] // 属性注入多个整数,根据特性指定名字
     public void 属性注入多个整数_根据特性指定名字()
     {
@@ -260,8 +264,19 @@ public class 依赖注入测试
         container.Push("f1", 123);
         container.Push("f2", 456);
         container.Push<Fish>();
-        
+
         var result = container.Get<Fish>();
         Assert.Equal(579, result.Cost);
+    }
+
+    [Fact] // 属性注入泛型
+    public void 属性注入泛型()
+    {
+        var container = new Container();
+        container.Push<IAnimal, Dog>();
+        container.Push<Bear<IAnimal>>();
+
+        var result = container.Get<Bear<IAnimal>>();
+        Assert.Equal("Dog", result.Animal.Name);
     }
 }

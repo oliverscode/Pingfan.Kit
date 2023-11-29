@@ -148,7 +148,10 @@ namespace Pingfan.Kit.Inject
                         {
                             var parameterInfo = parameterInfos[i];
                             // 获取特性上的名字
-                            var name = parameterInfo.GetCustomAttribute<InjectAttribute>()?.Name;
+                            var name = popItem.Name;
+                            if (name.IsNullOrEmpty())
+                                name = parameterInfo.GetCustomAttribute<InjectAttribute>()?.Name;
+                            
                             parameters[i] = Get(new PopItem(parameterInfo.ParameterType, name,
                                 ++popItem.Deep));
                         }
@@ -160,6 +163,7 @@ namespace Pingfan.Kit.Inject
                         foreach (var property in properties)
                         {
                             var propertyType = property.PropertyType;
+                            // 获取特性上的名字
                             var name = popItem.Name;
                             if (name.IsNullOrEmpty())
                                 name = property.GetCustomAttribute<InjectAttribute>()?.Name;
