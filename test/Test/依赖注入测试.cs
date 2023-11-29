@@ -1,6 +1,4 @@
 using Pingfan.Kit.Inject;
-using Pingfan.Kit.Inject.Attributes;
-using Pingfan.Kit.Inject.Interfaces;
 using Xunit.Abstractions;
 
 namespace Test;

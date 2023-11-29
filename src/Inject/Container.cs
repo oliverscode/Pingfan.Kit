@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Pingfan.Kit.Inject.Attributes;
-using Pingfan.Kit.Inject.Interfaces;
 
 namespace Pingfan.Kit.Inject
 {
@@ -14,6 +12,7 @@ namespace Pingfan.Kit.Inject
     {
         private readonly Container? _parent;
         private readonly List<Container> _children;
+        private readonly int _currentDeep; // 当前深度, 用于判断递归深度
         private readonly List<PushItem> _objectItems = new List<PushItem>();
         private Func<Type, object> _onNotFound = type => throw new Exception($"无法创建实例 {type}");
 
@@ -21,8 +20,6 @@ namespace Pingfan.Kit.Inject
         /// 每次注入的最大深度, 防止循环依赖
         /// </summary>
         public int MaxDeep { get; set; } = 20;
-
-        protected int CurrentDeep { get; set; }
 
 
         /// <summary>
@@ -45,15 +42,15 @@ namespace Pingfan.Kit.Inject
 
 
         /// <summary>
-        /// 传递父容器
+        /// 创建一个容器
         /// </summary>
-        /// <param name="parent"></param>
+        /// <param name="parent">默认为根容器</param>
         public Container(Container? parent = null)
         {
             _parent = parent;
             _children = new List<Container>();
-            this.CurrentDeep = parent?.CurrentDeep + 1 ?? 0;
-            if (this.CurrentDeep > this.MaxDeep)
+            this._currentDeep = parent?._currentDeep + 1 ?? 0;
+            if (this._currentDeep > this.MaxDeep)
                 throw new Exception($"递归深度超过{MaxDeep}层, 可能存在循环依赖");
 
             if (parent != null)
@@ -64,7 +61,7 @@ namespace Pingfan.Kit.Inject
 
 
         /// <summary>
-        /// 是否是跟容器, 一般用作全局容器
+        /// 是否是根容器, 一般用作全局变量容器
         /// </summary>
         public bool IsRoot => _parent == null;
 
@@ -74,22 +71,20 @@ namespace Pingfan.Kit.Inject
         public Container Root => _parent?.Root ?? this;
 
         /// <summary>
-        /// 子容器
-        /// </summary>
-        public List<Container> Children => _children;
-
-        /// <summary>
         /// 父容器
         /// </summary>
         public Container? Parent => _parent;
+
+        /// <summary>
+        /// 子容器
+        /// </summary>
+        public List<Container> Children => _children;
 
 
         /// <summary>
         /// 注入数据
         /// </summary>
-        /// <param name="name"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <exception cref="Exception"></exception>
+        /// <param name="name">如果重复, 可以靠名字区分</param>
         public void Push<T>(string? name = null)
         {
             var type = typeof(T);
@@ -111,6 +106,9 @@ namespace Pingfan.Kit.Inject
             }
         }
 
+        /// <summary>
+        /// 注入一个任意实例对象
+        /// </summary>
         public void Push(object instance)
         {
             var type = instance.GetType();
@@ -129,6 +127,9 @@ namespace Pingfan.Kit.Inject
             }
         }
 
+        /// <summary>
+        /// 注入一个任意实例对象, 并且指定名字
+        /// </summary>
         public void Push(string name, object instance)
         {
             var type = instance.GetType();
@@ -148,7 +149,9 @@ namespace Pingfan.Kit.Inject
         }
 
 
-        // TI必须是接口, T必须是类, 并且T必须实现TI
+        /// <summary>
+        /// 注入一个接口和实例
+        /// </summary>
         public void Push<TI, T>(string? name = null) where T : TI
         {
             var interfaceType = typeof(TI);
@@ -158,7 +161,9 @@ namespace Pingfan.Kit.Inject
             _objectItems.Add(item);
         }
 
-
+        /// <summary>
+        /// 获取容器中的对象
+        /// </summary>
         public T Get<T>(string? name = null)
         {
             return (T)Get(new PopItem(typeof(T), name, 0));
@@ -173,9 +178,9 @@ namespace Pingfan.Kit.Inject
             if (popItem.Type.IsInterface)
             {
                 var objectItems = _objectItems.Where(x => x.InterfaceType == popItem.Type).ToList();
-                PushItem pushItem;
                 if (objectItems.Count >= 1) // 找到多个, 用name再匹配一次
                 {
+                    PushItem pushItem;
                     if (objectItems.Count > 1)
                         pushItem = objectItems.FirstOrDefault(x => x.InstanceName == popItem.Name) ?? objectItems[0];
                     else
@@ -250,6 +255,11 @@ namespace Pingfan.Kit.Inject
                     var obj = _parent.Get(popItem);
                     // 判断是否有属性注入
                     InjectProperty(popItem, obj);
+                    if (obj is IContainerReady containerReady)
+                    {
+                        containerReady.OnContainerReady();
+                    }
+
                     return obj;
                 }
             }
@@ -285,10 +295,13 @@ namespace Pingfan.Kit.Inject
         }
 
 
+        /// <summary>
+        /// 创建一个子容器
+        /// </summary>
+        /// <returns></returns>
         public Container CreateChild()
         {
             var child = new Container(this);
-            _children.Add(child);
             return child;
         }
 

@@ -1,6 +1,6 @@
 using System;
 
-namespace Pingfan.Kit.Inject.Attributes
+namespace Pingfan.Kit.Inject
 {
     /// <summary>
     /// 对象注入, 只能在属性, 和形参上使用
@@ -9,7 +9,6 @@ namespace Pingfan.Kit.Inject.Attributes
     public class InjectAttribute : Attribute
     {
         internal string? Name { get; }
-        internal bool New { get; } = false;
 
         public InjectAttribute()
         {
@@ -24,13 +23,6 @@ namespace Pingfan.Kit.Inject.Attributes
             Name = name;
         }
 
-        /// <summary>
-        /// 注入
-        /// </summary>
-        /// <param name="isNew">是否每次都注入一个信息的</param>
-        public InjectAttribute(bool isNew)
-        {
-            New = isNew;
-        }
+
     }
 }

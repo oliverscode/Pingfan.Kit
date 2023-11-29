@@ -1,4 +1,4 @@
-namespace Pingfan.Kit.Inject.Interfaces
+namespace Pingfan.Kit.Inject
 {
     public interface IContainerReady
     {

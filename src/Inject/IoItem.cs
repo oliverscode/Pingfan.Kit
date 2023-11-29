@@ -7,7 +7,7 @@ namespace Pingfan.Kit.Inject
     /// <summary>
     /// 注入的对象
     /// </summary>
-    class PushItem
+    internal class PushItem
     {
         public Type? InterfaceType { get; }
         public Type? InstanceType { get; }
@@ -41,7 +41,7 @@ namespace Pingfan.Kit.Inject
     /// <summary>
     /// 获取的对象
     /// </summary>
-    class PopItem
+    internal class PopItem
     {
 
         public Type Type { get; set; }
