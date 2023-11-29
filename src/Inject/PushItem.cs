@@ -43,6 +43,7 @@ namespace Pingfan.Kit.Inject
     /// </summary>
     class PopItem
     {
+
         public Type Type { get; set; }
         public string? Name { get; set; }
         public int Deep { get; set; }

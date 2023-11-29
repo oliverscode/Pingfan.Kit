@@ -1,5 +1,6 @@
 using Pingfan.Kit.Inject;
 using Pingfan.Kit.Inject.Attributes;
+using Pingfan.Kit.Inject.Interfaces;
 using Xunit.Abstractions;
 
 namespace Test;
@@ -90,6 +91,38 @@ public class 依赖注入测试
         {
         }
     }
+
+
+    class AA : IAnimal, IContainerReady
+    {
+        [Inject] public Container Container { get; set; }
+
+
+        public string Name { get; set; }
+
+        public IAnimal BB { get; set; }
+
+        public AA(string name)
+        {
+            this.Name = name;
+        }
+
+        public void OnContainerReady()
+        {
+            this.Container = this.Container.CreateChild();
+
+            this.Container.Push("BB");
+            this.Container.Push<BB>();
+
+            this.BB = this.Container.Get<BB>();
+        }
+    }
+
+    class BB : IAnimal
+    {
+        public string Name => "BB";
+    }
+
 
     [Fact] // 注入接口和实例, 要实例的情况
     public void 注入1个接口和实例_要实例()
@@ -278,5 +311,19 @@ public class 依赖注入测试
 
         var result = container.Get<Bear<IAnimal>>();
         Assert.Equal("Dog", result.Animal.Name);
+    }
+
+    [Fact] // 生命周期
+    public void 生命周期()
+    {
+        var container = new Container();
+        container.Push<AA>();
+        container.Push("AA");
+
+        var result = container.Get<AA>();
+        Assert.Equal("AA", result.Name);
+
+
+        Assert.Equal("BB", result.BB.Name);
     }
 }

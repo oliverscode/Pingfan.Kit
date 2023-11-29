@@ -21,6 +21,8 @@ namespace Pingfan.Kit.Inject
         /// </summary>
         public int MaxDeep { get; set; } = 20;
 
+        public int CurrentDeep { get; set; }
+
 
         /// <summary>
         /// 传递父容器
@@ -30,14 +32,22 @@ namespace Pingfan.Kit.Inject
         {
             _parent = parent;
             _children = new List<Container>();
+            this.CurrentDeep = parent?.CurrentDeep + 1 ?? 0;
+            if (this.CurrentDeep > this.MaxDeep)
+                throw new Exception($"递归深度超过{MaxDeep}层, 可能存在循环依赖");
+
+            if (parent != null)
+            {
+                this.MaxDeep = parent.MaxDeep;
+            }
         }
 
 
         /// <summary>
         /// 是否是跟容器, 一般用作全局容器
         /// </summary>
-        public bool IsRoot => _parent != null;
-        
+        public bool IsRoot => _parent == null;
+
         /// <summary>
         /// 根容器
         /// </summary>
@@ -66,24 +76,55 @@ namespace Pingfan.Kit.Inject
             if (type.IsInterface)
                 throw new Exception("无法注入接口");
 
-            var item = new PushItem(null, type, name, null);
-            _objectItems.Add(item);
+            // // 获取type的所有接口类型, 并且分别注入
+            // var interfaceTypes = type.GetInterfaces();
+            //
+            // foreach (var interfaceType in interfaceTypes)
+            // {
+            //     var item = new PushItem(interfaceType, type, name, null);
+            //     _objectItems.Add(item);
+            // }
+
+            {
+                var item = new PushItem(null, type, name, null);
+                _objectItems.Add(item);
+            }
         }
 
         public void Push(object instance)
         {
             var type = instance.GetType();
 
-            var item = new PushItem(null, type, null, instance);
-            _objectItems.Add(item);
+            // // 获取type的所有接口类型, 并且分别注入
+            // var interfaceTypes = type.GetInterfaces();
+            // foreach (var interfaceType in interfaceTypes)
+            // {
+            //     var item = new PushItem(interfaceType, type, null, instance);
+            //     _objectItems.Add(item);
+            // }
+
+            {
+                var item = new PushItem(null, type, null, instance);
+                _objectItems.Add(item);
+            }
         }
 
         public void Push(string name, object instance)
         {
             var type = instance.GetType();
 
-            var item = new PushItem(null, type, name, instance);
-            _objectItems.Add(item);
+            // // 获取type的所有接口类型, 并且分别注入
+            // var interfaceTypes = type.GetInterfaces();
+            // foreach (var interfaceType in interfaceTypes)
+            // {
+            //     var item = new PushItem(interfaceType, type, name, instance);
+            //     _objectItems.Add(item);
+            // }
+
+            {
+                var item = new PushItem(null, type, name, instance);
+                _objectItems.Add(item);
+            }
         }
 
 
@@ -113,14 +154,20 @@ namespace Pingfan.Kit.Inject
             {
                 var objectItems = _objectItems.Where(x => x.InterfaceType == popItem.Type).ToList();
                 PushItem pushItem;
-                if (objectItems.Count > 1) // 找到多个, 用name再匹配一次
+                if (objectItems.Count >= 1) // 找到多个, 用name再匹配一次
                 {
-                    pushItem = objectItems.FirstOrDefault(x => x.InstanceName == popItem.Name) ?? objectItems[0];
+                    if (objectItems.Count > 1)
+                        pushItem = objectItems.FirstOrDefault(x => x.InstanceName == popItem.Name) ?? objectItems[0];
+                    else
+                        pushItem = objectItems[0];
+                    return Get(new PopItem(pushItem.InstanceType!, popItem.Name, ++popItem.Deep));
                 }
-                else
-                    pushItem = objectItems[0];
 
-                return Get(new PopItem(pushItem.InstanceType!, popItem.Name, ++popItem.Deep));
+                if (_parent != null)
+                {
+                    // 如果没有找到, 则从父容器中寻找
+                    return _parent.Get(popItem);
+                }
             }
 
             if (popItem.Type.IsClass || popItem.Type.IsValueType)
@@ -146,14 +193,18 @@ namespace Pingfan.Kit.Inject
                         var parameters = new object[parameterInfos.Length];
                         for (var i = 0; i < parameterInfos.Length; i++)
                         {
+                            popItem.Deep++;
                             var parameterInfo = parameterInfos[i];
+                            if (parameterInfo.ParameterType == this.GetType())
+                                throw new Exception("无法注入容器, 请使用属性注入");
+
                             // 获取特性上的名字
                             var name = popItem.Name;
                             if (name.IsNullOrEmpty())
                                 name = parameterInfo.GetCustomAttribute<InjectAttribute>()?.Name;
-                            
+
                             parameters[i] = Get(new PopItem(parameterInfo.ParameterType, name,
-                                ++popItem.Deep));
+                                popItem.Deep));
                         }
 
                         pushItem.Instance = constructorInfo.Invoke(parameters);
@@ -162,15 +213,32 @@ namespace Pingfan.Kit.Inject
                         var properties = popItem.Type.GetProperties().Where(p => p.IsDefined(typeof(InjectAttribute)));
                         foreach (var property in properties)
                         {
+                            popItem.Deep++;
                             var propertyType = property.PropertyType;
-                            // 获取特性上的名字
-                            var name = popItem.Name;
-                            if (name.IsNullOrEmpty())
-                                name = property.GetCustomAttribute<InjectAttribute>()?.Name;
-                            var propertyValue = Get(new PopItem(propertyType, name, ++popItem.Deep));
-                            property.SetValue(pushItem.Instance, propertyValue);
+                            // 如果是注入自己, 则注入当前实例
+                            if (propertyType == this.GetType())
+                            {
+                                property.SetValue(pushItem.Instance, this);
+                            }
+                            else
+                            {
+                                // 获取特性上的名字
+                                var name = popItem.Name;
+                                if (name.IsNullOrEmpty())
+                                    name = property.GetCustomAttribute<InjectAttribute>()?.Name;
+                                var propertyValue =
+                                    Get(new PopItem(propertyType, name, popItem.Deep));
+                                property.SetValue(pushItem.Instance, propertyValue);
+                            }
+                        }
+
+                        // 注入完成 是否继承IContainerReady
+                        if (pushItem.Instance is IContainerReady containerReady)
+                        {
+                            containerReady.OnContainerReady();
                         }
                     }
+
 
                     return pushItem.Instance!;
                 }
@@ -183,7 +251,7 @@ namespace Pingfan.Kit.Inject
                 }
             }
 
-         
+
             throw new Exception("无法创建实例");
         }
 
@@ -200,6 +268,9 @@ namespace Pingfan.Kit.Inject
         {
             foreach (var child in _children)
             {
+                // // 排除自身容器
+                // if (child == this)
+                //     continue;
                 child.Dispose();
             }
 
