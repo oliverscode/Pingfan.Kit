@@ -93,12 +93,12 @@ public class 依赖注入测试
 
     class AA : IAnimal, IContainerReady
     {
-        [Inject] public Container Container { get; set; }
+        [Inject] public IContainer Container { get; set; }
 
 
         public string Name { get; set; }
 
-      
+
         public IAnimal BB { get; set; } = new Dog();
 
         public AA(string name)
@@ -260,8 +260,8 @@ public class 依赖注入测试
     public void 注入多个字符串()
     {
         var container = new Container();
-        container.Push("f1", "123");
-        container.Push("f2", "456");
+        container.Push("123", "f1");
+        container.Push("456", "f2");
         var result = container.Get<string>("f2");
         Assert.Equal("456", result);
     }
@@ -270,8 +270,8 @@ public class 依赖注入测试
     public void 构造注入多个字符串_根据特性指定名字()
     {
         var container = new Container();
-        container.Push("f1", "123");
-        container.Push("f2", "456");
+        container.Push("123", "f1");
+        container.Push("456", "f2");
         container.Push<Cat>();
 
         var result = container.Get<Cat>();
@@ -282,8 +282,8 @@ public class 依赖注入测试
     public void 属性注入多个字符串_根据特性指定名字()
     {
         var container = new Container();
-        container.Push("f1", "123");
-        container.Push("f2", "456");
+        container.Push("123", "f1");
+        container.Push("456", "f2");
         container.Push<Pig>();
 
         var result = container.Get<Pig>();
@@ -294,8 +294,8 @@ public class 依赖注入测试
     public void 属性注入多个整数_根据特性指定名字()
     {
         var container = new Container();
-        container.Push("f1", 123);
-        container.Push("f2", 456);
+        container.Push(123, "f1");
+        container.Push(456, "f2");
         container.Push<Fish>();
 
         var result = container.Get<Fish>();
@@ -316,7 +316,7 @@ public class 依赖注入测试
     [Fact] // 生命周期
     public void 生命周期()
     {
-        var container = new Container();
+        IContainer container = new Container();
         container.Push<AA>();
         container.Push("AA");
 
