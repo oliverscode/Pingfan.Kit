@@ -94,18 +94,17 @@ namespace Pingfan.Kit.Inject
     /// </summary>
     public class Container : IContainer, IDisposable
     {
-        private readonly IContainer? _parent;
-        private readonly List<IContainer> _children;
         private readonly int _currentDeep; // 当前深度, 用于判断递归深度
         private readonly List<PushItem> _objectItems = new List<PushItem>();
         private Func<Type, object> _onNotFound = type => throw new Exception($"无法创建实例 {type}");
 
 
         public int MaxDeep { get; set; } = 20;
-        public bool IsRoot => _parent == null;
-        public IContainer Root => _parent?.Root ?? this;
-        public IContainer? Parent => _parent;
-        public List<IContainer> Children => _children;
+        public bool IsRoot => Parent == null;
+        public IContainer Root => Parent?.Root ?? this;
+        public IContainer? Parent { get; }
+
+        public List<IContainer> Children { get; }
 
         public Func<Type, object> OnNotFound
         {
@@ -128,8 +127,8 @@ namespace Pingfan.Kit.Inject
         /// <param name="parent">默认为根容器</param>
         public Container(Container? parent = null)
         {
-            _parent = parent;
-            _children = new List<IContainer>();
+            Parent = parent;
+            Children = new List<IContainer>();
             this._currentDeep = parent?._currentDeep + 1 ?? 0;
             if (this._currentDeep > this.MaxDeep)
                 throw new Exception($"递归深度超过{MaxDeep}层, 可能存在循环依赖");
@@ -196,10 +195,11 @@ namespace Pingfan.Kit.Inject
                     return Get(new PopItem(pushItem.InstanceType!, popItem.Name, ++popItem.Deep));
                 }
 
-                if (_parent != null)
+                if (Parent != null)
                 {
                     // 如果没有找到, 则从父容器中寻找
-                    return ((Container)_parent).Get(popItem);
+                    popItem.Deep++;
+                    return ((Container)Parent).Get(popItem);
                 }
             }
 
@@ -246,10 +246,30 @@ namespace Pingfan.Kit.Inject
 
                         pushItem.Instance = constructorInfo.Invoke(parameters);
 
-                        // 判断是否有属性注入
-                        InjectProperty(popItem, pushItem.Instance);
+                        // 注入属性
+                        var properties = popItem.Type.GetProperties().Where(p => p.IsDefined(typeof(InjectAttribute)));
+                        foreach (var property in properties)
+                        {
+                            // popItem.Deep++;
+                            var propertyType = property.PropertyType;
+                            // 如果是注入自己, 则注入当前实例
+                            if (propertyType == typeof(IContainer))
+                            {
+                                property.SetValue(pushItem.Instance, this);
+                            }
+                            else
+                            {
+                                // 获取特性上的名字
+                                var name = popItem.Name;
+                                if (name.IsNullOrEmpty())
+                                    name = property.GetCustomAttribute<InjectAttribute>()?.Name;
+                                var propertyValue =
+                                    Get(new PopItem(propertyType, name, popItem.Deep + 1));
+                                property.SetValue(pushItem.Instance, propertyValue);
+                            }
+                        }
 
-                        // 注入完成 是否继承IContainerReady
+
                         if (pushItem.Instance is IContainerReady containerReady)
                         {
                             containerReady.OnContainerReady();
@@ -261,55 +281,19 @@ namespace Pingfan.Kit.Inject
                 }
 
 
-                if (_parent != null)
+                if (Parent != null)
                 {
                     // 如果没有找到, 则从父容器中寻找
-                    var obj = ((Container)_parent).Get(popItem);
-                    // 判断是否有属性注入
-                    InjectProperty(popItem, obj);
-                    if (obj is IContainerReady containerReady)
-                    {
-                        containerReady.OnContainerReady();
-                    }
-
-                    return obj;
+                    popItem.Deep++;
+                    return ((Container)Parent).Get(popItem);
                 }
             }
+
             return this.OnNotFound(popItem.Type);
         }
 
 
-        private void InjectProperty(PopItem popItem, object instance)
-        {
-            var properties = popItem.Type.GetProperties().Where(p => p.IsDefined(typeof(InjectAttribute)));
-            foreach (var property in properties)
-            {
-                popItem.Deep++;
-                var propertyType = property.PropertyType;
-                // 如果是注入自己, 则注入当前实例
-                if (propertyType == typeof(IContainer))
-                {
-                    property.SetValue(instance, this);
-                }
-                else
-                {
-                    // 获取特性上的名字
-                    var name = popItem.Name;
-                    if (name.IsNullOrEmpty())
-                        name = property.GetCustomAttribute<InjectAttribute>()?.Name;
-                    var propertyValue =
-                        Get(new PopItem(propertyType, name, popItem.Deep));
-                    property.SetValue(instance, propertyValue);
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// 创建一个子容器
-        /// </summary>
-        /// <returns></returns>
-        public IContainer CreateChild()
+        public IContainer CreateContainer()
         {
             var child = new Container(this);
             return child;
@@ -319,20 +303,18 @@ namespace Pingfan.Kit.Inject
         /// <inheritdoc />
         public void Dispose()
         {
-            foreach (var child in _children)
+            foreach (var child in Children)
             {
-                // // 排除自身容器
-                // if (child == this)
-                //     continue;
                 child.Dispose();
             }
 
+            Children.Clear();
+
 
             // 从父类中移除自己
-            if (_parent != null)
-                _parent.Children.Remove(this);
+            if (Parent != null)
+                Parent.Children.Remove(this);
 
-            _children.Clear();
 
             // 释放所有的实例
             foreach (var objectItem in _objectItems)

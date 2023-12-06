@@ -108,7 +108,7 @@ public class 依赖注入测试
 
         public void OnContainerReady()
         {
-            this.Container = this.Container.CreateChild();
+            this.Container = this.Container.CreateContainer();
 
             this.Container.Push("BB");
             this.Container.Push<BB>();
@@ -209,7 +209,7 @@ public class 依赖注入测试
         var container = new Container();
         container.Push<Person>();
 
-        var child = container.CreateChild();
+        var child = container.CreateContainer();
 
 
         var result = child.Get<Person>();
@@ -223,8 +223,8 @@ public class 依赖注入测试
         var container = new Container();
         container.Push<Person>();
 
-        var child = container.CreateChild();
-        var child2 = child.CreateChild();
+        var child = container.CreateContainer();
+        var child2 = child.CreateContainer();
         var result = child2.Get<Person>();
         Assert.Equal("Person", result.Name);
     }
@@ -235,7 +235,7 @@ public class 依赖注入测试
         var container = new Container();
 
 
-        var child = container.CreateChild();
+        var child = container.CreateContainer();
         child.Push<Person>();
         var result = child.Get<Person>();
         Assert.Equal("Person", result.Name);

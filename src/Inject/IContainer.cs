@@ -63,7 +63,7 @@ namespace Pingfan.Kit.Inject
         /// <summary>
         /// 获取容器中的实例
         /// </summary>
-        /// <param name="name">如果重复可以别名区分, 区分大小写</param>
+        /// <param name="name">如果实例重复可以别名区分, 区分大小写</param>
         /// <typeparam name="T">实例或者接口的类型</typeparam>
         /// <returns></returns>
         T Get<T>(string? name = null);
@@ -72,6 +72,6 @@ namespace Pingfan.Kit.Inject
         /// 创建一个子容器
         /// </summary>
         /// <returns></returns>
-        IContainer CreateChild();
+        IContainer CreateContainer();
     }
 }
