@@ -191,7 +191,6 @@ namespace Pingfan.Kit.Inject
             {
                 return (T)Get(new PopItem(typeof(T), name, 0));
             }
-
         }
 
         /// <inheritdoc />
@@ -207,7 +206,8 @@ namespace Pingfan.Kit.Inject
                     if (objectItems.Count > 1)
                         pushItem = objectItems.FirstOrDefault(x => x.InstanceName == name) ?? objectItems[0];
                     else
-                        pushItem = objectItems[0];
+                        pushItem = objectItems.Last();
+
                     return pushItem.Instance != null;
                 }
 
@@ -229,7 +229,9 @@ namespace Pingfan.Kit.Inject
                         pushItem = objectItems.FirstOrDefault(x => x.InstanceName == name) ?? objectItems[0];
                     }
                     else
-                        pushItem = objectItems[0];
+                    {
+                        pushItem = objectItems.Last();
+                    }
 
                     return pushItem.Instance != null;
                 }
@@ -394,8 +396,6 @@ namespace Pingfan.Kit.Inject
             }
 
             _objectItems.Clear();
-
-            
         }
     }
 }
