@@ -98,7 +98,7 @@ namespace Pingfan.Kit.Inject
         private readonly int _currentDeep; // 当前深度, 用于判断递归深度
         private readonly List<PushItem> _objectItems = new List<PushItem>();
         private Func<Type, object> _onNotFound = type => throw new Exception($"无法创建实例 {type}");
-
+        private readonly object _lock = new object();
 
         /// <inheritdoc />
         public int MaxDeep { get; set; } = 20;
@@ -187,7 +187,11 @@ namespace Pingfan.Kit.Inject
         /// <inheritdoc />
         public T Get<T>(string? name = null)
         {
-            return (T)Get(new PopItem(typeof(T), name, 0));
+            lock (_lock)
+            {
+                return (T)Get(new PopItem(typeof(T), name, 0));
+            }
+
         }
 
         /// <inheritdoc />
@@ -255,7 +259,7 @@ namespace Pingfan.Kit.Inject
                     if (objectItems.Count > 1)
                         pushItem = objectItems.FirstOrDefault(x => x.InstanceName == popItem.Name) ?? objectItems[0];
                     else
-                        pushItem = objectItems[0];
+                        pushItem = objectItems.Last();
                     return Get(new PopItem(pushItem.InstanceType!, popItem.Name, ++popItem.Deep));
                 }
 
@@ -277,8 +281,8 @@ namespace Pingfan.Kit.Inject
                     {
                         pushItem = objectItems.FirstOrDefault(x => x.InstanceName == popItem.Name) ?? objectItems[0];
                     }
-                    else
-                        pushItem = objectItems[0];
+                    else // 最后一个
+                        pushItem = objectItems.Last();
 
                     if (pushItem.Instance == null)
                     {
@@ -361,6 +365,7 @@ namespace Pingfan.Kit.Inject
         public IContainer CreateContainer()
         {
             var child = new Container(this);
+            this.Children.Add(child);
             return child;
         }
 
@@ -389,6 +394,8 @@ namespace Pingfan.Kit.Inject
             }
 
             _objectItems.Clear();
+
+            
         }
     }
 }
