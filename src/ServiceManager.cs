@@ -15,21 +15,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static string Install()
         {
-            // 获取自身文件路径
-            var serverPath = Process.GetCurrentProcess().MainModule!.FileName;
-            if (serverPath.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server path");
-                return string.Empty;
-            }
-
-            // 获取自身文件名, windows下不包含.exe
-            var serverName = Path.GetFileNameWithoutExtension(serverPath);
-            if (serverName.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server name");
-                return string.Empty;
-            }
+            GetServerInfo(out var serverPath, out var serverName);
 
             // 排除install
             var args = Environment.CommandLine;
@@ -40,24 +26,13 @@ namespace Pingfan.Kit
 
             if (ProcessEx.IsWindows)
             {
-                var process = Cmd.Run($"nssm.exe install {serverName} {serverPath} {args}");
-                var sr = new StreamReader(process.StandardOutput.BaseStream, Encoding.Unicode);
-                var result = sr.ReadToEnd();
-                process.WaitForExit();
-                process.Dispose();
-
-
-                Start();
-                return result;
+                return RunCommand($"nssm.exe install {serverName} {serverPath} {args}");
             }
             else
             {
                 var cmd =
                     $"[Unit]\\nDescription={serverName} Auto Start Service\\nAfter=network.target\\n\\n[Service]\\nExecStart={serverPath}\\nUser=root\\nRestart=on-failure\\nRestartSec=3s\\n\\n[Install]\\nWantedBy=multi-user.target && sudo systemctl daemon-reload && sudo systemctl enable {serverName}";
-
-                var result = Cmd.RunWithOutput($"echo -e \"{cmd}\" > /etc/systemd/system/{serverName}.service");
-                Start();
-                return result;
+                return Cmd.RunWithOutput($"echo -e \"{cmd}\" > /etc/systemd/system/{serverName}.service");
             }
         }
 
@@ -68,30 +43,11 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static string Remove()
         {
-            // 获取自身文件路径
-            var serverPath = Process.GetCurrentProcess().MainModule!.FileName;
-            if (serverPath.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server path");
-                return string.Empty;
-            }
+            GetServerInfo(out var serverPath, out var serverName);
 
-            // 获取自身文件名, windows下不包含.exe
-            var serverName = Path.GetFileNameWithoutExtension(serverPath);
-            if (serverName.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server name");
-                return string.Empty;
-            }
-            
             if (ProcessEx.IsWindows)
             {
-                var process = Cmd.Run($"nssm.exe remove {serverName} confirm");
-                var sr = new StreamReader(process.StandardOutput.BaseStream, Encoding.Unicode);
-                var result = sr.ReadToEnd();
-                process.WaitForExit();
-                process.Dispose();
-                return result;
+                return RunCommand($"nssm.exe remove {serverName} confirm");
             }
             else
             {
@@ -101,30 +57,11 @@ namespace Pingfan.Kit
 
         public static string Start()
         {
-            // 获取自身文件路径
-            var serverPath = Process.GetCurrentProcess().MainModule!.FileName;
-            if (serverPath.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server path");
-                return string.Empty;
-            }
-
-            // 获取自身文件名, windows下不包含.exe
-            var serverName = Path.GetFileNameWithoutExtension(serverPath);
-            if (serverName.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server name");
-                return string.Empty;
-            }
+            GetServerInfo(out var serverPath, out var serverName);
 
             if (ProcessEx.IsWindows)
             {
-                var process = Cmd.Run($"nssm.exe start {serverName}");
-                var sr = new StreamReader(process.StandardOutput.BaseStream, Encoding.Unicode);
-                var result = sr.ReadToEnd();
-                process.WaitForExit();
-                process.Dispose();
-                return result;
+                return RunCommand($"nssm.exe start {serverName}");
             }
             else
             {
@@ -134,30 +71,11 @@ namespace Pingfan.Kit
 
         public static string Stop()
         {
-            // 获取自身文件路径
-            var serverPath = Process.GetCurrentProcess().MainModule!.FileName;
-            if (serverPath.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server path");
-                return string.Empty;
-            }
-
-            // 获取自身文件名, windows下不包含.exe
-            var serverName = Path.GetFileNameWithoutExtension(serverPath);
-            if (serverName.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server name");
-                return string.Empty;
-            }
+            GetServerInfo(out var serverPath, out var serverName);
 
             if (ProcessEx.IsWindows)
             {
-                var process = Cmd.Run($"nssm.exe stop {serverName}");
-                var sr = new StreamReader(process.StandardOutput.BaseStream, Encoding.Unicode);
-                var result = sr.ReadToEnd();
-                process.WaitForExit();
-                process.Dispose();
-                return result;
+                return RunCommand($"nssm.exe stop {serverName}");
             }
             else
             {
@@ -167,30 +85,11 @@ namespace Pingfan.Kit
 
         public static string ReStart()
         {
-            // 获取自身文件路径
-            var serverPath = Process.GetCurrentProcess().MainModule!.FileName;
-            if (serverPath.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server path");
-                return string.Empty;
-            }
-
-            // 获取自身文件名, windows下不包含.exe
-            var serverName = Path.GetFileNameWithoutExtension(serverPath);
-            if (serverName.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server name");
-                return string.Empty;
-            }
+            GetServerInfo(out var serverPath, out var serverName);
 
             if (ProcessEx.IsWindows)
             {
-                var process = Cmd.Run($"nssm.exe restart {serverName}");
-                var sr = new StreamReader(process.StandardOutput.BaseStream, Encoding.Unicode);
-                var result = sr.ReadToEnd();
-                process.WaitForExit();
-                process.Dispose();
-                return result;
+                return RunCommand($"nssm.exe restart {serverName}");
             }
             else
             {
@@ -200,35 +99,47 @@ namespace Pingfan.Kit
 
         public static string Status()
         {
-            // 获取自身文件路径
-            var serverPath = Process.GetCurrentProcess().MainModule!.FileName;
-            if (serverPath.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server path");
-                return string.Empty;
-            }
-
-            // 获取自身文件名, windows下不包含.exe
-            var serverName = Path.GetFileNameWithoutExtension(serverPath);
-            if (serverName.IsNullOrWhiteSpace())
-            {
-                Log.Error("Can not get server name");
-                return string.Empty;
-            }
+            GetServerInfo(out var serverPath, out var serverName);
 
             if (ProcessEx.IsWindows)
             {
-                var process = Cmd.Run($"nssm.exe status {serverName}");
-                var sr = new StreamReader(process.StandardOutput.BaseStream, Encoding.Unicode);
-                var result = sr.ReadToEnd();
-                process.WaitForExit();
-                process.Dispose();
-                return result;
+                return RunCommand($"nssm.exe status {serverName}");
             }
             else
             {
                 return Cmd.RunWithOutput($"systemctl status {serverName}");
             }
+        }
+
+        private static void GetServerInfo(out string serverPath, out string serverName)
+        {
+            serverPath = Process.GetCurrentProcess().MainModule!.FileName;
+            if (serverPath.IsNullOrWhiteSpace())
+            {
+                throw new Exception("Can not get server path");
+            }
+
+            serverName = Path.GetFileNameWithoutExtension(serverPath);
+            if (serverName.IsNullOrWhiteSpace())
+            {
+                throw new Exception("Can not get server name");
+            }
+        }
+
+        private static string RunCommand(string command)
+        {
+            // 判断当前目录是否有文件nssm.exe
+            if (!File.Exists("nssm.exe"))
+            {
+                throw new Exception("Can not find nssm.exe");
+            }
+
+            var process = Cmd.Run(command);
+            var sr = new StreamReader(process.StandardOutput.BaseStream, Encoding.Unicode);
+            var result = sr.ReadToEnd();
+            process.WaitForExit();
+            process.Dispose();
+            return result;
         }
     }
 }

@@ -156,6 +156,7 @@ namespace Pingfan.Kit.Inject
             if (type.IsInterface)
                 throw new Exception("无法注入接口");
 
+            lock (_lock)
             {
                 var item = new PushItem(null, type, name, null);
                 _objectItems.Add(item);
@@ -166,7 +167,7 @@ namespace Pingfan.Kit.Inject
         public void Push(object instance, string? name = null)
         {
             var type = instance.GetType();
-
+            lock (_lock)
             {
                 var item = new PushItem(null, type, name, instance);
                 _objectItems.Add(item);
@@ -178,9 +179,11 @@ namespace Pingfan.Kit.Inject
         {
             var interfaceType = typeof(TI);
             var instanceType = typeof(T);
-
-            var item = new PushItem(interfaceType, instanceType, name, null);
-            _objectItems.Add(item);
+            lock (_lock)
+            {
+                var item = new PushItem(interfaceType, instanceType, name, null);
+                _objectItems.Add(item);
+            }
         }
 
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Pingfan.Kit.Inject;
 
@@ -15,7 +14,10 @@ namespace Pingfan.Kit
         /// </summary>
         public static IContainer Container { get; } = new Container();
 
-        static App()
+        /// <summary>
+        /// 初始化, 支持命令行参数
+        /// </summary>
+        public static void Init()
         {
             // 捕获当前程序的全局异常
             CatchGlobalException();
