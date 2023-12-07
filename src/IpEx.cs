@@ -5,6 +5,9 @@ using System.Net.Sockets;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// Ip扩展方法
+    /// </summary>
     public static class IpEx
     {
         /// <summary>

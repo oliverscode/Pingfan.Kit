@@ -1,9 +1,112 @@
-﻿// using System;
-// using System.Collections.Generic;
-// using System.IO;
-// using System.Text;
-// using System.Threading.Tasks;
-//
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Pingfan.Kit.Inject;
+
+namespace Pingfan.Kit
+{
+    /// <summary>
+    /// 应用程序封装
+    /// </summary>
+    public class App
+    {
+        /// <summary>
+        /// 依赖注入容器
+        /// </summary>
+        public static IContainer Container { get; } = new Container();
+
+        static App()
+        {
+            // 捕获当前程序的全局异常
+            CatchGlobalException();
+
+            var args = Environment.CommandLine;
+            if (args.Contains(" install"))
+            {
+                Log.Info(ServiceManager.Install());
+
+                Environment.Exit(0);
+                return;
+            }
+
+            // 卸载服务
+            if (args.ContainsIgnoreCase(" uninstall") || args.ContainsIgnoreCase(" remove"))
+            {
+                Log.Info(ServiceManager.Remove());
+                Environment.Exit(0);
+                return;
+            }
+
+            if (args.ContainsIgnoreCase(" start"))
+            {
+                Log.Info(ServiceManager.Start());
+                Environment.Exit(0);
+                return;
+            }
+
+            if (args.ContainsIgnoreCase(" stop"))
+            {
+                Log.Info(ServiceManager.Stop());
+                Environment.Exit(0);
+                return;
+            }
+
+            if (args.ContainsIgnoreCase(" restart"))
+            {
+                Log.Info(ServiceManager.ReStart());
+                Environment.Exit(0);
+                return;
+            }
+
+            if (args.ContainsIgnoreCase(" status"))
+            {
+                Log.Info(ServiceManager.Status());
+                Environment.Exit(0);
+                return;
+            }
+        }
+
+        /// <summary>
+        /// 未处理的异常
+        /// </summary>
+        public static Action<Exception> OnError { get; set; } = (e) => { Log.Fatal(e.ToString()); };
+
+        private static void CatchGlobalException()
+        {
+            AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
+            {
+                var ex = (Exception)eventArgs.ExceptionObject;
+                OnError(ex);
+                Environment.Exit(1);
+            };
+            TaskScheduler.UnobservedTaskException += (sender, args) =>
+            {
+                var ex = args.Exception;
+                OnError(ex);
+                Environment.Exit(1);
+            };
+        }
+
+        /// <summary>
+        /// 启动APP
+        /// </summary>
+        public static void Run()
+        {
+            Loop.Wait();
+        }
+
+        /// <summary>
+        /// 启动APP
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public static void Run<T>()
+        {
+            Container.Get<T>();
+            Run();
+        }
+    }
+}
+
 //
 // namespace Pingfan.Kit
 // {

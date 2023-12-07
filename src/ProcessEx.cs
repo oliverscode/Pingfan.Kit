@@ -11,7 +11,9 @@ namespace Pingfan.Kit
     /// </summary>
     public static class ProcessEx
     {
-        private static readonly string MutexName = $"{Assembly.GetEntryAssembly()!.FullName}_{Environment.UserInteractive}";
+        private static readonly string MutexName =
+            $"{Assembly.GetEntryAssembly()!.FullName}_{Environment.UserInteractive}";
+
         private static Mutex? _mutex;
 
         /// <summary>
@@ -34,8 +36,13 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 是否是windows系统
+        /// </summary>
+        public static bool IsWindows => Environment.OSVersion.Platform == PlatformID.Win32NT;
+
+
 #if net48 || NETCOREAPP
-        
         /// <summary>
         /// 是否是管理员运行, 如果是linux则判断是否是root用户
         /// </summary>

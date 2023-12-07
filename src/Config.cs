@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Pingfan.Kit.Cache;
 
 namespace Pingfan.Kit
 {
@@ -15,6 +16,7 @@ namespace Pingfan.Kit
         private static readonly object Locker = new object();
         private static readonly ReaderWriterLockSlim CacheLock = new ReaderWriterLockSlim();
         private const string CachePrefixKey = "PingFan.Config.Cache";
+        private static readonly ICache CacheMemory = new CacheMemory();
 
         /// <summary>
         /// 当前配置文件绝对目录
@@ -25,7 +27,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 缓存时间, 单位秒, 默认1秒
         /// </summary>
-        public static int CacheSeconds { get; set; } = 1;
+        public static float CacheSeconds { get; set; } = 1;
 
         /// <summary>
         /// 写入配置
@@ -155,7 +157,7 @@ namespace Pingfan.Kit
             CacheLock.EnterUpgradeableReadLock();
             try
             {
-                return CacheMemory<string[]>.GetOrSet(CachePrefixKey,
+                return CacheMemory.GetOrSet(CachePrefixKey,
                     () =>
                     {
                         if (File.Exists(MainConfigFilePath) == false)
@@ -175,7 +177,7 @@ namespace Pingfan.Kit
             CacheLock.EnterWriteLock();
             try
             {
-                CacheMemory<string[]>.Clear(CachePrefixKey);
+                CacheMemory.Clear(CachePrefixKey);
             }
             finally
             {

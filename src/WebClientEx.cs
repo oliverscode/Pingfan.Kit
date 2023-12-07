@@ -9,6 +9,9 @@ namespace Pingfan.Kit
     /// </summary>
     public class WebClientEx : WebClient
     {
+        /// <summary>
+        /// 超时时间, 单位毫秒, 默认30秒
+        /// </summary>
         public int Timeout { get; set; }
 
         /// <inheritdoc />

@@ -63,6 +63,7 @@ namespace Pingfan.Kit.Inject
     {
         internal string? Name { get; }
 
+        /// <inheritdoc />
         public InjectAttribute()
         {
         }
@@ -92,20 +93,29 @@ namespace Pingfan.Kit.Inject
     /// <summary>
     /// 依赖注入容器
     /// </summary>
-    public class Container : IContainer, IDisposable
+    public class Container : IContainer
     {
         private readonly int _currentDeep; // 当前深度, 用于判断递归深度
         private readonly List<PushItem> _objectItems = new List<PushItem>();
         private Func<Type, object> _onNotFound = type => throw new Exception($"无法创建实例 {type}");
 
 
+        /// <inheritdoc />
         public int MaxDeep { get; set; } = 20;
+
+        /// <inheritdoc />
         public bool IsRoot => Parent == null;
+
+        /// <inheritdoc />
         public IContainer Root => Parent?.Root ?? this;
+
+        /// <inheritdoc />
         public IContainer? Parent { get; }
 
+        /// <inheritdoc />
         public List<IContainer> Children { get; }
 
+        /// <inheritdoc />
         public Func<Type, object> OnNotFound
         {
             get => _onNotFound;
@@ -139,6 +149,7 @@ namespace Pingfan.Kit.Inject
             }
         }
 
+        /// <inheritdoc />
         public void Push<T>(string? name = null)
         {
             var type = typeof(T);
@@ -151,6 +162,7 @@ namespace Pingfan.Kit.Inject
             }
         }
 
+        /// <inheritdoc />
         public void Push(object instance, string? name = null)
         {
             var type = instance.GetType();
@@ -161,6 +173,7 @@ namespace Pingfan.Kit.Inject
             }
         }
 
+        /// <inheritdoc />
         public void Push<TI, T>(string? name = null) where T : TI
         {
             var interfaceType = typeof(TI);
@@ -171,9 +184,60 @@ namespace Pingfan.Kit.Inject
         }
 
 
+        /// <inheritdoc />
         public T Get<T>(string? name = null)
         {
             return (T)Get(new PopItem(typeof(T), name, 0));
+        }
+
+        /// <inheritdoc />
+        public bool Has<T>(string? name = null)
+        {
+            var type = typeof(T);
+            if (type.IsInterface)
+            {
+                var objectItems = _objectItems.Where(x => x.InterfaceType == type).ToList();
+                if (objectItems.Count >= 1) // 找到多个, 用name再匹配一次
+                {
+                    PushItem pushItem;
+                    if (objectItems.Count > 1)
+                        pushItem = objectItems.FirstOrDefault(x => x.InstanceName == name) ?? objectItems[0];
+                    else
+                        pushItem = objectItems[0];
+                    return pushItem.Instance != null;
+                }
+
+                if (Parent != null)
+                {
+                    // 如果没有找到, 则从父容器中寻找
+                    return ((Container)Parent).Has<T>(name);
+                }
+            }
+
+            if (type.IsClass)
+            {
+                var objectItems = _objectItems.Where(x => x.InstanceType == type).ToList();
+                if (objectItems.Count >= 1) // 找到多个, 用name再匹配一次
+                {
+                    PushItem pushItem;
+                    if (objectItems.Count > 1)
+                    {
+                        pushItem = objectItems.FirstOrDefault(x => x.InstanceName == name) ?? objectItems[0];
+                    }
+                    else
+                        pushItem = objectItems[0];
+
+                    return pushItem.Instance != null;
+                }
+
+                if (Parent != null)
+                {
+                    // 如果没有找到, 则从父容器中寻找
+                    return ((Container)Parent).Has<T>(name);
+                }
+            }
+
+            return false;
         }
 
 
@@ -293,6 +357,7 @@ namespace Pingfan.Kit.Inject
         }
 
 
+        /// <inheritdoc />
         public IContainer CreateContainer()
         {
             var child = new Container(this);

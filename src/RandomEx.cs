@@ -180,9 +180,17 @@ namespace Pingfan.Kit
         private readonly List<KeyValuePair<T, int>> _list = new List<KeyValuePair<T, int>>();
         private int _maxWeights;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public RandomEx()
         {
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="items"></param>
         public RandomEx(IDictionary<T, int> items)
         {
             foreach (var item in items)

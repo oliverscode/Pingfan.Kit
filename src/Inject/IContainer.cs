@@ -67,6 +67,14 @@ namespace Pingfan.Kit.Inject
         /// <typeparam name="T">实例或者接口的类型</typeparam>
         /// <returns></returns>
         T Get<T>(string? name = null);
+        
+        /// <summary>
+        /// 是否有指定类型的实例
+        /// </summary>
+        /// <param name="name"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        bool Has<T>(string? name = null);
 
         /// <summary>
         /// 创建一个子容器

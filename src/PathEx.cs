@@ -7,6 +7,9 @@ using System.Text.RegularExpressions;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 目录封装
+    /// </summary>
     public static class PathEx
     {
         /// <summary>

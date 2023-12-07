@@ -45,6 +45,10 @@ namespace Pingfan.Kit
             });
         }
 
+        /// <summary>
+        /// 类似js的Promise
+        /// </summary>
+        /// <returns></returns>
         public TaskAwaiter<T> GetAwaiter()
         {
             return _task.GetAwaiter();

@@ -14,7 +14,7 @@ namespace Pingfan.Kit
             GetCrc32Table();
         }
 
-        protected static ulong[] Crc32Table = null!;
+        private static ulong[] _crc32Table = null!;
 
         /// <summary>
         /// 生成CRC32码表
@@ -22,7 +22,7 @@ namespace Pingfan.Kit
         private static void GetCrc32Table()
         {
             ulong crc;
-            Crc32Table = new ulong[256];
+            _crc32Table = new ulong[256];
             int i, j;
             for (i = 0; i < 256; i++)
             {
@@ -35,7 +35,7 @@ namespace Pingfan.Kit
                         crc >>= 1;
                 }
 
-                Crc32Table[i] = crc;
+                _crc32Table[i] = crc;
             }
         }
 
@@ -50,7 +50,7 @@ namespace Pingfan.Kit
             ulong value = 0xffffffff;
             for (int i = 0; i < len; i++)
             {
-                value = (value >> 8) ^ Crc32Table[(value & 0xFF) ^ buffer[i]];
+                value = (value >> 8) ^ _crc32Table[(value & 0xFF) ^ buffer[i]];
             }
 
             return (value ^ 0xffffffff).ToString("x2");
@@ -67,7 +67,7 @@ namespace Pingfan.Kit
             ulong value = 0xffffffff;
             for (var i = 0; i < len; i++)
             {
-                value = (value >> 8) ^ Crc32Table[(value & 0xFF) ^ (byte)stream.ReadByte()];
+                value = (value >> 8) ^ _crc32Table[(value & 0xFF) ^ (byte)stream.ReadByte()];
             }
 
             return (value ^ 0xffffffff).ToString("x2");
@@ -85,7 +85,7 @@ namespace Pingfan.Kit
             ulong value = 0xffffffff;
             for (int i = 0; i < len; i++)
             {
-                value = (value >> 8) ^ Crc32Table[(value & 0xFF) ^ buffer[i]];
+                value = (value >> 8) ^ _crc32Table[(value & 0xFF) ^ buffer[i]];
             }
 
             return (value ^ 0xffffffff).ToString("x2");

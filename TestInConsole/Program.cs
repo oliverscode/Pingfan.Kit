@@ -5,8 +5,10 @@ using Pingfan.Kit;
 using Timer = Pingfan.Kit.Timer;
 
 
-Timer.SetTime(-1, 16, -1, () =>
+
+Timer.SetInterval(2000, () =>
 {
-    Console.WriteLine("当前时间是: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+    Log.Info("正在执行定时任务");
 });
-Console.ReadLine();
+
+App.Run();

@@ -12,6 +12,10 @@ namespace Pingfan.Kit
         private readonly string _filePath; // 配置文件路径
         private readonly Dictionary<string, Dictionary<string, string>> _data; // 配置数据
 
+        /// <summary>
+        /// IniFile的构造函数
+        /// </summary>
+        /// <param name="filePath">需要加后缀</param>
         public IniFile(string filePath)
         {
             this._filePath = filePath;

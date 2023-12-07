@@ -253,42 +253,44 @@ namespace Pingfan.Kit
                     // 判断是否要输出到控制台
                     if (ConsoleLevel.Contains(enumLogLevel.ToString()))
                     {
+                        
                         if (enumLogLevel == EnumLogLevel.DBG)
                         {
-                            ConsoleEx.Write(str, ConsoleColor.Cyan);
+                            ConsoleEx.Write(str, ConsoleColor.Gray); // 调试信息通常使用灰色
                         }
                         else if (enumLogLevel == EnumLogLevel.SUC)
                         {
-                            ConsoleEx.Write(str, ConsoleColor.Green);
+                            ConsoleEx.Write(str, ConsoleColor.Green); // 成功信息使用绿色
                         }
                         else if (enumLogLevel == EnumLogLevel.INF)
                         {
-                            ConsoleEx.Write(str, ConsoleColor.Blue);
+                            ConsoleEx.Write(str, ConsoleColor.DarkCyan); // 一般信息使用深灰色，与调试等级区分
                         }
                         else if (enumLogLevel == EnumLogLevel.WAR)
                         {
-                            ConsoleEx.Write(str, ConsoleColor.Yellow);
+                            ConsoleEx.Write(str, ConsoleColor.Yellow); // 警告信息使用黄色
                         }
                         else if (enumLogLevel == EnumLogLevel.ERR)
                         {
-                            ConsoleEx.Write(str, ConsoleColor.Red);
+                            ConsoleEx.Write(str, ConsoleColor.Red); // 错误信息使用红色
                         }
                         else if (enumLogLevel == EnumLogLevel.FAL)
                         {
-                            ConsoleEx.Write(str, ConsoleColor.DarkMagenta);
+                            ConsoleEx.Write(str, ConsoleColor.Magenta); // 致命错误使用洋红色
                         }
                         else
                         {
-                            Console.Write(str);
+                            ConsoleEx.Write(str, ConsoleColor.White); // 默认颜色为白色
                         }
+                        
                     }
-
-
+                    
                     // 判断是否要输出到磁盘
                     if (FileLevel.Contains(enumLogLevel.ToString()))
                     {
                         var logPath = PathEx.Combine(RootPath, $"{DateTime.Now:yyyy-MM-dd}{LogFileName}.log");
                         FileEx.AppendAllText(logPath, str);
+
                     }
                 }
             }
@@ -334,7 +336,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Info(string logString)
         {
-            Default.Fatal(logString);
+            Default.Info(logString);
         }
 
         /// <summary>

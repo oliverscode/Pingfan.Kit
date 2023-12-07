@@ -93,7 +93,7 @@ namespace Pingfan.Kit
             {
                 while (true)
                 {
-                    Thread.Sleep(100);
+                    Thread.Sleep(1000);
                 }
             })
             {

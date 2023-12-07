@@ -4,8 +4,14 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
+    /// <summary>
+    /// 重复一个任务
+    /// </summary>
     public class Retry
     {
+        /// <summary>
+        /// 错误事件
+        /// </summary>
         public static event Action<Exception>? OnError;
 
         /// <summary>
@@ -309,6 +315,9 @@ namespace Pingfan.Kit
     }
 
 
+    /// <summary>
+    /// 重试类型
+    /// </summary>
     public enum RetryKind
     {
         /// <summary>

@@ -42,7 +42,7 @@ namespace Pingfan.Kit
                 }
 
 
-                // 便利子目录
+                // 遍历子目录
                 string[]? subDirs = null;
                 try
                 {

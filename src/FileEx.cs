@@ -44,10 +44,13 @@ namespace Pingfan.Kit
                 {
                     if (++attempts == RetryCount)
                         OnError?.Invoke(e);
-
+                    // 权限不足
+                    if (e.Message.ContainsIgnoreCase("denied"))
+                        break;
                     Thread.Sleep(RetryInterval);
                 }
             }
+
         }
 
         private static T RunWithRetry<T>(Func<T> action)
@@ -65,9 +68,14 @@ namespace Pingfan.Kit
                     if (++attempts == RetryCount)
                         OnError?.Invoke(e);
 
+                    // 权限不足
+                    if (e.Message.ContainsIgnoreCase("denied"))
+                        break;
                     Thread.Sleep(RetryInterval);
                 }
             }
+
+            return default!;
         }
 
         /// <summary>
