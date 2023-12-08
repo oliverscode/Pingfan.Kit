@@ -11,7 +11,7 @@ namespace Pingfan.Kit
     public class Progress
     {
         private long _current;
-        private DateTime _lastSpeedTime = DateTime.Now;
+        private DateTime _lastSpeedTime = DateTime.UtcNow;
         private long _lastSpeedCurrent = 0;
         private double _lastSpeed = 0;
         private readonly List<double> _speedBuffer = new List<double>(10);
@@ -60,7 +60,7 @@ namespace Pingfan.Kit
         {
             get
             {
-                var now = DateTime.Now;
+                var now = DateTime.UtcNow;
                 var timeSpan = now - _lastSpeedTime;
                 // 100毫秒内不计算
                 if (timeSpan.TotalMilliseconds < 100)
