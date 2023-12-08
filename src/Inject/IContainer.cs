@@ -78,7 +78,7 @@ namespace Pingfan.Kit.Inject
         /// <param name="defaultValue"></param>
         /// <typeparam name="T">实例或者接口的类型</typeparam>
         /// <returns></returns>
-        T Get<T>(string? name = null, T defaultValue = default);
+        T Get<T>(string? name = null, object? defaultValue = null);
 
         /// <summary>
         /// 是否有指定类型的实例

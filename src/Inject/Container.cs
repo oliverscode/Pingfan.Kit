@@ -64,6 +64,7 @@ namespace Pingfan.Kit.Inject
     public class InjectAttribute : Attribute
     {
         internal string? Name { get; }
+        internal object? DefaultValue { get; }
 
         /// <inheritdoc />
         public InjectAttribute()
@@ -77,6 +78,26 @@ namespace Pingfan.Kit.Inject
         public InjectAttribute(string name)
         {
             Name = name;
+        }
+
+        /// <summary>
+        /// 支持默认值
+        /// </summary>
+        /// <param name="defaultValue"></param>
+        public InjectAttribute(object? defaultValue)
+        {
+            DefaultValue = defaultValue;
+        }
+        
+        /// <summary>
+        /// 支持默认值
+        /// </summary>
+        /// <param name="name">容器中的名字</param>
+        /// <param name="defaultValue">注入失败的默认值</param>
+        public InjectAttribute(string name, object? defaultValue)
+        {
+            Name = name;
+            DefaultValue = defaultValue;
         }
     }
 
@@ -179,7 +200,7 @@ namespace Pingfan.Kit.Inject
 
 
         /// <inheritdoc />
-        public T Get<T>(string? name = null, T defaultValue = default)
+        public T Get<T>(string? name = null, object? defaultValue = null)
         {
             lock (_lock)
             {
@@ -248,13 +269,19 @@ namespace Pingfan.Kit.Inject
             for (var i = 0; i < parameters.Length; i++)
             {
                 var parameterInfo = parameters[i];
-                string? name = null;
-                if (parameterInfo.IsDefined(typeof(InjectAttribute)))
-                    name = parameterInfo.GetCustomAttribute<InjectAttribute>()?.Name;
+                var attr = parameterInfo.GetCustomAttribute<InjectAttribute>();
+
+
+                var name = attr?.Name;
                 if (string.IsNullOrEmpty(name))
                     name = parameterInfo.Name;
 
-                parameterValues[i] = Get(new PopItem(parameterInfo.ParameterType, name, 0, null));
+
+                var defaultValue = attr?.DefaultValue;
+                if (defaultValue == null)
+                    defaultValue = parameterInfo.DefaultValue;
+
+                parameterValues[i] = Get(new PopItem(parameterInfo.ParameterType, name, 0, defaultValue));
             }
 
             return method.DynamicInvoke(parameterValues);
@@ -313,20 +340,25 @@ namespace Pingfan.Kit.Inject
                         var parameters = new object[parameterInfos.Length];
                         for (var i = 0; i < parameterInfos.Length; i++)
                         {
-                            popItem.Deep++;
                             var parameterInfo = parameterInfos[i];
                             if (parameterInfo.ParameterType == this.GetType())
                                 throw new Exception("无法在构造参数中注入容器, 请使用属性注入");
 
+                            var attr = parameterInfo.GetCustomAttribute<InjectAttribute>();
                             // 获取特性上的名字
                             var name = popItem.Name;
                             if (name.IsNullOrEmpty())
-                                name = parameterInfo.GetCustomAttribute<InjectAttribute>()?.Name;
+                                name = attr?.Name;
                             else if (name.IsNullOrEmpty())
                                 name = parameterInfo.Name;
 
-                            parameters[i] = Get(new PopItem(parameterInfo.ParameterType, name, popItem.Deep,
-                                popItem.DefaultValue));
+                            var defaultValue = popItem.DefaultValue;
+                            if (defaultValue == null)
+                                defaultValue = attr?.DefaultValue;
+
+
+                            parameters[i] = Get(new PopItem(parameterInfo.ParameterType, name, ++popItem.Deep,
+                                defaultValue));
                         }
 
                         pushItem.Instance = constructorInfo.Invoke(parameters);
@@ -344,15 +376,21 @@ namespace Pingfan.Kit.Inject
                             }
                             else
                             {
+                                var attr = property.GetCustomAttribute<InjectAttribute>();
+
                                 // 获取特性上的名字
                                 var name = popItem.Name;
                                 if (name.IsNullOrEmpty())
-                                    name = property.GetCustomAttribute<InjectAttribute>()?.Name;
+                                    name = attr?.Name;
                                 else if (name.IsNullOrEmpty())
                                     name = property.Name;
 
+                                var defaultValue = popItem.DefaultValue;
+                                if (defaultValue == null)
+                                    defaultValue = attr?.DefaultValue;
+
                                 var propertyValue =
-                                    Get(new PopItem(propertyType, name, ++popItem.Deep, popItem.DefaultValue));
+                                    Get(new PopItem(propertyType, name, ++popItem.Deep, defaultValue));
                                 property.SetValue(pushItem.Instance, propertyValue);
                             }
                         }
@@ -377,9 +415,10 @@ namespace Pingfan.Kit.Inject
                 }
             }
 
+
             if (popItem.DefaultValue != null)
                 return popItem.DefaultValue;
-            
+
             return this.OnNotFound(popItem.Type);
         }
 

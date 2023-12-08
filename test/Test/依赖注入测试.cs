@@ -353,6 +353,24 @@ public class 依赖注入测试
         container.Invoke(fn);
     }
 
+    [Fact] // 方法注入默认值
+    public void 方法注入默认值()
+    {
+        IContainer container = new Container();
+        container.Push<AA>();
+        container.Push<BB>();
+        container.Push("AA");
+
+
+        var fn = (BB aa, [Inject(20)] int age) =>
+        {
+            Assert.True(aa.Name == "AA");
+            Assert.True(age == 20);
+        };
+
+        container.Invoke(fn);
+    }
+
     [Fact] // 默认值测试
     public void 默认值测试()
     {
