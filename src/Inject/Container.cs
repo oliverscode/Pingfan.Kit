@@ -46,12 +46,14 @@ namespace Pingfan.Kit.Inject
         public Type Type { get; set; }
         public string? Name { get; set; }
         public int Deep { get; set; }
+        public object? DefaultValue { get; set; }
 
-        public PopItem(Type type, string? name, int deep)
+        public PopItem(Type type, string? name, int deep, object? defaultValue)
         {
             Type = type;
             Name = name;
             Deep = deep;
+            DefaultValue = defaultValue;
         }
     }
 
@@ -76,17 +78,6 @@ namespace Pingfan.Kit.Inject
         {
             Name = name;
         }
-    }
-
-    /// <summary>
-    /// 容器事件接口
-    /// </summary>
-    public interface IContainerReady
-    {
-        /// <summary>
-        /// 注入完成后调用
-        /// </summary>
-        void OnContainerReady();
     }
 
 
@@ -188,11 +179,11 @@ namespace Pingfan.Kit.Inject
 
 
         /// <inheritdoc />
-        public T Get<T>(string? name = null)
+        public T Get<T>(string? name = null, T defaultValue = default)
         {
             lock (_lock)
             {
-                return (T)Get(new PopItem(typeof(T), name, 0));
+                return (T)Get(new PopItem(typeof(T), name, 0, defaultValue));
             }
         }
 
@@ -220,8 +211,7 @@ namespace Pingfan.Kit.Inject
                     return ((Container)Parent).Has<T>(name);
                 }
             }
-
-            if (type.IsClass)
+            else if (type.IsClass)
             {
                 var objectItems = _objectItems.Where(x => x.InstanceType == type).ToList();
                 if (objectItems.Count >= 1) // 找到多个, 用name再匹配一次
@@ -236,7 +226,7 @@ namespace Pingfan.Kit.Inject
                         pushItem = objectItems.Last();
                     }
 
-                    return pushItem.Instance != null;
+                    return pushItem != null;
                 }
 
                 if (Parent != null)
@@ -247,6 +237,27 @@ namespace Pingfan.Kit.Inject
             }
 
             return false;
+        }
+
+        /// <inheritdoc />
+        public object Invoke(Delegate method)
+        {
+            var methodInfo = method.Method;
+            var parameters = methodInfo.GetParameters();
+            var parameterValues = new object[parameters.Length];
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                var parameterInfo = parameters[i];
+                string? name = null;
+                if (parameterInfo.IsDefined(typeof(InjectAttribute)))
+                    name = parameterInfo.GetCustomAttribute<InjectAttribute>()?.Name;
+                if (string.IsNullOrEmpty(name))
+                    name = parameterInfo.Name;
+
+                parameterValues[i] = Get(new PopItem(parameterInfo.ParameterType, name, 0, null));
+            }
+
+            return method.DynamicInvoke(parameterValues);
         }
 
 
@@ -265,7 +276,7 @@ namespace Pingfan.Kit.Inject
                         pushItem = objectItems.FirstOrDefault(x => x.InstanceName == popItem.Name) ?? objectItems[0];
                     else
                         pushItem = objectItems.Last();
-                    return Get(new PopItem(pushItem.InstanceType!, popItem.Name, ++popItem.Deep));
+                    return Get(new PopItem(pushItem.InstanceType!, popItem.Name, ++popItem.Deep, popItem.DefaultValue));
                 }
 
                 if (Parent != null)
@@ -275,8 +286,7 @@ namespace Pingfan.Kit.Inject
                     return ((Container)Parent).Get(popItem);
                 }
             }
-
-            if (popItem.Type.IsClass || popItem.Type.IsValueType)
+            else if (popItem.Type.IsClass || popItem.Type.IsValueType)
             {
                 var objectItems = _objectItems.Where(x => x.InstanceType == popItem.Type).ToList();
                 if (objectItems.Count >= 1) // 找到多个, 用name再匹配一次
@@ -312,9 +322,11 @@ namespace Pingfan.Kit.Inject
                             var name = popItem.Name;
                             if (name.IsNullOrEmpty())
                                 name = parameterInfo.GetCustomAttribute<InjectAttribute>()?.Name;
+                            else if (name.IsNullOrEmpty())
+                                name = parameterInfo.Name;
 
-                            parameters[i] = Get(new PopItem(parameterInfo.ParameterType, name,
-                                popItem.Deep));
+                            parameters[i] = Get(new PopItem(parameterInfo.ParameterType, name, popItem.Deep,
+                                popItem.DefaultValue));
                         }
 
                         pushItem.Instance = constructorInfo.Invoke(parameters);
@@ -336,8 +348,11 @@ namespace Pingfan.Kit.Inject
                                 var name = popItem.Name;
                                 if (name.IsNullOrEmpty())
                                     name = property.GetCustomAttribute<InjectAttribute>()?.Name;
+                                else if (name.IsNullOrEmpty())
+                                    name = property.Name;
+
                                 var propertyValue =
-                                    Get(new PopItem(propertyType, name, popItem.Deep + 1));
+                                    Get(new PopItem(propertyType, name, ++popItem.Deep, popItem.DefaultValue));
                                 property.SetValue(pushItem.Instance, propertyValue);
                             }
                         }
@@ -362,6 +377,9 @@ namespace Pingfan.Kit.Inject
                 }
             }
 
+            if (popItem.DefaultValue != null)
+                return popItem.DefaultValue;
+            
             return this.OnNotFound(popItem.Type);
         }
 

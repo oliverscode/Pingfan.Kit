@@ -326,4 +326,40 @@ public class 依赖注入测试
 
         Assert.Equal("BB", result.BB.Name);
     }
+
+    [Fact] // 实力或者接口是否存在
+    public void 实力或者接口是否存在()
+    {
+        IContainer container = new Container();
+        container.Push<AA>();
+        container.Push("AA");
+
+        Assert.True(container.Has<AA>());
+        Assert.False(container.Has<IAnimal>());
+        Assert.False(container.Has<BB>());
+    }
+
+    [Fact] // 方法注入
+    public void 方法注入()
+    {
+        IContainer container = new Container();
+        container.Push<AA>();
+        container.Push<BB>();
+        container.Push("AA");
+
+
+        var fn = (BB aa) => { Assert.True(aa.Name == "AA"); };
+
+        container.Invoke(fn);
+    }
+
+    [Fact] // 默认值测试
+    public void 默认值测试()
+    {
+        IContainer container = new Container();
+
+        // container.Push("AA");
+        var result = container.Get<string>(null, "不是");
+        Assert.Equal("不是", result);
+    }
 }
