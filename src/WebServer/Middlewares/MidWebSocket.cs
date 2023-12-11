@@ -10,11 +10,18 @@ using Pingfan.Kit.WebServer.Middlewares.Websockets;
 
 namespace Pingfan.Kit.WebServer.Middlewares;
 
+/// <summary>
+/// WebSocket中间件
+/// </summary>
 public class MidWebSocket : IMiddleware
 {
     private readonly List<WebSocketItem> _webSockets = new List<WebSocketItem>();
+    /// <summary>
+    /// 默认UTF8编码    
+    /// </summary>
     public Encoding Encoding { get; set; } = Encoding.UTF8;
 
+    /// <inheritdoc />
     public void Invoke(IContainer container, IHttpContext ctx, Action next)
     {
         if (ctx.Request.HttpListenerContext.Request.IsWebSocketRequest == false)
@@ -69,12 +76,22 @@ public class MidWebSocket : IMiddleware
     }
 
 
+    /// <summary>
+    /// 添加一组处理器
+    /// </summary>
+    /// <param name="path"></param>
+    /// <typeparam name="T"></typeparam>
     public void Add<T>(string path = "/") where T : IWebSocketContext
     {
         var type = typeof(T);
         Add(path, type);
     }
 
+    /// <summary>
+    /// 添加一组处理器
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="type"></param>
     public void Add(string path, Type type)
     {
         _webSockets.Add(new WebSocketItem
@@ -91,3 +108,21 @@ public class MidWebSocket : IMiddleware
         public Type InstanceType { get; set; } = null!;
     }
 }
+
+
+/// <summary>
+/// 扩展
+/// </summary>
+public static class MidWebSocketEx
+{
+    /// <summary>
+    /// 使用静态文件中间件
+    /// </summary>
+    public static WebServer UseLog(this WebServer webServer, Action<MidWebSocket>? action = null)
+    {
+        var mid = new MidWebSocket();
+        action?.Invoke(mid);
+        webServer.Use(mid);
+        return webServer;
+    }
+} 

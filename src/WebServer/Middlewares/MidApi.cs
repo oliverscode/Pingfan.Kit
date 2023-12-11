@@ -31,6 +31,7 @@ public class MidApi : IMiddleware
     public string DefaultController { get; set; } = "/Home/Index";
 
 
+    /// <inheritdoc />
     public void Invoke(IContainer container, IHttpContext ctx, Action next)
     {
         var path = ctx.Request.Path;
@@ -137,7 +138,8 @@ public class MidApi : IMiddleware
 
 
             // 是否parameterInfo.ParameterType是否继承IMidRequestModel
-            if (parameterInfo.ParameterType.IsClass && parameterInfo.ParameterType.IsAssignableFrom(typeof(IMidRequestModel)))
+            if (parameterInfo.ParameterType.IsClass &&
+                parameterInfo.ParameterType.IsAssignableFrom(typeof(IMidRequestModel)))
             {
                 IMidRequestModel? requestModel = null;
                 try
@@ -150,12 +152,10 @@ public class MidApi : IMiddleware
                     throw new HttpArgumentException($"{parameterInfo.Name}参数不正确", parameterInfo.ParameterType,
                         parameterInfo.Name!);
                 }
-                
+
                 requestModel.Check();
                 args[i] = requestModel;
             }
-                
-            
         }
 
 
@@ -211,17 +211,32 @@ public class MidApi : IMiddleware
     }
 
 
+    /// <summary>
+    /// 添加一组控制器
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public void Add<T>() where T : class
     {
         Add<T>(null);
     }
 
+    /// <summary>
+    /// 添加一组控制器
+    /// </summary>
+    /// <param name="urlPrefix">/urlPrefix/控制器/方法名</param>
+    /// <typeparam name="T"></typeparam>
     public void Add<T>(string? urlPrefix) where T : class
     {
         var type = typeof(T);
         Add(urlPrefix, type);
     }
 
+    /// <summary>
+    /// 添加一组控制器
+    /// </summary>
+    /// <param name="urlPrefix">/urlPrefix/控制器/方法名</param>
+    /// <param name="type"></param>
+    /// <exception cref="Exception"></exception>
     public void Add(string? urlPrefix, Type type)
     {
         var methodInfos = type.GetMethods();
@@ -268,5 +283,23 @@ public class MidApi : IMiddleware
         public ParameterInfo[] ParameterInfos { get; set; } = null!;
         // public object? Instance { get; set; }
     }
-    
+}
+
+/// <summary>
+/// 扩展
+/// </summary>
+public static class MidApiEx
+{
+    /// <summary>
+    /// 使用静态文件中间件
+    /// </summary>
+    /// <param name="webServer"></param>
+    /// <param name="action"></param>
+    public static WebServer UseMidApi(this WebServer webServer, Action<MidApi>? action)
+    {
+        var mid = new MidApi();
+        action?.Invoke(mid);
+        webServer.Use(mid);
+        return webServer;
+    }
 }

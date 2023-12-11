@@ -145,7 +145,7 @@ public class WebServer : IContainerReady
         }
     }
 
-    public void UseMiddleware(IMiddleware middleware)
+    public void Use(IMiddleware middleware)
     {
         _middlewares.Add(middleware);
     }

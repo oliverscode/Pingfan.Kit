@@ -3,6 +3,7 @@ using Pingfan.Kit.Inject;
 using Pingfan.Kit.WebServer.Interfaces;
 
 namespace Pingfan.Kit.WebServer.Middlewares;
+
 /// <summary>
 /// 错误中间件
 /// </summary>
@@ -13,13 +14,13 @@ public class MidError : IMiddleware
     /// </summary>
     public bool ShowError { get; set; } = true;
     
-
     /// <summary>
     /// 当发生错误时
     /// </summary>
     public event Action<IHttpContext, Exception>? OnError;
 
-    
+
+    /// <inheritdoc />
     public void Invoke(IContainer container, IHttpContext ctx, Action next)
     {
         try
@@ -45,5 +46,21 @@ public class MidError : IMiddleware
             }
             
         }
+    }
+}
+
+/// <summary>
+/// 扩展
+/// </summary>
+public static class MidErrorEx{
+    /// <summary>
+    /// 添加错误中间件
+    /// </summary>
+    public static WebServer AddError(this WebServer server, Action<MidError>? action = null)
+    {
+        var mid = new MidError();
+        action?.Invoke(mid);
+        server.Use(mid);
+        return server;
     }
 }

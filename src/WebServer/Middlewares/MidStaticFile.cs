@@ -122,6 +122,7 @@ public class MidStaticFile : IMiddleware
     }
 
 
+    /// <inheritdoc />
     public void Invoke(IContainer container, IHttpContext ctx, Action next)
     {
         var url = ctx.Request.Path.EndsWith("/") ? "" : ctx.Request.Path;
@@ -231,3 +232,20 @@ public class MidStaticFile : IMiddleware
         }
     }
 }
+
+/// <summary>
+/// 扩展
+/// </summary>
+public static class MidStaticFileEx
+{
+    /// <summary>
+    /// 使用静态文件中间件
+    /// </summary>
+    public static WebServer UseLog(this WebServer webServer, Action<MidStaticFile>? action = null)
+    {
+        var mid = new MidStaticFile();
+        action?.Invoke(mid);
+        webServer.Use(mid);
+        return webServer;
+    }
+} 

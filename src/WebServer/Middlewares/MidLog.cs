@@ -28,9 +28,7 @@ public class MidLog : IMiddleware
     public bool IsWriteDisk { get; set; } = true;
 
 
-    /// <summary>
-    /// 中间件的执行方法
-    /// </summary>
+    /// <inheritdoc />
     public void Invoke(IContainer container, IHttpContext ctx, Action next)
     {
         // 不记录日志的请求类型
@@ -106,5 +104,22 @@ public class MidLog : IMiddleware
             //         log);
             // }
         }
+    }
+}
+
+/// <summary>
+/// 扩展
+/// </summary>
+public static class MidLogEx
+{
+    /// <summary>
+    /// 使用日志组件
+    /// </summary>
+    public static WebServer UseLog(this WebServer webServer, Action<MidLog>? action = null)
+    {
+        var mid = new MidLog();
+        action?.Invoke(mid);
+        webServer.Use(mid);
+        return webServer;
     }
 }

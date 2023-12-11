@@ -18,12 +18,12 @@ public class Startup : IContainerReady
 
         var error = new MidError();
         error.OnError += (ctx, err) => { Console.WriteLine("发生错误" + err); };
-        webServer.UseMiddleware(error);
+        webServer.Use(error);
 
         
         var webSocket = Container.New<MidWebSocket>();
         webSocket.Add<Game>("/");
-        webServer.UseMiddleware(webSocket);
+        webServer.Use(webSocket);
        
         
 
@@ -31,18 +31,18 @@ public class Startup : IContainerReady
         staticFile.AddDirectory("/", "D:\\露营照片");
         staticFile.AddDirectory("/", "E:\\");
         staticFile.AddDirectory("/", "www");
-        webServer.UseMiddleware(staticFile);
+        webServer.Use(staticFile);
 
 
         var log = Container.New<MidLog>();
         log.HttpMethod = "GET,POST";
         log.LogHandler = Console.WriteLine;
-        webServer.UseMiddleware(log);
+        webServer.Use(log);
 
 
         var api = this.Container.New<MidApi>();
         api.Add<Home>();
-        webServer.UseMiddleware(api);
+        webServer.Use(api);
 
 
         // webServer.BeginRequest += (ctx) =>
