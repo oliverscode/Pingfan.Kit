@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Pingfan.Kit.Inject;
 
 namespace Pingfan.Kit
 {
@@ -8,7 +9,11 @@ namespace Pingfan.Kit
     /// </summary>
     public class App
     {
-   
+        /// <summary>
+        /// 根容器
+        /// </summary>
+        public static IContainer Container { get; private set; }
+
         /// <summary>
         /// 初始化, 支持命令行参数
         /// </summary>
@@ -85,13 +90,24 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
+        /// 启动指定类
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public static void Run<T>() where T : class
+        {
+            Container = new Container();
+            Container.New<T>();
+            Run();
+        }
+
+
+        /// <summary>
         /// 启动APP
         /// </summary>
         public static void Run()
         {
             Loop.Wait();
         }
-        
     }
 }
 

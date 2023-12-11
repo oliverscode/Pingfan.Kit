@@ -8,7 +8,7 @@ namespace Pingfan.Kit
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    public class ThreadSafeDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TValue>
+    public class ThreadSafeDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TValue> where TKey : notnull
     {
         /// <inheritdoc />
         public ThreadSafeDictionary()

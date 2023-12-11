@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Pingfan.Kit.csproj" />
+      <ProjectReference Include="..\..\src\Pingfan.Kit.csproj" />
     </ItemGroup>
 
 </Project>
