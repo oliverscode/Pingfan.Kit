@@ -46,8 +46,8 @@ public class MidApi : IMiddleware
             return;
         }
 
-        container.Push<string>(item.InstanceType.Name, "ControllerName");
-        container.Push<string>(item.MethodInfo.Name, "ActionName");
+        container.Register<string>(item.InstanceType.Name, "ControllerName");
+        container.Register<string>(item.MethodInfo.Name, "ActionName");
 
         var args = new object?[item.ParameterInfos.Length];
         for (var i = 0; i < args.Length; i++)

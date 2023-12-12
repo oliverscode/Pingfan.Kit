@@ -10,6 +10,7 @@ namespace Pingfan.Kit.Inject
     {
         internal string? Name { get; }
         internal object? DefaultValue { get; }
+        internal IContainer? Container { get; set; }
 
         /// <inheritdoc />
         public InjectAttribute()
@@ -17,7 +18,7 @@ namespace Pingfan.Kit.Inject
         }
 
         /// <summary>
-        /// 注入
+        /// 按指定名称注入
         /// </summary>
         /// <param name="name">容器中的名称</param>
         public InjectAttribute(string name)
@@ -25,21 +26,32 @@ namespace Pingfan.Kit.Inject
             Name = name;
         }
 
+
+        /// <summary>
+        /// 指定容器里注入
+        /// </summary>
+        /// <param name="container"></param>
+        public InjectAttribute(IContainer container)
+        {
+            Container = container;
+        }
+
         /// <summary>
         /// 支持默认值
         /// </summary>
         /// <param name="defaultValue"></param>
-        public InjectAttribute(object? defaultValue)
+        public InjectAttribute(object defaultValue)
         {
             DefaultValue = defaultValue;
         }
+
 
         /// <summary>
         /// 支持默认值
         /// </summary>
         /// <param name="name">容器中的名字</param>
         /// <param name="defaultValue">注入失败的默认值</param>
-        public InjectAttribute(string name, object? defaultValue)
+        public InjectAttribute(string name, object defaultValue)
         {
             Name = name;
             DefaultValue = defaultValue;

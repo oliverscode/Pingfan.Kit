@@ -41,10 +41,10 @@ public class MidWebSocket : IMiddleware
 
         var protocol = ctx.Request.Headers["Sec-WebSocket-Protocol"];
         var listenerWebSocketContext = ctx.Request.HttpListenerContext.AcceptWebSocketAsync(protocol).Result;
-        container.Push(listenerWebSocketContext);
-        container.Push(Encoding);
+        container.Register(listenerWebSocketContext);
+        container.Register(Encoding);
         var webSocketContext = (IWebSocketContext)container.New(item.InstanceType);
-        if (webSocketContext.OnCheck() == false)
+        if (webSocketContext.OnCheck(protocol) == false)
         {
             return;
         }

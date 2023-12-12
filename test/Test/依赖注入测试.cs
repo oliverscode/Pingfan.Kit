@@ -138,7 +138,7 @@ public class UnitTest1
     {
         var container = new Container();
 
-        container.Push<IAnimal, Person>();
+        container.Register<IAnimal, Person>();
         var result = container.Get<Person>();
 
         Assert.Equal("Person", result.Name);
@@ -149,7 +149,7 @@ public class UnitTest1
     {
         var container = new Container();
 
-        container.Push<IAnimal, Person>();
+        container.Register<IAnimal, Person>();
         var result = container.Get<IAnimal>();
 
         Assert.Equal("Person", result.Name);
@@ -159,8 +159,8 @@ public class UnitTest1
     public void 注入2个接口和实例_要接口()
     {
         var container = new Container();
-        container.Push<IAnimal, Dog>();
-        container.Push<IAnimal, Person>();
+        container.Register<IAnimal, Dog>();
+        container.Register<IAnimal, Person>();
         var result = container.Get<IAnimal>();
 
         Assert.Equal("Person", result.Name);
@@ -170,8 +170,8 @@ public class UnitTest1
     public void 注入2个接口和实例_要名字()
     {
         var container = new Container();
-        container.Push<IAnimal, Dog>();
-        container.Push<IAnimal, Person>("p");
+        container.Register<IAnimal, Dog>();
+        container.Register<IAnimal, Person>("p");
         var result = container.Get<IAnimal>("p");
 
         Assert.Equal("Person", result.Name);
@@ -181,8 +181,8 @@ public class UnitTest1
     public void 注入2个接口和实例_要实例()
     {
         var container = new Container();
-        container.Push<IAnimal, Dog>();
-        container.Push<IAnimal, Person>();
+        container.Register<IAnimal, Dog>();
+        container.Register<IAnimal, Person>();
         var result = container.Get<Person>();
 
         Assert.Equal("Person", result.Name);
@@ -192,9 +192,9 @@ public class UnitTest1
     public void 循环依赖()
     {
         var container = new Container();
-        container.Push<A>();
-        container.Push<B>();
-        container.Push<C>();
+        container.Register<A>();
+        container.Register<B>();
+        container.Register<C>();
         var ex = Assert.Throws<Exception>(() => container.Get<A>()); // 假设你的方法是同步的
 
 
@@ -205,8 +205,8 @@ public class UnitTest1
     public void 属性注入()
     {
         var container = new Container();
-        container.Push<Person>();
-        container.Push<Taxi>();
+        container.Register<Person>();
+        container.Register<Taxi>();
         var result = container.Get<Taxi>();
 
         Assert.Equal("Person", result.Person.Name);
@@ -216,7 +216,7 @@ public class UnitTest1
     public void 在父级中寻找()
     {
         var container = new Container();
-        container.Push<Person>();
+        container.Register<Person>();
 
         var child = container.CreateContainer();
 
@@ -230,7 +230,7 @@ public class UnitTest1
     public void 在祖级中寻找()
     {
         var container = new Container();
-        container.Push<Person>();
+        container.Register<Person>();
 
         var child = container.CreateContainer();
         var child2 = child.CreateContainer();
@@ -245,7 +245,7 @@ public class UnitTest1
 
 
         var child = container.CreateContainer();
-        child.Push<Person>();
+        child.Register<Person>();
         var result = child.Get<Person>();
         Assert.Equal("Person", result.Name);
 
@@ -261,7 +261,7 @@ public class UnitTest1
     public void 注入字符串()
     {
         var container = new Container();
-        container.Push("123");
+        container.Register("123");
         var result = container.Get<string>();
         Assert.Equal("123", result);
     }
@@ -270,8 +270,8 @@ public class UnitTest1
     public void 注入多个字符串()
     {
         var container = new Container();
-        container.Push("123", "f1");
-        container.Push("456", "f2");
+        container.Register("123", "f1");
+        container.Register("456", "f2");
         var result = container.Get<string>("f2");
         Assert.Equal("456", result);
     }
@@ -280,9 +280,9 @@ public class UnitTest1
     public void 构造注入多个字符串_根据特性指定名字()
     {
         var container = new Container();
-        container.Push("123", "f1");
-        container.Push("456", "f2");
-        container.Push<Cat>();
+        container.Register("123", "f1");
+        container.Register("456", "f2");
+        container.Register<Cat>();
 
         var result = container.Get<Cat>();
         Assert.Equal("123 456", result.Name);
@@ -292,9 +292,9 @@ public class UnitTest1
     public void 属性注入多个字符串_根据特性指定名字()
     {
         var container = new Container();
-        container.Push("123", "f1");
-        container.Push("456", "f2");
-        container.Push<Pig>();
+        container.Register("123", "f1");
+        container.Register("456", "f2");
+        container.Register<Pig>();
 
         var result = container.Get<Pig>();
         Assert.Equal("123 456", result.Name);
@@ -304,9 +304,9 @@ public class UnitTest1
     public void 属性注入多个整数_根据特性指定名字()
     {
         var container = new Container();
-        container.Push(123, "f1");
-        container.Push(456, "f2");
-        container.Push<Fish>();
+        container.Register(123, "f1");
+        container.Register(456, "f2");
+        container.Register<Fish>();
 
         var result = container.Get<Fish>();
         Assert.Equal(579, result.Cost);
@@ -316,8 +316,8 @@ public class UnitTest1
     public void 属性注入泛型()
     {
         var container = new Container();
-        container.Push<IAnimal, Dog>();
-        container.Push<Bear<IAnimal>>();
+        container.Register<IAnimal, Dog>();
+        container.Register<Bear<IAnimal>>();
 
         var result = container.Get<Bear<IAnimal>>();
         Assert.Equal("Dog", result.Animal.Name);
@@ -327,17 +327,17 @@ public class UnitTest1
     public void 生命周期()
     {
         IContainer container = new Container();
-        container.Push<AA>();
-        container.Push("AA");
+        container.Register<AA>();
+        container.Register("AA");
         Assert.True(container.Get<AA>().Name == "AA");
 
         var subContainer = container.CreateContainer();
-        subContainer.Push<BB>();
+        subContainer.Register<BB>();
         Assert.True(subContainer.Get<BB>().Name == "AA");
 
         subContainer.Delete<BB>();
 
-        container.Push("BB");
+        container.Register("BB");
         Assert.True(subContainer.Get<BB>().Name == "BB");
 
 
@@ -349,8 +349,8 @@ public class UnitTest1
     public void 实力或者接口是否存在()
     {
         IContainer container = new Container();
-        container.Push<AA>();
-        container.Push("AA");
+        container.Register<AA>();
+        container.Register("AA");
 
 
         Assert.True(container.Has<AA>());

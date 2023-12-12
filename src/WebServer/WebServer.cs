@@ -79,15 +79,15 @@ public class WebServer : IContainerReady
     private void ExecuteHttpContext(HttpListenerContext httpListenerContext)
     {
         var httpContainer = Container.CreateContainer();
-        httpContainer.Push<IHttpContext>(Config.HttpContextType);
-        httpContainer.Push<IHttpRequest>(Config.HttpRequestType);
-        httpContainer.Push<IHttpResponse>(Config.HttpResponseType);
+        httpContainer.Register<IHttpContext>(Config.HttpContextType);
+        httpContainer.Register<IHttpRequest>(Config.HttpRequestType);
+        httpContainer.Register<IHttpResponse>(Config.HttpResponseType);
 
         var items = new Dictionary<string, object>();
-        httpContainer.Push(items);
+        httpContainer.Register(items);
 
 
-        httpContainer.Push(httpListenerContext);
+        httpContainer.Register(httpListenerContext);
 
         var httpContext = (IHttpContext)httpContainer.Get(Config.HttpContextType)!;
 
@@ -167,7 +167,7 @@ public static class WebServerExtensions
     {
         var config = new WebServerConfig();
         func(config);
-        container.Push(config);
+        container.Register(config);
 
 
         return container.New<WebServer>();

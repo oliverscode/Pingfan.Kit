@@ -56,7 +56,7 @@ public class WebSocketContextDefault : IWebSocketContext
         this.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None);
     }
 
-    public virtual bool OnCheck()
+    public virtual bool OnCheck(string protocol)
     {
         return false;
     }

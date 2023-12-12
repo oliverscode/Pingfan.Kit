@@ -10,6 +10,11 @@ namespace Pingfan.Kit.Inject
     /// </summary>
     public class Container : IContainer
     {
+        /// <summary>
+        /// 根容器
+        /// </summary>
+        public static IContainer Root { get; private set; } = null!;
+
         private readonly int _currentDeep; // 当前深度, 用于判断递归深度
         private readonly List<InjectPush> _objectItems = new List<InjectPush>();
         internal readonly object Lock = new object();
@@ -18,13 +23,14 @@ namespace Pingfan.Kit.Inject
             throw new InjectNotRegisteredException($"{pop.Name}未被注册, 类型:{pop.Type}", pop);
 
         /// <inheritdoc />
+        public string? Name { get; set; }
+
+        /// <inheritdoc />
         public int MaxDeep { get; set; } = 20;
 
         /// <inheritdoc />
         public bool IsRoot => Parent == null;
 
-        /// <inheritdoc />
-        public IContainer Root => Parent?.Root ?? this;
 
         /// <inheritdoc />
         public IContainer? Parent { get; }
@@ -52,7 +58,8 @@ namespace Pingfan.Kit.Inject
         /// 创建一个容器
         /// </summary>
         /// <param name="parent">默认为根容器</param>
-        public Container(Container? parent = null)
+        /// <param name="name">起个名字, 方便辨识</param>
+        public Container(Container? parent = null, string? name = null)
         {
             Parent = parent;
             Children = new List<IContainer>();
@@ -60,15 +67,24 @@ namespace Pingfan.Kit.Inject
             if (this._currentDeep > this.MaxDeep)
                 throw new Exception($"递归深度超过{MaxDeep}层, 可能存在循环依赖");
 
-            if (parent != null)
+
+            if (parent == null)
+            {
+                Root = this;
+            }
+            else
             {
                 this.MaxDeep = parent.MaxDeep;
             }
+
+            Name = name;
+            if (string.IsNullOrWhiteSpace(Name) && parent == null)
+                Name = "Root";
         }
 
 
         /// <inheritdoc />
-        public void Push<T>(string? name = null)
+        public void Register<T>(string? name = null)
         {
             var type = typeof(T);
             if (type.IsInterface)
@@ -78,7 +94,7 @@ namespace Pingfan.Kit.Inject
         }
 
         /// <inheritdoc />
-        public void Push<T>(T instance, string? name = null)
+        public void Register<T>(T instance, string? name = null)
         {
             var type = typeof(T);
             if (type.IsInterface)
@@ -89,7 +105,7 @@ namespace Pingfan.Kit.Inject
 
 
         /// <inheritdoc />
-        public void Push<TI, T>(T instance, string? name = null) where T : TI
+        public void Register<TI, T>(T instance, string? name = null) where T : TI
         {
             var interfaceType = typeof(TI);
             var instanceType = typeof(T);
@@ -98,7 +114,7 @@ namespace Pingfan.Kit.Inject
 
 
         /// <inheritdoc />
-        public void Push<TI, T>(string? name = null) where T : TI
+        public void Register<TI, T>(string? name = null) where T : TI
         {
             var interfaceType = typeof(TI);
             var instanceType = typeof(T);
@@ -106,25 +122,25 @@ namespace Pingfan.Kit.Inject
         }
 
         /// <inheritdoc />
-        public void Push(Type instanceType, string? name = null)
+        public void Register(Type instanceType, string? name = null)
         {
             Push(new InjectPush(null, instanceType, name, null));
         }
 
         /// <inheritdoc />
-        public void Push(Type interfaceType, object instance, string? name = null)
+        public void Register(Type interfaceType, object instance, string? name = null)
         {
             Push(new InjectPush(interfaceType, instance.GetType(), name, instance));
         }
 
         /// <inheritdoc />
-        public void Push(Type interfaceType, Type instanceType, string? name = null)
+        public void Register(Type interfaceType, Type instanceType, string? name = null)
         {
             Push(new InjectPush(interfaceType, instanceType, null, null));
         }
 
         /// <inheritdoc />
-        public void Push<T>(Type instanceType, string? name = null)
+        public void Register<T>(Type instanceType, string? name = null)
         {
             var interfaceType = typeof(T);
             Push(new InjectPush(interfaceType, instanceType, name, null));
@@ -151,7 +167,10 @@ namespace Pingfan.Kit.Inject
                 x.InterfaceType == push.InterfaceType && x.InstanceType == push.InstanceType &&
                 string.Equals(x.InstanceName, push.InstanceName, StringComparison.OrdinalIgnoreCase));
             if (item != null)
-                item.Instance = push.Instance;
+            {
+                if (push.Instance != null)
+                    item.Instance = push.Instance;
+            }
             else
                 _objectItems.Add(push);
         }
@@ -160,13 +179,13 @@ namespace Pingfan.Kit.Inject
         /// <inheritdoc />
         public T Get<T>(string? name = null, object? defaultValue = null)
         {
-            return (T)Get(new InjectPop(typeof(T), name, 0, defaultValue));
+            return (T)Get(new InjectPop(typeof(T), name, 0, defaultValue, this));
         }
 
         /// <inheritdoc />
         public object Get(Type instanceType, string? name = null, object? defaultValue = null)
         {
-            return Get(new InjectPop(instanceType, name, 0, defaultValue));
+            return Get(new InjectPop(instanceType, name, 0, defaultValue, this));
         }
 
         private object Get(InjectPop injectPop)
@@ -175,7 +194,7 @@ namespace Pingfan.Kit.Inject
             if (injectPop.Deep > MaxDeep)
                 throw new Exception($"递归深度超过{MaxDeep}层, 可能存在循环依赖");
 
-            var objectItems = _objectItems
+            var objectItems = ((Container)injectPop.Container)._objectItems
                 .Where(x => (x.InterfaceType == injectPop.Type || x.InstanceType == injectPop.Type) &&
                             x.InstanceName == injectPop.Name).ToList();
 
@@ -231,8 +250,11 @@ namespace Pingfan.Kit.Inject
                         var name = injectPop.Name ?? attr?.Name ?? null;
                         // 获取默认值
                         var defaultValue = injectPop.DefaultValue ?? attr?.DefaultValue;
+                        // 获取容器
+                        var container = attr?.Container ?? injectPop.Container;
+
                         parameters[i] = Get(new InjectPop(parameterInfo.ParameterType, name, injectPop.Deep,
-                            defaultValue));
+                            defaultValue, container));
                     }
 
                     push.Instance = constructorInfo.Invoke(parameters);
@@ -254,7 +276,10 @@ namespace Pingfan.Kit.Inject
                         {
                             var name = injectPop.Name ?? attr?.Name;
                             var defaultValue = injectPop.DefaultValue ?? attr?.DefaultValue;
-                            var propertyValue = Get(new InjectPop(propertyType, name, injectPop.Deep, defaultValue));
+                            var container = attr?.Container ?? injectPop.Container;
+                            
+                            var propertyValue = Get(new InjectPop(propertyType, name, injectPop.Deep, defaultValue,
+                                container));
                             property.SetValue(push.Instance, propertyValue);
                         }
                     }
@@ -271,6 +296,8 @@ namespace Pingfan.Kit.Inject
 
             if (Parent != null)
             {
+                // return ((Container)Parent!).Get(injectPop);
+                injectPop.Container = Parent;
                 return ((Container)Parent!).Get(injectPop);
             }
 
@@ -346,14 +373,14 @@ namespace Pingfan.Kit.Inject
         {
             if (type.IsInterface)
                 throw new Exception("无法创建接口");
-            Push(type);
+            Register(type);
             return Get(type);
         }
 
         /// <inheritdoc />
-        public IContainer CreateContainer()
+        public IContainer CreateContainer(string? name = null)
         {
-            var child = new Container(this);
+            var child = new Container(this, name);
             this.Children.Add(child);
             return child;
         }
@@ -385,6 +412,33 @@ namespace Pingfan.Kit.Inject
 
                 _objectItems.Clear();
             }
+        }
+
+
+        /// <inheritdoc />
+        public IContainer? FindContainer(string name)
+        {
+            if (string.Equals(this.Name, name))
+                return this;
+
+            foreach (var child in Children)
+            {
+                var result = child.FindContainer(name);
+                if (result != null)
+                    return result;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 查找一个容器
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static IContainer? Find(string name)
+        {
+            return Root.FindContainer(name);
         }
     }
 }

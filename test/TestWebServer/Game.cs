@@ -33,7 +33,7 @@ public class Game : WebSocketContextDefault
         Console.WriteLine(data);
     }
 
-    public override bool OnCheck()
+    public override bool OnCheck(string protocol)
     {
         return true;
     }

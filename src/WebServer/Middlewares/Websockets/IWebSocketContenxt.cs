@@ -17,7 +17,7 @@ public interface IWebSocketContext
     /// <summary>
     /// 检查请求是否合法
     /// </summary>
-    bool OnCheck();
+    bool OnCheck(string protocol);
 
     /// <summary>
     /// 客户端已经连接上后
