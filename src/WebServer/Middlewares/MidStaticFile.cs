@@ -23,7 +23,7 @@ public class MidStaticFile : IMiddleware
     };
 
     // 常见的mime
-    private static readonly Dictionary<string, string> _mime =
+    private static readonly Dictionary<string, string> Mime =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { ".html", "text/html" },
@@ -102,10 +102,10 @@ public class MidStaticFile : IMiddleware
     public static string GetMime(string key)
     {
         key = Path.GetExtension(key);
-        if (_mime.TryGetValue(key, out var mime))
+        if (Mime.TryGetValue(key, out var mime))
             return mime;
 
-        var item = _mime.FirstOrDefault(p => p.Key.IndexOf(key, StringComparison.OrdinalIgnoreCase) >= 0);
+        var item = Mime.FirstOrDefault(p => p.Key.IndexOf(key, StringComparison.OrdinalIgnoreCase) >= 0);
         if (item.Value != null)
             return item.Value;
         return "application/octet-stream";
@@ -118,7 +118,7 @@ public class MidStaticFile : IMiddleware
     /// <param name="value"></param>
     public static void SetMime(string key, string value)
     {
-        _mime.Add(key, value);
+        Mime.Add(key, value);
     }
 
 
@@ -241,9 +241,9 @@ public static class MidStaticFileEx
     /// <summary>
     /// 使用静态文件中间件
     /// </summary>
-    public static WebServer UseLog(this WebServer webServer, Action<MidStaticFile>? action = null)
+    public static WebServer UseStaticFile(this WebServer webServer, Action<MidStaticFile>? action = null)
     {
-        var mid = new MidStaticFile();
+        var mid = webServer.Container.New<MidStaticFile>();
         action?.Invoke(mid);
         webServer.Use(mid);
         return webServer;

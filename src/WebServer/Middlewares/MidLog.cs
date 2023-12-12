@@ -117,7 +117,7 @@ public static class MidLogEx
     /// </summary>
     public static WebServer UseLog(this WebServer webServer, Action<MidLog>? action = null)
     {
-        var mid = new MidLog();
+        var mid = webServer.Container.New<MidLog>();
         action?.Invoke(mid);
         webServer.Use(mid);
         return webServer;

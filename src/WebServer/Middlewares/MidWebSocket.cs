@@ -16,6 +16,7 @@ namespace Pingfan.Kit.WebServer.Middlewares;
 public class MidWebSocket : IMiddleware
 {
     private readonly List<WebSocketItem> _webSockets = new List<WebSocketItem>();
+
     /// <summary>
     /// 默认UTF8编码    
     /// </summary>
@@ -55,7 +56,7 @@ public class MidWebSocket : IMiddleware
         var buffer = new byte[1024 * 4];
         while (webSocketContext.IsAvailable)
         {
-            var result =  webSocketContext.WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer),
+            var result = webSocketContext.WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer),
                 CancellationToken.None).Result;
             if (result.MessageType == WebSocketMessageType.Close)
             {
@@ -109,7 +110,6 @@ public class MidWebSocket : IMiddleware
     }
 }
 
-
 /// <summary>
 /// 扩展
 /// </summary>
@@ -118,11 +118,11 @@ public static class MidWebSocketEx
     /// <summary>
     /// 使用静态文件中间件
     /// </summary>
-    public static WebServer UseLog(this WebServer webServer, Action<MidWebSocket>? action = null)
+    public static WebServer UseWebSocket(this WebServer webServer, Action<MidWebSocket>? action = null)
     {
-        var mid = new MidWebSocket();
+        var mid = webServer.Container.New<MidWebSocket>();
         action?.Invoke(mid);
         webServer.Use(mid);
         return webServer;
     }
-} 
+}

@@ -27,23 +27,23 @@ public class WebServer : IContainerReady
     /// <summary>
     /// 请求开始前执行
     /// </summary>
-    public event Action<IHttpContext>? BeginRequest;
+    public event Action<IContainer, IHttpContext>? BeginRequest;
 
     /// <summary>
     /// 仅仅在BeginRequest之后执行
     /// </summary>
-    public event Action<IHttpContext>? Handler;
+    public event Action<IContainer, IHttpContext>? Handler;
 
 
     /// <summary>
     /// 请求结束后执行
     /// </summary>
-    public event Action<IHttpContext>? EndRequest;
+    public event Action<IContainer, IHttpContext>? EndRequest;
 
     /// <summary>
     /// 有异常时执行
     /// </summary>
-    public event Action<IHttpContext, Exception>? RequestError;
+    public event Action<IContainer, IHttpContext, Exception>? RequestError;
 
 
     public WebServer(WebServerConfig config)
@@ -107,10 +107,10 @@ public class WebServer : IContainerReady
             //     httpContext.Response.KeepAlive = true;
             // }
 
-            this.BeginRequest?.Invoke(httpContext);
+            this.BeginRequest?.Invoke(httpContainer, httpContext);
 
 
-            this.Handler?.Invoke(httpContext);
+            this.Handler?.Invoke(httpContainer, httpContext);
 
             // 执行中间件
             var midIndex = 0;
@@ -125,7 +125,7 @@ public class WebServer : IContainerReady
             func();
 
 
-            this.EndRequest?.Invoke(httpContext);
+            this.EndRequest?.Invoke(httpContainer, httpContext);
         }
         catch (HttpEndException)
         {
@@ -137,7 +137,7 @@ public class WebServer : IContainerReady
         {
             if (httpContext.Response.StatusCode < 500)
                 httpContext.Response.StatusCode = 500;
-            this.RequestError?.Invoke(httpContext, ex);
+            this.RequestError?.Invoke(httpContainer, httpContext, ex);
         }
         finally
         {

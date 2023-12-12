@@ -1,7 +1,6 @@
 ﻿using Pingfan.Kit.Inject;
 using Pingfan.Kit.WebServer;
 using Pingfan.Kit.WebServer.Middlewares;
-
 using TestWebServer;
 
 namespace ConsoleTest;
@@ -20,12 +19,11 @@ public class Startup : IContainerReady
         error.OnError += (ctx, err) => { Console.WriteLine("发生错误" + err); };
         webServer.Use(error);
 
-        
+
         var webSocket = Container.New<MidWebSocket>();
         webSocket.Add<Game>("/");
         webServer.Use(webSocket);
-       
-        
+
 
         var staticFile = Container.New<MidStaticFile>();
         staticFile.AddDirectory("/", "D:\\露营照片");
@@ -50,7 +48,7 @@ public class Startup : IContainerReady
         //     ctx.Response.SendChunked = false;
         //     ctx.Response.Write("Hello World");
         // };
-        webServer.RequestError += (ctx, ex) =>
+        webServer.RequestError += (container, ctx, ex) =>
         {
             if (ex is InjectNotRegisteredException injectNotRegisteredException)
             {

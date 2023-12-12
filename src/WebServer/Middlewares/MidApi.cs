@@ -291,13 +291,13 @@ public class MidApi : IMiddleware
 public static class MidApiEx
 {
     /// <summary>
-    /// 使用静态文件中间件
+    /// 使用Api中间件
     /// </summary>
     /// <param name="webServer"></param>
     /// <param name="action"></param>
-    public static WebServer UseMidApi(this WebServer webServer, Action<MidApi>? action)
+    public static WebServer UseApi(this WebServer webServer, Action<MidApi>? action)
     {
-        var mid = new MidApi();
+        var mid = webServer.Container.New<MidApi>();
         action?.Invoke(mid);
         webServer.Use(mid);
         return webServer;

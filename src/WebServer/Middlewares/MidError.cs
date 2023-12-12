@@ -56,11 +56,11 @@ public static class MidErrorEx{
     /// <summary>
     /// 添加错误中间件
     /// </summary>
-    public static WebServer AddError(this WebServer server, Action<MidError>? action = null)
+    public static WebServer UseError(this WebServer webServer, Action<MidError>? action = null)
     {
-        var mid = new MidError();
+        var mid = webServer.Container.New<MidError>();
         action?.Invoke(mid);
-        server.Use(mid);
-        return server;
+        webServer.Use(mid);
+        return webServer;
     }
 }
