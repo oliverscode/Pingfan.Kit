@@ -179,13 +179,13 @@ namespace Pingfan.Kit.Inject
         /// <inheritdoc />
         public T Get<T>(string? name = null, object? defaultValue = null)
         {
-            return (T)Get(new InjectPop(typeof(T), name, 0, defaultValue, this));
+            return (T)Get(new InjectPop(typeof(T), name, 0, defaultValue));
         }
 
         /// <inheritdoc />
         public object Get(Type instanceType, string? name = null, object? defaultValue = null)
         {
-            return Get(new InjectPop(instanceType, name, 0, defaultValue, this));
+            return Get(new InjectPop(instanceType, name, 0, defaultValue));
         }
 
         private object Get(InjectPop injectPop)
@@ -194,7 +194,7 @@ namespace Pingfan.Kit.Inject
             if (injectPop.Deep > MaxDeep)
                 throw new Exception($"递归深度超过{MaxDeep}层, 可能存在循环依赖");
 
-            var objectItems = ((Container)injectPop.Container)._objectItems
+            var objectItems = this._objectItems
                 .Where(x => (x.InterfaceType == injectPop.Type || x.InstanceType == injectPop.Type) &&
                             x.InstanceName == injectPop.Name).ToList();
 
@@ -250,15 +250,13 @@ namespace Pingfan.Kit.Inject
                         var name = injectPop.Name ?? attr?.Name ?? null;
                         // 获取默认值
                         var defaultValue = injectPop.DefaultValue ?? attr?.DefaultValue;
-                        // 获取容器
-                        var container = attr?.Container ?? injectPop.Container;
+
 
                         parameters[i] = Get(new InjectPop(parameterInfo.ParameterType, name, injectPop.Deep,
-                            defaultValue, container));
+                            defaultValue));
                     }
 
                     push.Instance = constructorInfo.Invoke(parameters);
-
                     // 注入属性
                     var properties = injectPop.Type.GetPropertiesByCache();
                     foreach (var property in properties)
@@ -276,10 +274,8 @@ namespace Pingfan.Kit.Inject
                         {
                             var name = injectPop.Name ?? attr?.Name;
                             var defaultValue = injectPop.DefaultValue ?? attr?.DefaultValue;
-                            var container = attr?.Container ?? injectPop.Container;
-                            
-                            var propertyValue = Get(new InjectPop(propertyType, name, injectPop.Deep, defaultValue,
-                                container));
+                      
+                            var propertyValue = Get(new InjectPop(propertyType, name, injectPop.Deep, defaultValue));
                             property.SetValue(push.Instance, propertyValue);
                         }
                     }
@@ -296,9 +292,8 @@ namespace Pingfan.Kit.Inject
 
             if (Parent != null)
             {
-                // return ((Container)Parent!).Get(injectPop);
-                injectPop.Container = Parent;
                 return ((Container)Parent!).Get(injectPop);
+               
             }
 
             if (injectPop.DefaultValue != null)
@@ -375,6 +370,41 @@ namespace Pingfan.Kit.Inject
                 throw new Exception("无法创建接口");
             Register(type);
             return Get(type);
+        }
+
+
+        /// <inheritdoc />
+        public void InjectProperties(object instance)
+        {
+            // 注入属性
+            var properties = instance.GetType().GetPropertiesByCache();
+            foreach (var property in properties)
+            {
+                var attr = InjectCache<InjectAttribute>.GetCustomAttributeCache(property);
+                if (attr == null) continue;
+
+                var propertyType = property.PropertyType;
+                // 判断propertyType是否是IContainer的实现类或者子类
+                if (typeof(IContainer) == property || typeof(IContainer).IsAssignableFrom(propertyType))
+                {
+                    property.SetValue(instance, this);
+                }
+                else
+                {
+                    var name = attr?.Name;
+                    var defaultValue = attr?.DefaultValue;
+
+
+                    var propertyValue = Get(new InjectPop(propertyType, name, 0, defaultValue));
+                    property.SetValue(instance, propertyValue);
+                }
+            }
+
+
+            if (instance is IContainerReady containerReady)
+            {
+                containerReady.OnContainerReady();
+            }
         }
 
         /// <inheritdoc />

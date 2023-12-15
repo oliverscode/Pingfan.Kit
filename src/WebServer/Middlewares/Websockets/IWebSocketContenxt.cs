@@ -9,7 +9,7 @@ namespace Pingfan.Kit.WebServer.Middlewares.Websockets;
 public interface IWebSocketContext
 {
     bool IsAvailable { get; }
-    WebSocket WebSocket { get; }
+    WebSocket WebSocket { get; set; }
     Encoding Encoding { get; }
     string Protocol { get; }
     

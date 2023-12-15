@@ -11,15 +11,14 @@ namespace Pingfan.Kit.Inject
         public string? Name { get; set; }
         public int Deep { get; set; }
         public object? DefaultValue { get; set; }
-        public IContainer Container { get; set; }
 
-        public InjectPop(Type type, string? name, int deep, object? defaultValue, IContainer container)
+
+        public InjectPop(Type type, string? name, int deep, object? defaultValue)
         {
             Type = type;
             Name = name;
             Deep = deep;
             DefaultValue = defaultValue;
-            Container = container;
         }
     }
 }

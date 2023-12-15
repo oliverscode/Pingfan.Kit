@@ -27,7 +27,7 @@ namespace Pingfan.Kit.Inject
         /// 是否是根容器, 一般用作单例
         /// </summary>
         bool IsRoot { get; }
-        
+
         /// <summary>
         /// 父容器
         /// </summary>
@@ -182,6 +182,12 @@ namespace Pingfan.Kit.Inject
         /// </summary>
         object New(Type type);
 
+        /// <summary>
+        /// 注入属性
+        /// </summary>
+        /// <param name="instance"></param>
+        void InjectProperties(object instance);
+
         // /// <summary>
         // /// 调用一个方法, 并注入参数
         // /// </summary>
@@ -195,7 +201,7 @@ namespace Pingfan.Kit.Inject
         /// </summary>
         /// <returns></returns>
         IContainer CreateContainer(string? name = null);
-        
+
         /// <summary>
         /// 查找容器
         /// </summary>

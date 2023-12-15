@@ -10,11 +10,23 @@ namespace Pingfan.Kit.WebServer.Middlewares.Websockets;
 public class WebSocketContextDefault : IWebSocketContext
 {
     private readonly IHttpResponse _httpResponse;
+    private WebSocket? _webSocket;
+
     public Encoding Encoding { get; set; }
     public string Protocol => this.HttpListenerWebSocketContext.WebSocket.SubProtocol!;
     public readonly HttpListenerWebSocketContext HttpListenerWebSocketContext;
 
-    public WebSocket WebSocket => this.HttpListenerWebSocketContext.WebSocket;
+    public WebSocket WebSocket
+    {
+        get
+        {
+            if (_webSocket == null)
+                _webSocket = this.HttpListenerWebSocketContext.WebSocket;
+            return _webSocket;
+        }
+        set => _webSocket = value;
+    }
+
     public bool IsAvailable => this.HttpListenerWebSocketContext.WebSocket.State == WebSocketState.Open;
 
     public WebSocketContextDefault(

@@ -368,4 +368,32 @@ public class UnitTest1
         var result = container.Get<string>(null, "不是");
         Assert.Equal("不是", result);
     }
+
+    [Fact] // 属性注入测试
+    public void 属性注入测试()
+    {
+        IContainer container = new Container();
+
+
+        container.Register<DD>();
+        container.Register<string>("平凡", null);
+
+
+        var result = container.New<DD>();
+        Assert.Equal("平凡", result.Name);
+
+
+        result = new DD();
+        container.InjectProperties(result);
+        Assert.Equal("平凡", result.Name);
+    }
+
+    class DD
+    {
+        [Inject] public string Name { get; set; }
+
+        public DD()
+        {
+        }
+    }
 }
