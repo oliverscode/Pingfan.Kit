@@ -461,14 +461,6 @@ namespace Pingfan.Kit.Inject
             return null;
         }
 
-        /// <summary>
-        /// 查找一个容器
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static IContainer? Find(string name)
-        {
-            return Root.FindContainer(name);
-        }
+
     }
 }
