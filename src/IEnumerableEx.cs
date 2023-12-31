@@ -80,5 +80,13 @@ namespace Pingfan.Kit
         {
             return list.Any(p => p.Equals(value, StringComparison.OrdinalIgnoreCase));
         }
+        
+        /// <summary>
+        /// 克隆一个集合
+        /// </summary>
+        public static IEnumerable<T> Clone<T>(this IEnumerable<T> list)
+        {
+            return list.Select(p => p);
+        }
     }
 }

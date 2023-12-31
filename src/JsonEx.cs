@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD3_1 || NET6
+﻿
 
 namespace Pingfan.Kit
 {
@@ -84,7 +84,7 @@ namespace Pingfan.Kit
     /// </summary>
     public static class JsonElementEx
     {
-#if NET6
+#if NETCOREAPP
         /// <summary>
         /// 获取JsonElement的值
         /// </summary>
@@ -113,4 +113,3 @@ namespace Pingfan.Kit
 #endif
     }
 }
-#endif

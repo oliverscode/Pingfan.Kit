@@ -55,6 +55,7 @@ public class HttpResponseDefault : IHttpResponse
 
     private JsonSerializerOptions? _jsonSerializerOptions;
 
+    [Obsolete("Obsolete")]
     public JsonSerializerOptions JsonSerializerOptions
     {
         get
@@ -65,8 +66,9 @@ public class HttpResponseDefault : IHttpResponse
                 {
                     // 支持中文
                     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    // 忽略默认值
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+                    // 忽略Null值
+                    IgnoreNullValues = true,
+                    // DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
                 };
             }
 
