@@ -94,6 +94,12 @@ namespace Pingfan.Kit
         /// </summary>
         public static int ToInt(this string str, int defaultValue = 0)
         {
+            // 提取str中所有的数字部分
+            var match = Regex.Match(str, @"[-+]?[0-9]+");
+            if (match.Success)
+                str = match.Value;
+            
+
             if (int.TryParse(str, out var result))
             {
                 return result;
@@ -107,6 +113,11 @@ namespace Pingfan.Kit
         /// </summary>
         public static uint ToUInt(this string str, uint defaultValue = 0)
         {
+            // 提取str中所有的数字部分
+            var match = Regex.Match(str, @"[-+]?[0-9]+");
+            if (match.Success)
+                str = match.Value;
+
             if (uint.TryParse(str, out var result))
             {
                 return result;
@@ -120,6 +131,11 @@ namespace Pingfan.Kit
         /// </summary>
         public static long ToLong(this string str, long defaultValue = 0)
         {
+            // 提取str中所有的数字部分
+            var match = Regex.Match(str, @"[-+]?[0-9]+");
+            if (match.Success)
+                str = match.Value;
+
             if (long.TryParse(str, out var result))
             {
                 return result;
@@ -133,6 +149,11 @@ namespace Pingfan.Kit
         /// </summary>
         public static ulong ToULong(this string str, ulong defaultValue = 0)
         {
+            // 提取str中所有的数字部分
+            var match = Regex.Match(str, @"[-+]?[0-9]+");
+            if (match.Success)
+                str = match.Value;
+
             if (ulong.TryParse(str, out var result))
             {
                 return result;
@@ -146,6 +167,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static float ToFloat(this string str, float defaultValue = 0)
         {
+            
             if (float.TryParse(str, out var result))
             {
                 return result;

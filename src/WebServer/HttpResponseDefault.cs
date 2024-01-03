@@ -41,6 +41,7 @@ public class HttpResponseDefault : IHttpResponse
                     OutputStream.WriteTo(HttpListenerResponse.OutputStream);
                 }
             }
+            HttpListenerResponse.Close();
         }
         catch
         {
@@ -48,7 +49,6 @@ public class HttpResponseDefault : IHttpResponse
         }
         finally
         {
-            HttpListenerResponse.Close();
             OutputStream.Dispose();
         }
     }

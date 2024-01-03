@@ -23,8 +23,9 @@ public class HttpRequestDefault : IHttpRequest
     {
         try
         {
-            HttpListenerContext.Request.InputStream.Dispose();
             InputStream.Dispose();
+            HttpListenerContext.Request.InputStream.Dispose();
+         
         }
         catch
         {
