@@ -8,7 +8,7 @@ namespace Pingfan.Kit
     /// <summary>
     /// 服务管理
     /// </summary>
-    static class ServiceManager
+    public static class ServiceManager
     {
         /// <summary>
         /// 安装服务
@@ -113,13 +113,13 @@ namespace Pingfan.Kit
 
         private static void GetServerInfo(out string serverPath, out string serverName)
         {
-            serverPath = Process.GetCurrentProcess().MainModule!.FileName;
+            serverPath = Process.GetCurrentProcess().MainModule!.FileName!;
             if (serverPath.IsNullOrWhiteSpace())
             {
                 throw new Exception("Can not get server path");
             }
 
-            serverName = Path.GetFileNameWithoutExtension(serverPath);
+            serverName = AppDomain.CurrentDomain.FriendlyName;
             if (serverName.IsNullOrWhiteSpace())
             {
                 throw new Exception("Can not get server name");

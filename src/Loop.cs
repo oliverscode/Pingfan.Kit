@@ -19,7 +19,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static Task Run(Action method)
         {
-            return Task.Run(() =>
+            return Task.Run(function: () =>
             {
                 while (true)
                 {

@@ -100,12 +100,12 @@ namespace Pingfan.Kit
     /// </summary>
     public class Logger : ILogger
     {
-        internal static readonly string RootPath = PathEx.CombineFromCurrentDirectory("log");
+        internal static readonly string RootPath = PathEx.CombineCurrentDirectory("log");
 
         /// <summary>
         /// 日志保留天数
         /// </summary>
-        public static int LogKeepDays = Config.Get("LogKeepDays", "365").ToInt(365);
+        public static readonly int LogKeepDays = Config.Get("LogKeepDays", "365").ToInt(365);
 
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Pingfan.Kit
             Timer.SetIntervalWithTry(1000 * 60 * 60, () =>
             {
                 var now = DateTime.Now;
-                var dir = PathEx.CombineFromCurrentDirectory("log");
+                var dir = PathEx.CombineCurrentDirectory("log");
                 var paths = DirectoryEx.GetFiles(dir, "*.log");
                 foreach (var path in paths)
                 {
@@ -171,12 +171,12 @@ namespace Pingfan.Kit
         /// <summary>
         /// 输出到控制台的级别
         /// </summary>
-        public string ConsoleLevel;
+        public string ConsoleLevel { get; set; }
 
         /// <summary>
         /// 输出到磁盘的级别
         /// </summary>
-        public string FileLevel;
+        public string FileLevel { get; set; }
 
 
         /// <summary>

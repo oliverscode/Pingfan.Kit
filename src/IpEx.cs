@@ -61,7 +61,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 通过http://ip-api.com/json/获取Ip的物理地址, 仅供参考
+        /// 通过http://ip-api.com/json/获取Ip的物理地址, 每分钟最大45次请求
         /// </summary>
         public static string? GetWanIpLocation(string ip, string lang = "zh-CN")
         {

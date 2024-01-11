@@ -12,7 +12,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 根容器
         /// </summary>
-        public static IContainer Container { get; private set; }
+        public static IContainer Container { get; private set; } = new Container();
 
         /// <summary>
         /// 初始化, 支持命令行参数
@@ -23,7 +23,17 @@ namespace Pingfan.Kit
             CatchGlobalException();
 
             var args = Environment.CommandLine;
-            if (args.Contains(" install"))
+            // 卸载服务
+            if (args.ContainsIgnoreCase(" uninstall") || args.ContainsIgnoreCase(" remove") ||
+                args.ContainsIgnoreCase(" disable"))
+            {
+                Log.Info(ServiceManager.Remove());
+                Environment.Exit(0);
+                return;
+            }
+
+            // 安装服务
+            if (args.Contains(" install") || args.ContainsIgnoreCase(" enable"))
             {
                 Log.Info(ServiceManager.Install());
 
@@ -31,13 +41,6 @@ namespace Pingfan.Kit
                 return;
             }
 
-            // 卸载服务
-            if (args.ContainsIgnoreCase(" uninstall") || args.ContainsIgnoreCase(" remove"))
-            {
-                Log.Info(ServiceManager.Remove());
-                Environment.Exit(0);
-                return;
-            }
 
             if (args.ContainsIgnoreCase(" start"))
             {
@@ -95,7 +98,6 @@ namespace Pingfan.Kit
         /// <typeparam name="T"></typeparam>
         public static void Run<T>() where T : class
         {
-            Container = new Container();
             Container.New<T>();
             Run();
         }

@@ -13,6 +13,10 @@ namespace Pingfan.Kit
         private readonly Dictionary<string, Section> _data;
         private readonly string _path;
 
+        /// <summary>
+        /// 当前配置文件目录
+        /// </summary>
+        /// <param name="path"></param>
         public IniFile(string path)
         {
             _data = new Dictionary<string, Section>(StringComparer.OrdinalIgnoreCase);
@@ -20,6 +24,9 @@ namespace Pingfan.Kit
             Load();
         }
 
+        /// <summary>
+        /// 获取配置值
+        /// </summary>
         public string GetValue(string section, string key, string defaultValue = "")
         {
             lock (_data)
@@ -36,6 +43,10 @@ namespace Pingfan.Kit
             }
         }
 
+        
+        /// <summary>
+        /// 设置配置值
+        /// </summary>
         public void SetValue(string section, string key, string value)
         {
             lock (_data)
@@ -49,6 +60,10 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 获取所有配置值
+        /// </summary>
+        /// <returns></returns>
         public string[] GetSectionNames()
         {
             lock (_data)
@@ -59,6 +74,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 载入配置
+        /// </summary>
         public void Load()
         {
             lock (_data)
@@ -104,6 +122,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 清空配置
+        /// </summary>
         public void Clear()
         {
             lock (_data)
@@ -112,6 +133,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 保存配置
+        /// </summary>
         public void Save()
         {
             lock (_data)

@@ -22,7 +22,7 @@ namespace Pingfan.Kit
         /// 当前配置文件绝对目录
         /// </summary>
         public static string MainConfigFilePath =>
-            PathEx.CombineFromCurrentDirectory("app.ini");
+            PathEx.CombineCurrentDirectory("app.ini");
 
         /// <summary>
         /// 缓存时间, 单位秒, 默认1秒

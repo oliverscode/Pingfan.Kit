@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
@@ -13,36 +12,15 @@ namespace Pingfan.Kit
     public static class PathEx
     {
         /// <summary>
-        /// 当前程序运行的目录, 会先获取当前进程的环境变量RootDir, 如果没有则获取当前启动程序的Assembly目录
+        /// 当前程序运行的目录, 结尾会有分隔符
         /// </summary>
-        public static string CurrentDirectory
-        {
-            get
-            {
-                // 先从环境变量中取
-                var path =
-                    Environment.GetEnvironmentVariable("RootDir", EnvironmentVariableTarget.Process);
-                
-                // 如果没有, 则从启动程序的Assembly目录中取
-                if (string.IsNullOrWhiteSpace(path))
-                    path = AppDomain.CurrentDomain.BaseDirectory;
+        public static string CurrentDirectory { get; set; } = AppDomain.CurrentDomain.BaseDirectory;
 
-                return path;
-            }
-        }
-
-        /// <summary>
-        /// 把当前程序目录设置到RootDir进程环境变量里
-        /// </summary>
-        public static void SetCurrentDirectory(string dir = "")
-        {
-            Environment.SetEnvironmentVariable("RootDir", CurrentDirectory, EnvironmentVariableTarget.Process);
-        }
 
         /// <summary>
         /// 从当前目录拼凑绝对路径
         /// </summary>
-        public static string CombineFromCurrentDirectory(params string[] paths)
+        public static string CombineCurrentDirectory(params string[] paths)
         {
             // 把当前目录加入到路径中
             var ps = new string[paths.Length + 1];
@@ -62,7 +40,7 @@ namespace Pingfan.Kit
             var ps = new List<string>();
             foreach (var path in paths)
             {
-                var p = path.Split(new [] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
+                var p = path.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
                 ps.AddRange(p);
             }
 
@@ -75,7 +53,6 @@ namespace Pingfan.Kit
                 result = separator + result;
             }
 #endif
-
             return result;
         }
 
@@ -87,7 +64,7 @@ namespace Pingfan.Kit
             path = Regex.Replace(path, @"(\\+)", @"\");
             path = Regex.Replace(path, @"(/+)", @"/");
 
-            return string.Join("\\", path.Split(new [] { '\\', '/' }, StringSplitOptions.None));
+            return string.Join('\\'.ToString(), path.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries));
         }
 
         /// <summary>
@@ -98,20 +75,20 @@ namespace Pingfan.Kit
             path = Regex.Replace(path, @"(\\+)", @"\");
             path = Regex.Replace(path, @"(/+)", @"/");
 
-            return string.Join("/", path.Split(new [] { '\\', '/' }, StringSplitOptions.None));
+            return string.Join('/'.ToString(), path.Split(new[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries));
         }
 
 
-        /// <summary>
-        /// 如果目录不存在就创建这个目录
-        /// </summary>
-        public static void CreateDirectoryIfNotExists(string path)
-        {
-            var dir = Path.GetDirectoryName(path);
-            if (Directory.Exists(dir) == false)
-            {
-                Directory.CreateDirectory(dir ?? throw new InvalidOperationException());
-            }
-        }
+        // /// <summary>
+        // /// 如果目录不存在就创建这个目录
+        // /// </summary>
+        // public static void CreateDirectoryIfNotExists(string path)
+        // {
+        //     var dir = Path.GetDirectoryName(path);
+        //     if (Directory.Exists(dir) == false)
+        //     {
+        //         Directory.CreateDirectory(dir ?? throw new InvalidOperationException());
+        //     }
+        // }
     }
 }

@@ -8,7 +8,7 @@ namespace Pingfan.Kit
     public static class ThreadEx
     {
         /// <summary>
-        /// 支持一个范围的延迟
+        /// 支持一个范围的随机延迟
         /// </summary>
         public static void Sleep(int minMilliseconds, int maxMilliseconds)
         {

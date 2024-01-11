@@ -25,9 +25,9 @@ namespace Pingfan.Kit
         /// <summary>
         /// 间隔1秒一直重试1个任务
         /// </summary>
-        public static async Task RunAsync(Func<Task> method)
+        public static Task RunAsync(Func<Task> method)
         {
-            await Run(int.MaxValue, 1000, method);
+            return RunAsync(int.MaxValue, 1000, method);
         }
 
         /// <summary>
