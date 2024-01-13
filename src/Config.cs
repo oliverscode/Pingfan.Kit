@@ -104,7 +104,8 @@ namespace Pingfan.Kit
             Set(key, defaultValue);
             return defaultValue;
         }
-
+        
+        
         /// <summary>
         /// 从命令行中取参数, 格式为: key=value
         /// </summary>
