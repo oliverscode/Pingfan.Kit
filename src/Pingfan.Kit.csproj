@@ -4,7 +4,7 @@
         <LangVersion>10</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>常用工具库, 大大提高工作效率</Description>
-        <PackageVersion>3.6.9</PackageVersion>
+        <PackageVersion>3.7.0</PackageVersion>
         <Authors>Oliver</Authors>
      
         <PackageProjectUrl>https://github.com/oliverscode/Pingfan.Kit</PackageProjectUrl>
@@ -21,7 +21,7 @@
      
         <PackageTags>Util,Kit,Tools</PackageTags>
      
-        <TargetFrameworks>net6.0;net8.0;net48</TargetFrameworks>
+        <TargetFrameworks>net48;net6.0;net8.0</TargetFrameworks>
      
         <Nullable>enable</Nullable>
     </PropertyGroup>
