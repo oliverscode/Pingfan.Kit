@@ -1,4 +1,5 @@
 using Pingfan.Kit;
+using Pingfan.Kit.Cache;
 using Pingfan.Kit.Inject;
 using Xunit.Abstractions;
 
@@ -386,6 +387,10 @@ public class UnitTest1
         result = new DD();
         container.InjectProperties(result);
         Assert.Equal("平凡", result.Name);
+
+
+        var cache = new CacheMemory();
+       
     }
 
     class DD

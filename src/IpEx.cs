@@ -63,7 +63,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 通过http://ip-api.com/json/获取Ip的物理地址, 每分钟最大45次请求
         /// </summary>
-        public static string? GetWanIpLocation(string ip, string lang = "zh-CN")
+        public static string? GetIpLocation(string ip, string lang = "zh-CN")
         {
             var url = $"http://ip-api.com/json/{ip}?lang={lang}";
             var html = Http.Get(url).Trim();

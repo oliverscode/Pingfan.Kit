@@ -29,7 +29,7 @@ namespace Pingfan.Kit.Cache
 
 
         /// <inheritdoc />
-        public T? Get<T>(string key, T? defaultValue = null) where T : class?
+        public T? Get<T>(string key, T? defaultValue = default) 
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
             return _tryGet<T>(key, out var item) ? item : defaultValue;
@@ -37,7 +37,7 @@ namespace Pingfan.Kit.Cache
 
 
         /// <inheritdoc />
-        public bool TryGet<T>(string key, out T? result, T? defaultValue = null) where T : class?
+        public bool TryGet<T>(string key, out T? result, T? defaultValue = default) 
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
@@ -52,7 +52,7 @@ namespace Pingfan.Kit.Cache
         }
 
         /// <inheritdoc />
-        public T? GetOrSet<T>(string key, Func<T?> valueFactory, float seconds = 1) where T : class?
+        public T? GetOrSet<T>(string key, Func<T?> valueFactory, float seconds = 1) 
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
             if (valueFactory == null) throw new ArgumentNullException(nameof(valueFactory));
@@ -70,7 +70,7 @@ namespace Pingfan.Kit.Cache
 
         /// <inheritdoc />
         public async Task<T?> GetOrSetAsync<T>(string key, Func<Task<T?>> valueFactory, float seconds = 1)
-            where T : class?
+            
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
             if (valueFactory == null) throw new ArgumentNullException(nameof(valueFactory));
@@ -95,7 +95,7 @@ namespace Pingfan.Kit.Cache
 
 
         /// <inheritdoc />
-        public void Set<T>(string key, T? data, float seconds) where T : class?
+        public void Set<T>(string key, T? data, float seconds) 
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
             var expirationDate = DateTime.UtcNow.AddSeconds(seconds);
@@ -105,7 +105,7 @@ namespace Pingfan.Kit.Cache
 
 
         /// <inheritdoc />
-        public bool Set<T>(string key, T? data) where T : class?
+        public bool Set<T>(string key, T? data) 
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
@@ -134,7 +134,7 @@ namespace Pingfan.Kit.Cache
 
 
         /// <inheritdoc />
-        public bool TryRemove<T>(string key, out T? result, T? defaultValue = null) where T : class?
+        public bool TryRemove<T>(string key, out T? result, T? defaultValue = default) 
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
@@ -185,7 +185,7 @@ namespace Pingfan.Kit.Cache
         }
 
 
-        private bool _tryGet<T>(string key, out T? data) where T : class?
+        private bool _tryGet<T>(string key, out T? data) 
         {
             data = default;
             if (_cacheMap.TryGetValue(key, out var item) && item.ExpireDateTime > DateTime.UtcNow)
