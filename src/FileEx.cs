@@ -132,7 +132,7 @@ namespace Pingfan.Kit
             {
                 RunWithRetry(() =>
                 {
-                    Directory.CreateDirectory(path);
+                    PathEx.CreateDirectoryIfNotExists(path);
                     File.WriteAllText(path, contents, encoding);
                 });
             }
@@ -150,7 +150,7 @@ namespace Pingfan.Kit
             {
                 RunWithRetry(() =>
                 {
-                    Directory.CreateDirectory(path);
+                    PathEx.CreateDirectoryIfNotExists(path);
                     File.WriteAllLines(path, contents, encoding);
                 });
             }
@@ -180,7 +180,7 @@ namespace Pingfan.Kit
             {
                 RunWithRetry(() =>
                 {
-                    Directory.CreateDirectory(path);
+                    PathEx.CreateDirectoryIfNotExists(path);
                     File.WriteAllBytes(path, bytes);
                 });
             }
@@ -198,7 +198,7 @@ namespace Pingfan.Kit
             {
                 RunWithRetry(() =>
                 {
-                    Directory.CreateDirectory(path);
+                    PathEx.CreateDirectoryIfNotExists(path);
                     File.AppendAllText(path, contents, encoding);
                 });
             }

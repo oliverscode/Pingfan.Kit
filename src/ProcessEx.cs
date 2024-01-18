@@ -42,7 +42,6 @@ namespace Pingfan.Kit
         public static bool IsWindows => Environment.OSVersion.Platform == PlatformID.Win32NT;
 
 
-#if net48 || NETCOREAPP
         /// <summary>
         /// 是否是管理员运行, 如果是linux则判断是否是root用户
         /// </summary>
@@ -84,7 +83,6 @@ namespace Pingfan.Kit
                 }
             }
         }
-#endif
 
 
         // 宏判断是否是windows系统

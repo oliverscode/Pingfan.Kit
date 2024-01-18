@@ -10,6 +10,15 @@ namespace Pingfan.Kit
     /// </summary>
     public static class ServiceManager
     {
+        static ServiceManager()
+        {
+            // 判断是否是管理员
+            if (!ProcessEx.IsAdmin)
+            {
+                Log.Fatal("Please run as administrator");
+            }
+        }
+
         /// <summary>
         /// 安装服务
         /// </summary>

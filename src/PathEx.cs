@@ -79,16 +79,16 @@ namespace Pingfan.Kit
         }
 
 
-        // /// <summary>
-        // /// 如果目录不存在就创建这个目录
-        // /// </summary>
-        // public static void CreateDirectoryIfNotExists(string path)
-        // {
-        //     var dir = Path.GetDirectoryName(path);
-        //     if (Directory.Exists(dir) == false)
-        //     {
-        //         Directory.CreateDirectory(dir ?? throw new InvalidOperationException());
-        //     }
-        // }
+        /// <summary>
+        /// 如果目录不存在就创建这个目录
+        /// </summary>
+        public static void CreateDirectoryIfNotExists(string path)
+        {
+            var dir = Path.GetDirectoryName(path);
+            if (Directory.Exists(dir) == false)
+            {
+                Directory.CreateDirectory(dir ?? throw new InvalidOperationException());
+            }
+        }
     }
 }
