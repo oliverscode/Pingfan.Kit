@@ -16,3 +16,5 @@ Desktop.ini
 *.log
 
 Public/
+TestRunOnline/
+test/
