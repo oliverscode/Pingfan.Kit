@@ -116,7 +116,7 @@ namespace Pingfan.Kit
         static Logger()
         {
             // 每60分钟清理一次日志
-            Timer.SetIntervalWithTry(1000 * 60 * 60, () =>
+            Timer.LoopWithTry(1000 * 60 * 60, () =>
             {
                 var now = DateTime.Now;
                 var dir = PathEx.CombineCurrentDirectory("log");

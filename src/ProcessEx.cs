@@ -3,6 +3,10 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+// ReSharper disable RedundantAssignment
+// ReSharper disable InlineOutVariableDeclaration
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
 
 namespace Pingfan.Kit
 {

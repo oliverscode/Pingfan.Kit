@@ -113,10 +113,9 @@ namespace Pingfan.Kit
             if (LeftTime == TimeSpan.MaxValue)
                 leftTime = "00:00";
             else if (LeftTime.TotalHours >= 1)
-                leftTime = string.Format("{0:D2}:{1:D2}:{2:D2}", LeftTime.TotalHours, LeftTime.Minutes,
-                    LeftTime.Seconds);
+                leftTime = $"{LeftTime.TotalHours:D2}:{LeftTime.Minutes:D2}:{LeftTime.Seconds:D2}";
             else
-                leftTime = string.Format("{0:D2}:{1:D2}", LeftTime.Minutes, LeftTime.Seconds);
+                leftTime = $"{LeftTime.Minutes:D2}:{LeftTime.Seconds:D2}";
 
 
             return $"{_current}/{Total} [{(int)Percent}%] left {leftTime} ({Speed:F1}/s)";

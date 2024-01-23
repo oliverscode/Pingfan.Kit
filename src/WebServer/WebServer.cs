@@ -8,19 +8,27 @@ using Pingfan.Kit.WebServer.Interfaces;
 
 namespace Pingfan.Kit.WebServer;
 
+/// <summary>
+/// Web服务器
+/// </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
 public class WebServer : IContainerReady
 {
-    private readonly HttpListener _httpListener = new HttpListener();
-    private readonly List<IMiddleware> _middlewares = new List<IMiddleware>();
+    private readonly HttpListener _httpListener = new();
+    private readonly List<IMiddleware> _middlewares = new();
 
     private static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+    
 
-    // // HTTP路由列表
-    // private readonly ConcurrentDictionary<string, Action<IHttpContext>> _httpMaps =
-    //     new(StringComparer.OrdinalIgnoreCase);
-
-
+    /// <summary>
+    /// 容器
+    /// </summary>
     [Inject] public IContainer Container { get; set; } = null!;
+    
+    
+    /// <summary>
+    /// 配置
+    /// </summary>
     public WebServerConfig Config { get; }
 
 
@@ -46,6 +54,9 @@ public class WebServer : IContainerReady
     public event Action<IContainer, IHttpContext, Exception>? RequestError;
 
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
     public WebServer(WebServerConfig config)
     {
         Config = config;
@@ -54,6 +65,7 @@ public class WebServer : IContainerReady
         _httpListener.Start();
     }
 
+    /// <inheritdoc />
     public void OnContainerReady()
     {
         StartListen();
@@ -89,23 +101,16 @@ public class WebServer : IContainerReady
 
         httpContainer.Register(httpListenerContext);
 
-        var httpContext = (IHttpContext)httpContainer.Get(Config.HttpContextType)!;
+        var httpContext = (IHttpContext)httpContainer.Get(Config.HttpContextType);
 
         try
         {
             if (IsWindows)
                 httpListenerContext.Response.Headers["Server"] = "";
             else
-                httpListenerContext.Response.Headers.Add("Server", Config.DefaultServerName);
+                httpListenerContext.Response.Headers["Server"] = Config.DefaultServerName;
             httpListenerContext.Response.Headers["Date"] = "";
 
-
-            // 如果http协议大于1.1 就启用SendChunked
-            // if (httpContext.Request.HttpListenerContext.Request.ProtocolVersion >= HttpVersion.Version11)
-            // {
-            //     httpListenerContext.Response.SendChunked = true;
-            //     httpContext.Response.KeepAlive = true;
-            // }
 
             this.BeginRequest?.Invoke(httpContainer, httpContext);
 
@@ -119,6 +124,7 @@ public class WebServer : IContainerReady
             {
                 if (midIndex < _middlewares.Count)
                 {
+                    // ReSharper disable once AccessToDisposedClosure
                     _middlewares[midIndex++].Invoke(httpContainer, httpContext, func!);
                 }
             };
@@ -145,31 +151,28 @@ public class WebServer : IContainerReady
         }
     }
 
+    /// <summary>
+    /// 添加中间件
+    /// </summary>
     public void Use(IMiddleware middleware)
     {
         _middlewares.Add(middleware);
     }
-
-    // /// <summary>
-    // /// 映射一个路由
-    // /// </summary>
-    // /// <param name="url"></param>
-    // /// <param name="fn"></param>
-    // public void Map(string url, Action<IHttpContext> fn)
-    // {
-    //     _httpMaps[url] = fn;
-    // }
 }
 
+/// <summary>
+/// 扩展
+/// </summary>
 public static class WebServerExtensions
 {
+    /// <summary>
+    /// 使用WebServer, 同时会注入WebServerConfig
+    /// </summary>
     public static WebServer UseWebServer(this IContainer container, Action<WebServerConfig> func)
     {
         var config = new WebServerConfig();
         func(config);
         container.Register(config);
-
-
         return container.New<WebServer>();
     }
 }

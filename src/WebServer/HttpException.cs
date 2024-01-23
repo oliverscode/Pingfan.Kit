@@ -14,9 +14,17 @@ public class HttpEndException : Exception
 /// </summary>
 public class HttpArgumentException : Exception
 {
+    /// <summary>
+    /// 参数类型
+    /// </summary>
     public Type Type { get; }
+
+    /// <summary>
+    /// 参数名
+    /// </summary>
     public string Name { get; }
 
+    /// <inheritdoc />
     public HttpArgumentException(string message, Type type, string name) : base(message)
     {
         Type = type;

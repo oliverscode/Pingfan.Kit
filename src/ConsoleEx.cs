@@ -91,8 +91,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// 输出一行
         /// </summary>
-        /// <param name="text"></param>
-        /// <param name="outColor"></param>
         public static void WriteLine(string? text = null, ConsoleColor outColor = ConsoleColor.DarkGray)
         {
             lock (Locker)

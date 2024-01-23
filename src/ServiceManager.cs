@@ -20,7 +20,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 安装服务
+        /// 安装服务, 不会自动启动
         /// </summary>
         public static string Install()
         {
@@ -47,7 +47,7 @@ namespace Pingfan.Kit
 
 
         /// <summary>
-        /// 卸载服务
+        /// 卸载服务, 如果没有停止, 需要手动停止
         /// </summary>
         /// <returns></returns>
         public static string Remove()
@@ -64,6 +64,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 启动服务
+        /// </summary>
         public static string Start()
         {
             GetServerInfo(out var serverPath, out var serverName);
@@ -78,6 +81,9 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 停止服务
+        /// </summary>
         public static string Stop()
         {
             GetServerInfo(out var serverPath, out var serverName);
@@ -92,6 +98,10 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 重启服务
+        /// </summary>
+        /// <returns></returns>
         public static string ReStart()
         {
             GetServerInfo(out var serverPath, out var serverName);
@@ -106,6 +116,10 @@ namespace Pingfan.Kit
             }
         }
 
+        /// <summary>
+        /// 查看服务状态
+        /// </summary>
+        /// <returns></returns>
         public static string Status()
         {
             GetServerInfo(out var serverPath, out var serverName);

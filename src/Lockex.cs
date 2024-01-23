@@ -49,6 +49,41 @@ namespace Pingfan.Kit
                 locker.Release();
             }
         }
+        
+        
+        /// <summary>
+        /// 本程序域为锁名, 不需区分大小写，执行action, 其实就是lock的语法糖
+        /// </summary>
+        public static void Run(Action action)
+        {
+            var locker = Get(AppDomain.CurrentDomain.FriendlyName);
+            locker.Wait();
+            try
+            {
+                action();
+            }
+            finally
+            {
+                locker.Release();
+            }
+        }
+
+        /// <summary>
+        /// 本程序域为锁名, 不需区分大小写，执行action, 其实就是lock的语法糖
+        /// </summary>
+        public static async Task RunAsync(Func<Task> action)
+        {
+            var locker = Get(AppDomain.CurrentDomain.FriendlyName);
+            await locker.WaitAsync();
+            try
+            {
+                await action();
+            }
+            finally
+            {
+                locker.Release();
+            }
+        }
 
         /// <summary>
         /// 获取Key为名的锁, 不区分大小写, 如果不存在则创建

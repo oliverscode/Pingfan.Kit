@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -115,12 +116,7 @@ namespace Pingfan.Kit
         public static string GetByCmd(string key, string defaultValue = "")
         {
             var m = Regex.Match(Environment.CommandLine, $@"{key}=(\S+)");
-            if (m.Success)
-            {
-                return m.Groups[1].Value;
-            }
-
-            return defaultValue;
+            return m.Success ? m.Groups[1].Value : defaultValue;
         }
 
         /// <summary>
@@ -153,7 +149,7 @@ namespace Pingfan.Kit
             return lines!.Any(line => line.StartsWith(key + "="));
         }
 
-        private static string[]? ReadLinesCache()
+        private static IEnumerable<string>? ReadLinesCache()
         {
             CacheLock.EnterUpgradeableReadLock();
             try

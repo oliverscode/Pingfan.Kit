@@ -23,7 +23,7 @@ namespace Pingfan.Kit
             var tasks = Enumerable.Range(0, threadCount)
                 .Select(_ => Task.Run(() =>
                 {
-                    while (queue.TryDequeue(out T data))
+                    while (queue.TryDequeue(out var data))
                     {
                         callBack(data);
                     }
@@ -44,7 +44,7 @@ namespace Pingfan.Kit
             var tasks = Enumerable.Range(0, threadCount)
                 .Select(_ => Task.Run(async () =>
                 {
-                    while (queue.TryDequeue(out T data))
+                    while (queue.TryDequeue(out var data))
                     {
                         await callBack(data);
                     }
@@ -58,8 +58,6 @@ namespace Pingfan.Kit
         /// </summary>
         public static T RandomOne<T>(this IEnumerable<T> collection)
         {
-            var arr = new int[]{
-            };
             var list = collection as IList<T> ?? collection.ToList();
             var index = RandomEx.Next(0, list.Count);
             return list[index];

@@ -10,12 +10,17 @@ namespace Pingfan.Kit
     public class App
     {
         /// <summary>
+        /// 未处理的异常
+        /// </summary>
+        public static Action<Exception> OnError { get; set; } = (e) => { Log.Fatal(e.ToString()); };
+        
+        /// <summary>
         /// 根容器
         /// </summary>
         public static IContainer Container { get; private set; } = new Container();
 
         /// <summary>
-        /// 初始化, 支持命令行参数
+        /// 初始化, 捕获全局异常, 如果有异常会记录日志并退出程序, 同时支持命令行参数进行安装, 卸载, 启动, 停止, 重启, 状态
         /// </summary>
         public static void Init()
         {
@@ -71,10 +76,7 @@ namespace Pingfan.Kit
             }
         }
 
-        /// <summary>
-        /// 未处理的异常
-        /// </summary>
-        public static Action<Exception> OnError { get; set; } = (e) => { Log.Fatal(e.ToString()); };
+
 
         private static void CatchGlobalException()
         {

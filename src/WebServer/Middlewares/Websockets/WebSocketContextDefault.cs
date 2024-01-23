@@ -7,15 +7,26 @@ using Pingfan.Kit.WebServer.Interfaces;
 
 namespace Pingfan.Kit.WebServer.Middlewares.Websockets;
 
+/// <summary>
+/// WebSocket上下文默认实现
+/// </summary>
 public class WebSocketContextDefault : IWebSocketContext
 {
     private readonly IHttpResponse _httpResponse;
     private WebSocket? _webSocket;
 
+    /// <inheritdoc />
     public Encoding Encoding { get; set; }
+
+    /// <inheritdoc />
     public string Protocol => this.HttpListenerWebSocketContext.WebSocket.SubProtocol!;
+
+    /// <summary>
+    /// HttpListenerWebSocketContext实例
+    /// </summary>
     public readonly HttpListenerWebSocketContext HttpListenerWebSocketContext;
 
+    /// <inheritdoc />
     public WebSocket WebSocket
     {
         get
@@ -27,8 +38,12 @@ public class WebSocketContextDefault : IWebSocketContext
         set => _webSocket = value;
     }
 
+    /// <inheritdoc />
     public bool IsAvailable => this.HttpListenerWebSocketContext.WebSocket.State == WebSocketState.Open;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
     public WebSocketContextDefault(
         HttpListenerWebSocketContext httpListenerWebSocketContext,
         IHttpResponse httpResponse,
@@ -39,6 +54,7 @@ public class WebSocketContextDefault : IWebSocketContext
         Encoding = encoding;
     }
 
+    /// <inheritdoc />
     public void Send(object json)
     {
         if (this.IsAvailable == false) return;
@@ -46,6 +62,7 @@ public class WebSocketContextDefault : IWebSocketContext
         Send(txt);
     }
 
+    /// <inheritdoc />
     public void Send(string message)
     {
         if (this.IsAvailable == false) return;
@@ -54,7 +71,7 @@ public class WebSocketContextDefault : IWebSocketContext
             true, CancellationToken.None);
     }
 
-
+    /// <inheritdoc />
     public void Send(byte[] data)
     {
         if (this.IsAvailable == false) return;
@@ -62,29 +79,35 @@ public class WebSocketContextDefault : IWebSocketContext
             true, CancellationToken.None);
     }
 
+    /// <inheritdoc />
     public void Close()
     {
         if (this.IsAvailable == false) return;
         this.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Close", CancellationToken.None);
     }
 
+    /// <inheritdoc />
     public virtual bool OnCheck(string protocol)
     {
         return false;
     }
 
+    /// <inheritdoc />
     public virtual void OnOpen()
     {
     }
 
+    /// <inheritdoc />
     public virtual void OnClose()
     {
     }
 
+    /// <inheritdoc />
     public virtual void OnBinary(byte[] data)
     {
     }
 
+    /// <inheritdoc />
     public virtual void OnMessage(string message)
     {
     }

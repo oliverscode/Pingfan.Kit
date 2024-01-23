@@ -10,7 +10,6 @@ namespace Pingfan.Kit
     /// </summary>
     public static class FunctionEx
     {
-        
         private enum FnKind
         {
             /// <summary>
@@ -23,48 +22,40 @@ namespace Pingfan.Kit
             /// </summary>
             Throttle,
         }
-        private class DataItem
-        {
-            public Task Timer = null!;
-            public CancellationTokenSource Cts = null!;
-        }
-        
-        
-        private static readonly ConcurrentDictionary<string, DataItem> List =
-            new ConcurrentDictionary<string, DataItem>(StringComparer.OrdinalIgnoreCase);
+
+
+        private static readonly ConcurrentDictionary<string, CancellationTokenSource> List =
+            new(StringComparer.OrdinalIgnoreCase);
 
         private static void Fn(string key, int delay, FnKind fnKind, Delegate action, params object?[]? args)
         {
-            // var key = action.GetMethodInfo().Name;
             if (List.TryGetValue(key, out var item))
             {
-                if (fnKind == FnKind.Debounce)
-                {
-                    item.Cts.Cancel();
-                    List.TryRemove(key, out _);
-                }
-                else if (fnKind == FnKind.Throttle)
+                if (fnKind == FnKind.Throttle)
                 {
                     return;
                 }
+
+                if (fnKind == FnKind.Debounce)
+                {
+                    if (List.TryRemove(key, out _))
+                    {
+                        item.Cancel();
+                    }
+                }
+
             }
 
-            var cts = new CancellationTokenSource();
-            var timer = Timer.SetTimeout(delay, () =>
+            var tokenSource = Timer.Loop(delay, () =>
             {
                 action.DynamicInvoke(args);
                 List.TryRemove(key, out _);
-            }, cts.Token);
-            List[key] = new DataItem
-            {
-                Timer = timer,
-                Cts = cts
-            };
+            });
+            List[key] = tokenSource;
         }
-        
+
         #region 防抖器部分
 
-        
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
@@ -217,7 +208,8 @@ namespace Pingfan.Kit
         /// <summary>
         /// 防抖器, 一定时间内只执行最后一次
         /// </summary>
-        public static void Debounce<T1, T2, T3>(string key, int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2, T3 p3)
+        public static void Debounce<T1, T2, T3>(string key, int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2,
+            T3 p3)
         {
             Fn(key, delay, FnKind.Debounce, action, p1, p2, p3);
         }
@@ -314,10 +306,11 @@ namespace Pingfan.Kit
         {
             Fn(key, delay, FnKind.Debounce, action, p1, p2, p3, p4, p5, p6, p7, p8, p9);
         }
+
         #endregion
 
         #region 节流器部分
-        
+
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
@@ -470,7 +463,8 @@ namespace Pingfan.Kit
         /// <summary>
         /// 节流器, 一定时间内只执行一次
         /// </summary>
-        public static void Throttle<T1, T2, T3>(string key, int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2, T3 p3)
+        public static void Throttle<T1, T2, T3>(string key, int delay, Func<T1, T2, T3, Task> action, T1 p1, T2 p2,
+            T3 p3)
         {
             Fn(key, delay, FnKind.Throttle, action, p1, p2, p3);
         }
@@ -569,6 +563,5 @@ namespace Pingfan.Kit
         }
 
         #endregion
-        
     }
 }

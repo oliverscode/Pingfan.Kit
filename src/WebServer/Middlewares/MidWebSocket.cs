@@ -44,7 +44,7 @@ public class MidWebSocket : IMiddleware
         container.Register(listenerWebSocketContext);
         container.Register(Encoding);
         var webSocketContext = (IWebSocketContext)container.New(item.InstanceType);
-        if (webSocketContext.OnCheck(protocol) == false)
+        if (webSocketContext.OnCheck(protocol!) == false)
         {
             return;
         }

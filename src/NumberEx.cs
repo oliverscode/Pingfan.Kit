@@ -131,7 +131,7 @@ namespace Pingfan.Kit
             }
             else
             {
-                return (T)Enum.GetValues(typeof(T)).GetValue(0);
+                return (T)Enum.GetValues(typeof(T)).GetValue(0)!;
             }
         }
     }

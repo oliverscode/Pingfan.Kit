@@ -90,14 +90,11 @@ namespace Pingfan.Kit
                 var output = sb.ToString();
                 return output;
             }
-
             finally
             {
                 process?.Kill();
                 process?.Dispose();
             }
-
-            return string.Empty;
         }
     }
 }

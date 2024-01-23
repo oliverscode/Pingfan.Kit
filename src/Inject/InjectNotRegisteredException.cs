@@ -7,6 +7,9 @@ namespace Pingfan.Kit.Inject
     /// </summary>
     public class InjectNotRegisteredException : Exception
     {
+        /// <summary>
+        /// 需要提取的类型
+        /// </summary>
         public InjectPop Pop { get; set; }
 
         /// <inheritdoc />

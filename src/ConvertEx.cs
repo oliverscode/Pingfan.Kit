@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+#pragma warning disable SYSLIB0011
 
 namespace Pingfan.Kit
 {
@@ -16,7 +17,6 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="obj">能序列化的对象</param>
         /// <returns></returns>
-        [Obsolete("Obsolete")]
         public static byte[] ToBytes(object obj)
         {
             using var ms = new MemoryStream();
@@ -30,7 +30,6 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="bytes"></param>
         /// <returns></returns>
-        [Obsolete("Obsolete")]
         public static object ToObject(byte[] bytes)
         {
             using var ms = new MemoryStream(bytes);
@@ -44,7 +43,6 @@ namespace Pingfan.Kit
         /// <param name="bytes"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        [Obsolete("Obsolete")]
         public static T ToObject<T>(byte[] bytes) 
         {
             using var ms = new MemoryStream(bytes);
@@ -52,7 +50,6 @@ namespace Pingfan.Kit
             return ((T)ChangeType(formatter.Deserialize(ms), typeof(T))!);
         }
 
-        [Obsolete("Obsolete")]
         private static IFormatter GetFormatter()
         {
             return new BinaryFormatter { Binder = new VersionDeserializer() };

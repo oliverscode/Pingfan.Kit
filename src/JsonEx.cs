@@ -1,5 +1,8 @@
 ﻿
 
+using System;
+#pragma warning disable CS0612 // Type or member is obsolete
+
 namespace Pingfan.Kit
 {
     using System.Text.Unicode;
@@ -13,7 +16,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// JSON序列化配置
         /// </summary>
-        public static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions()
+        [Obsolete] public static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions()
         {
             // 中文支持
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(UnicodeRanges.All),
@@ -88,12 +91,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 获取JsonElement的值
         /// </summary>
-        /// <param name="jObject"></param>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static T Get<T>(this JsonElement jObject, string key, T defaultValue = default(T))
+        public static T? Get<T>(this JsonElement jObject, string key, T? defaultValue = default)
         {
             try
             {

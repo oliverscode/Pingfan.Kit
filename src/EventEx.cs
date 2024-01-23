@@ -257,7 +257,7 @@ namespace Pingfan.Kit
 
         public void Emit(string eventName, params object[] args)
         {
-            if (!_actions.TryGetValue(eventName, out List<EventAction> eventsActions))
+            if (!_actions.TryGetValue(eventName, out var eventsActions))
                 return;
 
             var removeList = new List<EventAction>();

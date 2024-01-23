@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+// ReSharper disable FunctionNeverReturns
 
 namespace Pingfan.Kit
 {

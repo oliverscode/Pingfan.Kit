@@ -1,15 +1,3 @@
-/// <summary>
-/// 类说明：HttpHelper类，用来实现Http访问，Post或者Get方式的，直接访问，带Cookie的，带证书的等方式，可以设置代理
-/// 重要提示：请不要自行修改本类，如果因为你自己修改后将无法升级到新版本。如果确实有什么问题请到官方网站提建议，
-/// 我们一定会及时修改
-/// 编码日期：2011-09-20
-/// 编 码 人：苏飞
-/// 联系方式：361983679
-/// 官方网址：http://www.sufeinet.com/thread-3-1-1.html
-/// 修改日期：2023-06-12
-/// 版 本 号：2.3.7
-/// </summary>
-
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -19,6 +7,11 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
+#pragma warning disable CS8601 // Possible null reference assignment.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable SYSLIB0014
+#pragma warning disable CS8622 // Nullability of reference types in type of parameter doesn't match the target delegate (possibly because of nullability attributes).
+
 // ReSharper disable All
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
@@ -65,8 +58,6 @@ namespace Pingfan.Kit
             };
             return _httpHelper.GetHtml(httpItem).Html;
         }
-
-      
     }
 
     /// <summary>
@@ -801,7 +792,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        //     获取或设置用于请求的 HTTP 版本。返回结果:用于请求的 HTTP 版本。默认为 System.Net.HttpVersion.Version11。
+        /// 获取或设置用于请求的 HTTP 版本。返回结果:用于请求的 HTTP 版本。默认为 System.Net.HttpVersion.Version11。
         /// </summary>
         public Version ProtocolVersion { get; set; }
 

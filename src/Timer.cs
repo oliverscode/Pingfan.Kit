@@ -17,34 +17,29 @@ namespace Pingfan.Kit
         /// <summary>
         /// 创建一个定时器，但只执行1次
         /// </summary>
-        public static Task SetTimeout(
-            int milliSecond,
-            Action method,
-            CancellationToken cancellationToken = default
-        )
+        public static CancellationTokenSource Once(int milliSecond, Action method)
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                await Task.Delay(milliSecond, cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
+                await Task.Delay(milliSecond, token.Token);
+                if (token.IsCancellationRequested)
                     return;
                 method();
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            }, token.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            return token;
         }
 
         /// <summary>
         /// 创建一个定时器，但只执行1次, 同时不抛出异常
         /// </summary>
-        public static Task SetTimeoutWithTry(
-            int milliSecond,
-            Action method,
-            CancellationToken cancellationToken = default
-        )
+        public static CancellationTokenSource OnceWithTry(int milliSecond, Action method)
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                await Task.Delay(milliSecond, cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
+                await Task.Delay(milliSecond, token.Token);
+                if (token.IsCancellationRequested)
                     return;
 
                 try
@@ -55,22 +50,23 @@ namespace Pingfan.Kit
                 {
                     OnError?.Invoke(e);
                 }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            }, token.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            return token;
         }
 
         /// <summary>
         /// 创建一个定时器，但只执行1次, 同时不抛出异常
         /// </summary>
-        public static Task SetTimeoutWithTryAsync(
+        public static CancellationTokenSource OnceWithTryAsync(
             int milliSecond,
-            Func<Task> method,
-            CancellationToken cancellationToken = default
+            Func<Task> method
         )
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                await Task.Delay(milliSecond, cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
+                await Task.Delay(milliSecond, token.Token);
+                if (token.IsCancellationRequested)
                     return;
                 try
                 {
@@ -80,42 +76,38 @@ namespace Pingfan.Kit
                 {
                     OnError?.Invoke(e);
                 }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            }, token.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            return token;
         }
 
         /// <summary>
         /// 创建一个定时器
         /// </summary>
-        public static Task SetInterval(
-            int milliSecond,
-            Action method,
-            CancellationToken cancellationToken = default
-        )
+        public static CancellationTokenSource Loop(int milliSecond, Action method)
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                while (cancellationToken.IsCancellationRequested == false)
+                while (token.IsCancellationRequested == false)
                 {
                     method();
-                    if (cancellationToken.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                         return;
-                    await Task.Delay(milliSecond, cancellationToken);
+                    await Task.Delay(milliSecond, token.Token);
                 }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }, token.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            return token;
         }
 
         /// <summary>
         /// 创建一个定时器, 同时不抛出异常
         /// </summary>
-        public static Task SetIntervalWithTry(
-            int milliSecond,
-            Action method,
-            CancellationToken cancellationToken = default
-        )
+        public static CancellationTokenSource LoopWithTry(int milliSecond, Action method)
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                while (cancellationToken.IsCancellationRequested == false)
+                while (token.IsCancellationRequested == false)
                 {
                     try
                     {
@@ -126,45 +118,43 @@ namespace Pingfan.Kit
                         OnError?.Invoke(e);
                     }
 
-                    if (cancellationToken.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                         return;
-                    await Task.Delay(milliSecond, cancellationToken);
+                    await Task.Delay(milliSecond, token.Token);
                 }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }, token.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            return token;
         }
 
         /// <summary>
         /// 创建一个定时器
         /// </summary>
-        public static Task SetIntervalAsync(
-            int milliSecond,
-            Func<Task> method,
-            CancellationToken cancellationToken = default
-        )
+        public static CancellationTokenSource LoopAsync(int milliSecond, Func<Task> method)
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                while (cancellationToken.IsCancellationRequested == false)
+                while (token.IsCancellationRequested == false)
                 {
                     await method();
-                    if (cancellationToken.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                         return;
-                    await Task.Delay(milliSecond, cancellationToken);
+                    await Task.Delay(milliSecond, token.Token);
                 }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            }, token.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            return token;
         }
 
 
         /// <summary>
         /// 创建一个定时器, 同时不抛出异常
         /// </summary>
-        public static Task SetIntervalWithTryAsync(int milliSecond,
-            Func<Task> method,
-            CancellationToken cancellationToken = default)
+        public static CancellationTokenSource LoopWithTryAsync(int milliSecond, Func<Task> method)
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                while (cancellationToken.IsCancellationRequested == false)
+                while (token.IsCancellationRequested == false)
                 {
                     try
                     {
@@ -175,128 +165,116 @@ namespace Pingfan.Kit
                         OnError?.Invoke(e);
                     }
 
-                    if (cancellationToken.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                         return;
-                    await Task.Delay(milliSecond, cancellationToken);
+                    await Task.Delay(milliSecond, token.Token);
                 }
-            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            }, token.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            return token;
         }
 
         /// <summary>
         /// 准点执行, 不能在夏令时地区使用, hour, minute, second为-1时, 则会忽略该参数
         /// </summary>
-        public static Task SetTime(
-            int hour,
-            int minute,
-            int second,
-            Action method,
-            CancellationToken cancellationToken = default
-        )
+        public static CancellationTokenSource At(int hour, int minute, int second, Action method)
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                while (cancellationToken.IsCancellationRequested == false)
+                while (token.IsCancellationRequested == false)
                 {
                     var now = DateTime.Now;
                     if (hour != -1 && now.Hour != hour)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
                     if (minute != -1 && now.Minute != minute)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
                     if (second != -1 && now.Second != second)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
                     method();
-                    if (cancellationToken.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                         return;
-                    await Task.Delay(1000, cancellationToken);
+                    await Task.Delay(1000, token.Token);
                 }
-            }, cancellationToken);
+            }, token.Token);
+            return token;
         }
 
         /// <summary>
         /// 准点执行, 不能在夏令时地区使用, hour, minute, second为-1时, 则会忽略该参数
         /// </summary>
-        public static Task SetTimeAsync(
-            int hour,
-            int minute,
-            int second,
-            Func<Task> method,
-            CancellationToken cancellationToken = default
-        )
+        public static CancellationTokenSource AtAsync(int hour, int minute, int second, Func<Task> method)
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                while (cancellationToken.IsCancellationRequested == false)
+                while (token.IsCancellationRequested == false)
                 {
                     var now = DateTime.Now;
                     if (hour != -1 && now.Hour != hour)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
                     if (minute != -1 && now.Minute != minute)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
                     if (second != -1 && now.Second != second)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
                     await method();
-                    if (cancellationToken.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                         return;
-                    await Task.Delay(1000, cancellationToken);
+                    await Task.Delay(1000, token.Token);
                 }
-            }, cancellationToken);
+            }, token.Token);
+            return token;
         }
 
         /// <summary>
         /// 准点执行, 不能在夏令时地区使用, hour, minute, second为-1时, 则会忽略该参数
         /// </summary>
-        public static Task SetTimeWithTry(
-            int hour,
-            int minute,
-            int second,
-            Action method,
-            CancellationToken cancellationToken = default
-        )
+        public static CancellationTokenSource AtWithTry(int hour, int minute, int second, Action method)
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                while (cancellationToken.IsCancellationRequested == false)
+                while (token.IsCancellationRequested == false)
                 {
                     var now = DateTime.Now;
                     if (hour != -1 && now.Hour != hour)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
                     if (minute != -1 && now.Minute != minute)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
                     if (second != -1 && now.Second != second)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
@@ -309,44 +287,40 @@ namespace Pingfan.Kit
                         OnError?.Invoke(e);
                     }
 
-                    if (cancellationToken.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                         return;
-                    await Task.Delay(1000, cancellationToken);
+                    await Task.Delay(1000, token.Token);
                 }
-            }, cancellationToken);
+            }, token.Token);
+            return token;
         }
 
         /// <summary>
         /// 准点执行, 不能在夏令时地区使用, hour, minute, second为-1时, 则会忽略该参数
         /// </summary>
-        public static Task SetTimeWithTryAsync(
-            int hour,
-            int minute,
-            int second,
-            Func<Task> method,
-            CancellationToken cancellationToken = default
-        )
+        public static CancellationTokenSource AtWithTryAsync(int hour, int minute, int second, Func<Task> method)
         {
-            return Task.Factory.StartNew(async () =>
+            var token = new CancellationTokenSource();
+            Task.Factory.StartNew(async () =>
             {
-                while (cancellationToken.IsCancellationRequested == false)
+                while (token.IsCancellationRequested == false)
                 {
                     var now = DateTime.Now;
                     if (hour != -1 && now.Hour != hour)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
                     if (minute != -1 && now.Minute != minute)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
                     if (second != -1 && now.Second != second)
                     {
-                        await Task.Delay(1000, cancellationToken);
+                        await Task.Delay(1000, token.Token);
                         continue;
                     }
 
@@ -359,11 +333,12 @@ namespace Pingfan.Kit
                         OnError?.Invoke(e);
                     }
 
-                    if (cancellationToken.IsCancellationRequested)
+                    if (token.IsCancellationRequested)
                         return;
-                    await Task.Delay(1000, cancellationToken);
+                    await Task.Delay(1000, token.Token);
                 }
-            }, cancellationToken);
+            }, token.Token);
+            return token;
         }
     }
 }

@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Reflection;
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 namespace Pingfan.Kit.Inject
 {
+    /// <summary>
+    /// 依赖注入接口的缓存
+    /// </summary>
     public static class InjectCache
     {
         // 线程安全的集合
@@ -87,6 +92,10 @@ namespace Pingfan.Kit.Inject
     }
 
 
+    /// <summary>
+    /// 依赖注入接口的缓存
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public static class InjectCache<T> where T : Attribute
     {
        

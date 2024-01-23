@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+#pragma warning disable SYSLIB0021
 
 namespace Pingfan.Kit
 {
@@ -23,7 +25,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// DES加密
         /// </summary>
-        /// <param name="buffer"></param>
         public static byte[] Encrypt(byte[] buffer)
         {
             var des = new DESCryptoServiceProvider
@@ -48,8 +49,6 @@ namespace Pingfan.Kit
         /// <summary>
         /// DES解密
         /// </summary>
-        /// <param name="buffer"></param>
-        /// <returns></returns>
         public static byte[] Decrypt(byte[] buffer)
         {
             var des = new DESCryptoServiceProvider
@@ -74,24 +73,20 @@ namespace Pingfan.Kit
         /// <summary>
         /// DES加密字符串
         /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
         public static string Encrypt(string str)
         {
             var buffer = Encoding.UTF8.GetBytes(str);
             buffer = Encrypt(buffer);
-            var result = System.Convert.ToBase64String(buffer);
+            var result = Convert.ToBase64String(buffer);
             return result;
         }
 
         /// <summary>
         /// DES解密字符串
         /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
         public static string Decrypt(string str)
         {
-            var buffer = System.Convert.FromBase64String(str);
+            var buffer = Convert.FromBase64String(str);
             buffer = Decrypt(buffer);
             var result = Encoding.UTF8.GetString(buffer);
             return result;
@@ -106,12 +101,14 @@ namespace Pingfan.Kit
         /// <summary>
         /// 密钥长度必须是 16、24 或 32 位
         /// </summary>
-        public static readonly byte[] Key = new byte[] { 0x8B, 0x4A, 0x2E, 0x3D, 0x78, 0x4F, 0x2C, 0x67, 0x1A, 0xAB, 0x19, 0x59, 0xE0, 0x7F, 0x1F, 0x88 };
+        public static readonly byte[] Key = new byte[]
+            { 0x8B, 0x4A, 0x2E, 0x3D, 0x78, 0x4F, 0x2C, 0x67, 0x1A, 0xAB, 0x19, 0x59, 0xE0, 0x7F, 0x1F, 0x88 };
 
         /// <summary>
         /// 偏移量长度必须是 16 位
         /// </summary>
-        public static readonly byte[] Iv = new byte[] { 0xA3, 0x6B, 0x7D, 0x45, 0x50, 0xC4, 0x8A, 0x90, 0xC6, 0x1D, 0x04, 0x9D, 0x3B, 0x13, 0x16, 0x4C };
+        public static readonly byte[] Iv = new byte[]
+            { 0xA3, 0x6B, 0x7D, 0x45, 0x50, 0xC4, 0x8A, 0x90, 0xC6, 0x1D, 0x04, 0x9D, 0x3B, 0x13, 0x16, 0x4C };
 
         /// <summary>
         /// AES 加密
@@ -132,6 +129,7 @@ namespace Pingfan.Kit
                 cs.Write(buffer, 0, buffer.Length);
                 cs.FlushFinalBlock();
             }
+
             buffer = ms.ToArray();
 
             return buffer;
@@ -156,6 +154,7 @@ namespace Pingfan.Kit
                 cs.Write(buffer, 0, buffer.Length);
                 cs.FlushFinalBlock();
             }
+
             buffer = ms.ToArray();
 
             return buffer;
@@ -170,7 +169,7 @@ namespace Pingfan.Kit
         {
             var buffer = Encoding.UTF8.GetBytes(str);
             buffer = Encrypt(buffer);
-            var result = System.Convert.ToBase64String(buffer);
+            var result = Convert.ToBase64String(buffer);
             return result;
         }
 

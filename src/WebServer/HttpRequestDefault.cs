@@ -9,23 +9,36 @@ using Pingfan.Kit.WebServer.Interfaces;
 
 namespace Pingfan.Kit.WebServer;
 
+/// <summary>
+/// HTTP默认请求
+/// </summary>
 public class HttpRequestDefault : IHttpRequest
 {
+    /// <inheritdoc />
     public HttpListenerContext HttpListenerContext { get; }
+
+    /// <summary>
+    /// HttpListenerRequest
+    /// </summary>
     public HttpListenerRequest HttpListenerRequest => HttpListenerContext.Request;
 
+    /// <summary>
+    /// 构造函数
+    /// </summary>
     public HttpRequestDefault(HttpListenerContext httpListenerContext)
     {
         HttpListenerContext = httpListenerContext;
     }
 
+    /// <summary>
+    /// 关闭连接并且释放
+    /// </summary>
     public void Dispose()
     {
         try
         {
             InputStream.Dispose();
             HttpListenerContext.Request.InputStream.Dispose();
-         
         }
         catch
         {
@@ -34,10 +47,12 @@ public class HttpRequestDefault : IHttpRequest
     }
 
 
+    /// <inheritdoc />
     public Uri Url => HttpListenerRequest.Url!;
 
     private string _path = null!;
 
+    /// <inheritdoc />
     public string Path
     {
         get
@@ -54,27 +69,34 @@ public class HttpRequestDefault : IHttpRequest
         set => _path = value;
     }
 
+    /// <inheritdoc />
     public string Method => HttpListenerRequest.HttpMethod.ToUpper();
 
+    /// <inheritdoc />
     public Stream InputStream => HttpListenerRequest.InputStream;
 
+    /// <inheritdoc />
     public NameValueCollection Headers => HttpListenerRequest.Headers;
-    public string UserAgent => HttpListenerRequest.UserAgent;
+
+    /// <inheritdoc />
+    public string UserAgent => HttpListenerRequest.UserAgent ?? "";
 
 
-    private string? _ip;
+    private string _ip = "";
 
+    /// <inheritdoc />
     public string Ip
     {
         get
         {
-            if (!string.IsNullOrEmpty(_ip)) return _ip;
+            if (!string.IsNullOrEmpty(_ip))
+                return _ip!;
             string[] ipHeads = { "CF-Connecting-IP", "X_FORWARDED_FOR", "X-Forwarded-For", "X-Real-IP" };
             var ips = ipHeads.Select(head => HttpListenerRequest.Headers[head])
                 .Where(t => string.IsNullOrEmpty(t) == false)
                 .ToList();
 
-            ips.Add(HttpListenerRequest.RemoteEndPoint.Address.ToString());
+            ips.Add(HttpListenerRequest.RemoteEndPoint?.Address?.ToString() ?? string.Empty);
 
             // 只需要第一个IP
             foreach (var m in ips.Select(ip => Regex.Match(ip!, @"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"))
@@ -84,17 +106,18 @@ public class HttpRequestDefault : IHttpRequest
                 break;
             }
 
-            return _ip;
+            return _ip!;
         }
     }
 
-    private string? _device;
+    private string? _device = "";
 
+    /// <inheritdoc />
     public string Device
     {
         get
         {
-            if (!string.IsNullOrEmpty(_device)) return _device;
+            if (!string.IsNullOrEmpty(_device)) return _device!;
 
 
             if (HttpListenerRequest.UserAgent!.IndexOf("Android", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -118,13 +141,14 @@ public class HttpRequestDefault : IHttpRequest
     }
 
 
-    private string? _queryString;
+    private string? _queryString = "";
 
+    /// <inheritdoc />
     public string QueryString
     {
         get
         {
-            if (string.IsNullOrEmpty(_queryString) == false) return _queryString;
+            if (string.IsNullOrEmpty(_queryString) == false) return _queryString!;
             if (HttpListenerRequest.Url == null) return "";
 
             _queryString = HttpListenerRequest.Url.Query;
@@ -137,6 +161,7 @@ public class HttpRequestDefault : IHttpRequest
 
     private string? _postString;
 
+    /// <inheritdoc />
     public string Body
     {
         get
@@ -149,13 +174,16 @@ public class HttpRequestDefault : IHttpRequest
         set => _postString = value;
     }
 
+    /// <inheritdoc />
     public CookieCollection Cookies => HttpListenerRequest.Cookies;
 
+    /// <inheritdoc />
     public string? Get(string key)
     {
         return GetValue(QueryString, key)!;
     }
 
+    /// <inheritdoc />
     public string? Form(string key)
     {
         return GetValue(Body, key)!;
@@ -163,6 +191,7 @@ public class HttpRequestDefault : IHttpRequest
 
     private JsonDocument? _json;
 
+    /// <inheritdoc />
     public JsonDocument? Json
     {
         get
@@ -181,12 +210,14 @@ public class HttpRequestDefault : IHttpRequest
         }
     }
 
+    /// <inheritdoc />
     public string? GetCookie(string key)
     {
         var cookie = HttpListenerRequest.Cookies[key];
         return cookie?.Value;
     }
 
+    /// <inheritdoc />
     public string? this[string key]
     {
         // post->get->cookie->header

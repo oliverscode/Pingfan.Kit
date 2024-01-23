@@ -130,7 +130,7 @@ public class MidApi : IMiddleware
                     args[i] = BigInteger.Parse(value!);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new HttpArgumentException($"{parameterInfo.Name}参数不正确", parameterInfo.ParameterType,
                     parameterInfo.Name!);
@@ -147,7 +147,7 @@ public class MidApi : IMiddleware
                     requestModel =
                         (IMidRequestModel)JsonSerializer.Deserialize(ctx.Request.Body, parameterInfo.ParameterType)!;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     throw new HttpArgumentException($"{parameterInfo.Name}参数不正确", parameterInfo.ParameterType,
                         parameterInfo.Name!);

@@ -27,10 +27,10 @@ public class MidError : IMiddleware
         {
             next();
         }
-        catch (HttpEndException e)
+        catch (HttpEndException)
         {
         }
-        catch (HttpArgumentException e)
+        catch (HttpArgumentException)
         {
             
         }

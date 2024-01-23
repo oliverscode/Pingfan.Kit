@@ -40,23 +40,23 @@ namespace Pingfan.Kit
                 "http://ip-api.com/json/",
                 "http://icanhazip.com",
             };
+            var http = new HttpHelper();
+            
             foreach (var url in urls)
             {
-                try
+                var item = new HttpItem
                 {
-                    var html = Http.Get(url).Trim();
-                    var ip = html.Match(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}").FirstOrDefault();
-                    if (!string.IsNullOrEmpty(ip))
-                    {
-                        return ip;
-                    }
-                }
-                catch
+                    URL = url,
+                    Timeout = 2000
+                };
+                var html = http.GetHtml(item).Html;
+                var ip = html.Match(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}").FirstOrDefault();
+                if (!string.IsNullOrEmpty(ip))
                 {
-                    // ignored
+                    return ip;
                 }
             }
-
+            
             return null;
         }
 
