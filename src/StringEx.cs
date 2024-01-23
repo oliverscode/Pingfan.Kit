@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -52,53 +53,40 @@ namespace Pingfan.Kit
         /// <summary>
         /// 是否为NULL或者空字符串
         /// </summary>
-        public static bool IsNullOrEmpty(this string? s1)
-        {
-            return string.IsNullOrEmpty(s1);
-        }
+        public static bool IsNullOrEmpty(this string? s1) => string.IsNullOrEmpty(s1);
 
         /// <summary>
         /// 是否为NULL或者空白字符串
         /// </summary>
-        public static bool IsNullOrWhiteSpace(this string? s1)
-        {
-            return string.IsNullOrWhiteSpace(s1);
-        }
+        public static bool IsNullOrWhiteSpace(this string? s1) => string.IsNullOrWhiteSpace(s1);
 
         /// <summary>
         /// 是否为数字, 包含浮点数
         /// </summary>
-        public static bool IsNumber(this string s1)
-        {
-            return Regex.IsMatch(s1, @"^[-+]?[0-9]*\.?[0-9]+$");
-        }
+        public static bool IsNumber(this string s1) => Regex.IsMatch(s1, @"^[-+]?[0-9]*\.?[0-9]+$");
 
         /// <summary>
         /// 是否为整数, 包含负数, 以及大数
         /// </summary>
-        public static bool IsInt(this string s1)
-        {
-            return Regex.IsMatch(s1, @"^[-+]?[0-9]+$");
-        }
+        public static bool IsInt(this string s1) => Regex.IsMatch(s1, @"^[-+]?[0-9]+$");
 
         /// <summary>
         /// 格式化一个字符串
         /// </summary>
-        public static string Format(this string s1, params object[] values)
-        {
-            return string.Format(s1, values);
-        }
+        public static string Format(this string s1, params object[] values) => string.Format(s1, values);
 
         /// <summary>
         /// 转成整数, 如果转换失败, 返回默认值
         /// </summary>
         public static int ToInt(this string str, int defaultValue = 0)
         {
+            if (string.IsNullOrEmpty(str)) return defaultValue;
+
             // 提取str中所有的数字部分
             var match = Regex.Match(str, @"[-+]?[0-9]+");
             if (match.Success)
                 str = match.Value;
-            
+
 
             if (int.TryParse(str, out var result))
             {
@@ -113,6 +101,8 @@ namespace Pingfan.Kit
         /// </summary>
         public static uint ToUInt(this string str, uint defaultValue = 0)
         {
+            if (string.IsNullOrEmpty(str)) return defaultValue;
+
             // 提取str中所有的数字部分
             var match = Regex.Match(str, @"[-+]?[0-9]+");
             if (match.Success)
@@ -131,6 +121,8 @@ namespace Pingfan.Kit
         /// </summary>
         public static long ToLong(this string str, long defaultValue = 0)
         {
+            if (string.IsNullOrEmpty(str)) return defaultValue;
+
             // 提取str中所有的数字部分
             var match = Regex.Match(str, @"[-+]?[0-9]+");
             if (match.Success)
@@ -149,6 +141,8 @@ namespace Pingfan.Kit
         /// </summary>
         public static ulong ToULong(this string str, ulong defaultValue = 0)
         {
+            if (string.IsNullOrEmpty(str)) return defaultValue;
+
             // 提取str中所有的数字部分
             var match = Regex.Match(str, @"[-+]?[0-9]+");
             if (match.Success)
@@ -167,7 +161,8 @@ namespace Pingfan.Kit
         /// </summary>
         public static float ToFloat(this string str, float defaultValue = 0)
         {
-            
+            if (string.IsNullOrEmpty(str)) return defaultValue;
+
             if (float.TryParse(str, out var result))
             {
                 return result;
@@ -181,6 +176,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static double ToDouble(this string str, double defaultValue = 0)
         {
+            if (string.IsNullOrEmpty(str)) return defaultValue;
             if (double.TryParse(str, out var result))
             {
                 return result;
@@ -194,6 +190,8 @@ namespace Pingfan.Kit
         /// </summary>
         public static decimal ToDecimal(this string str, decimal defaultValue = 0)
         {
+            if (string.IsNullOrEmpty(str)) return defaultValue;
+
             if (decimal.TryParse(str, out var result))
             {
                 return result;
@@ -203,25 +201,17 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 转成布尔值, 如果转换失败, 返回默认值, 如果是字符串, 则判断是否为null, false, 0, undefined, NaN, 这些字符串都会返回false
+        /// 先转成int, 再判断是否为0
         /// </summary>
-        public static bool ToBool(this string str)
-        {
-            if (str.IsNullOrWhiteSpace())
-                return false;
-            if (Regex.IsMatch(str, "null|false|0|undefined|NaN", RegexOptions.IgnoreCase))
-            {
-                return false;
-            }
+        public static bool ToBool(this string str) => str.ToInt() != 0;
 
-            return true;
-        }
 
         /// <summary>
         /// 转成时间, 如果转换失败, 返回默认值
         /// </summary>
         public static DateTime ToDatetime(this string str, DateTime defaultValue = default)
         {
+            if (string.IsNullOrEmpty(str)) return defaultValue;
             if (DateTime.TryParse(str, out var result))
             {
                 return result;
@@ -324,7 +314,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 正则匹配一个字符串
         /// </summary>
-        public static IList<string> Match(this string input, string pattern, RegexOptions options = RegexOptions.None)
+        public static List<string> Match(this string input, string pattern, RegexOptions options = RegexOptions.None)
         {
             var list = new List<string>();
             var m = Regex.Match(input, pattern, options);
@@ -351,10 +341,10 @@ namespace Pingfan.Kit
         /// <summary>
         /// 正则匹配一个字符串
         /// </summary>
-        public static List<List<string>> Matches(this string input, string pattern,
+        public static Table<string> Matches(this string input, string pattern,
             RegexOptions options = RegexOptions.None)
         {
-            var list = new List<List<string>>();
+            var list = new Table<string>();
             var ms = Regex.Matches(input, pattern, options);
             if (ms.Count == 0)
                 return list;
@@ -365,6 +355,7 @@ namespace Pingfan.Kit
                     continue;
                 }
 
+                // ReSharper disable once CollectionNeverQueried.Local
                 var item = new List<string>();
                 // 除了第一个元素全部返回, 除非只有一个元素
                 if (m.Groups.Count == 1)
@@ -378,6 +369,8 @@ namespace Pingfan.Kit
                         item.Add(m.Groups[i].Value);
                     }
                 }
+
+                list.Add(item);
             }
 
             return list;

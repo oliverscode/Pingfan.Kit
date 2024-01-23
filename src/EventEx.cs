@@ -16,8 +16,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static readonly EventEx Default = new EventEx();
 
-        private readonly ConcurrentDictionary<string, List<EventAction>> _actions =
-            new ConcurrentDictionary<string, List<EventAction>>();
+        private readonly ConcurrentDictionary<string, List<EventAction>> _actions = new();
 
         #region 监听事件
 

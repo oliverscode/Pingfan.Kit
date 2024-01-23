@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace Pingfan.Kit
 {
-
     /// <summary>
     /// 可以判断超时的类
     /// </summary>
@@ -24,7 +23,9 @@ namespace Pingfan.Kit
                 {
                     action();
                 }
-                catch (OperationCanceledException) { }
+                catch (OperationCanceledException)
+                {
+                }
             }, token);
 
             if (!task.Wait(TimeSpan.FromSeconds(seconds)))
@@ -39,8 +40,8 @@ namespace Pingfan.Kit
         /// </summary>
         public static async Task RunAsync(Func<Task> func, double seconds)
         {
-            CancellationTokenSource cts = new CancellationTokenSource();
-            CancellationToken token = cts.Token;
+            var cts = new CancellationTokenSource();
+            var token = cts.Token;
 
             var delayTask = Task.Delay(TimeSpan.FromSeconds(seconds), token);
             var task = func();
@@ -52,6 +53,7 @@ namespace Pingfan.Kit
             }
             else
             {
+                // ReSharper disable once MethodHasAsyncOverload
                 cts.Cancel(); // 取消延迟任务
                 throw new TimeoutException("The operation has timed out.");
             }

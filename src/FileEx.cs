@@ -12,7 +12,7 @@ namespace Pingfan.Kit
     /// </summary>
     public static class FileEx
     {
-        private static readonly ConcurrentDictionary<string, object> Locks = new ConcurrentDictionary<string, object>();
+        private static readonly ConcurrentDictionary<string, object> Locks = new();
 
         /// <summary>
         /// 错误事件
