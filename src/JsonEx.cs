@@ -1,6 +1,5 @@
-﻿
+﻿using System;
 
-using System;
 #pragma warning disable CS0612 // Type or member is obsolete
 
 namespace Pingfan.Kit
@@ -47,7 +46,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 一段JSON字符串转换为对象
         /// </summary>
-        public static T FromString<T>(string json, T defaultValue = default!)
+        public static T? FromString<T>(string json, T? defaultValue = default!)
         {
             try
             {
@@ -76,9 +75,24 @@ namespace Pingfan.Kit
         /// <summary>
         /// 把JSON字符串转换为对象
         /// </summary>
-        public static T FromJsonString<T>(this string json, T defaultValue = default!)
+        public static T? FromJsonString<T>(this string json, T? defaultValue = default)
         {
             return Json.FromString<T>(json, defaultValue);
+        }
+
+        /// <summary>
+        /// 改变Json类型
+        /// </summary>
+        public static T? Change<T>(this JsonElement json, T? defaultValue = default)
+        {
+            try
+            {
+                return json.Deserialize<T>();
+            }
+            catch (Exception e)
+            {
+                return defaultValue;
+            }
         }
     }
 

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using Pingfan.Kit.Inject;
 using Pingfan.Kit.WebServer.Interfaces;
 using Pingfan.Kit.WebServer.Middlewares.Websockets;
+
+// ReSharper disable ClassNeverInstantiated.Global
 
 namespace Pingfan.Kit.WebServer.Middlewares;
 
@@ -15,10 +16,16 @@ namespace Pingfan.Kit.WebServer.Middlewares;
 /// </summary>
 public class MidWebSocket : IMiddleware
 {
-    private readonly List<WebSocketItem> _webSockets = new List<WebSocketItem>();
+    private readonly Dictionary<string, WebSocketHandlerDefault> _handlers =
+        new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// 默认UTF8编码    
+    /// 默认的WebSocketContext类型
+    /// </summary>
+    public Type WebSocketContextType { get; set; } = typeof(WebSocketDefault);
+
+    /// <summary>
+    /// 默认UTF-8编码    
     /// </summary>
     public Encoding Encoding { get; set; } = Encoding.UTF8;
 
@@ -32,24 +39,25 @@ public class MidWebSocket : IMiddleware
         }
 
         var path = ctx.Request.Path;
-        var item = _webSockets.FirstOrDefault(p => string.Equals(path, p.Path, StringComparison.OrdinalIgnoreCase));
-        if (item == null)
+
+        if (_handlers.TryGetValue(path, out var handler) == false)
         {
             next();
             return;
         }
 
         var protocol = ctx.Request.Headers["Sec-WebSocket-Protocol"];
-        var listenerWebSocketContext = ctx.Request.HttpListenerContext.AcceptWebSocketAsync(protocol).Result;
-        container.Register(listenerWebSocketContext);
+        var socketContext = ctx.Request.HttpListenerContext.AcceptWebSocketAsync(protocol).Result;
+        container.Register(socketContext);
         container.Register(Encoding);
-        var webSocketContext = (IWebSocketContext)container.New(item.InstanceType);
-        if (webSocketContext.OnCheck(protocol!) == false)
+        var webSocketContext = (WebSocketDefault)container.New(WebSocketContextType);
+
+        if (handler.OnCheck(protocol) == false)
         {
             return;
         }
 
-        webSocketContext.OnOpen();
+        handler.OnOpened(webSocketContext);
 
 
         // 接收数据
@@ -60,20 +68,21 @@ public class MidWebSocket : IMiddleware
                 CancellationToken.None).Result;
             if (result.MessageType == WebSocketMessageType.Close)
             {
-                webSocketContext.OnClose();
                 break;
             }
 
             if (result.MessageType == WebSocketMessageType.Binary)
             {
-                webSocketContext.OnBinary(buffer);
+                handler.OnBinary(webSocketContext, buffer);
             }
             else if (result.MessageType == WebSocketMessageType.Text)
             {
                 var txt = Encoding.GetString(buffer, 0, result.Count);
-                webSocketContext.OnMessage(txt);
+                handler.OnMessage(webSocketContext, txt);
             }
         }
+
+        handler.OnClosed(webSocketContext);
     }
 
 
@@ -82,7 +91,7 @@ public class MidWebSocket : IMiddleware
     /// </summary>
     /// <param name="path"></param>
     /// <typeparam name="T"></typeparam>
-    public void Add<T>(string path = "/") where T : IWebSocketContext
+    public void Add<T>(string path = "/") where T : WebSocketHandlerDefault
     {
         var type = typeof(T);
         Add(path, type);
@@ -95,18 +104,9 @@ public class MidWebSocket : IMiddleware
     /// <param name="type"></param>
     public void Add(string path, Type type)
     {
-        _webSockets.Add(new WebSocketItem
-        {
-            Path = path,
-            InstanceType = type
-        });
-    }
-
-
-    private class WebSocketItem
-    {
-        public string Path { get; set; } = null!;
-        public Type InstanceType { get; set; } = null!;
+        // 创建对象
+        var instance = (WebSocketHandlerDefault)Activator.CreateInstance(type)!;
+        _handlers.Add(path, instance);
     }
 }
 
@@ -116,7 +116,7 @@ public class MidWebSocket : IMiddleware
 public static class MidWebSocketEx
 {
     /// <summary>
-    /// 使用静态文件中间件
+    /// 使用WebSocket中间件
     /// </summary>
     public static WebServer UseWebSocket(this WebServer webServer, Action<MidWebSocket>? action = null)
     {
