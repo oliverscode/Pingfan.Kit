@@ -22,7 +22,7 @@ public class MidWebSocket : IMiddleware
     /// <summary>
     /// 默认的WebSocketContext类型
     /// </summary>
-    public Type WebSocketContextType { get; set; } = typeof(WebSocketDefault);
+    public Type WebSocketContextType { get; set; } = typeof(WebSocketContextDefault);
 
     /// <summary>
     /// 默认UTF-8编码    
@@ -50,7 +50,7 @@ public class MidWebSocket : IMiddleware
         var socketContext = ctx.Request.HttpListenerContext.AcceptWebSocketAsync(protocol).Result;
         container.Register(socketContext);
         container.Register(Encoding);
-        var webSocketContext = (WebSocketDefault)container.New(WebSocketContextType);
+        var webSocketContext = (WebSocketContextDefault)container.New(WebSocketContextType);
 
         if (handler.OnCheck(protocol) == false)
         {

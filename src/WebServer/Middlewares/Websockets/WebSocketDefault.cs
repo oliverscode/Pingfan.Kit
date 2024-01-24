@@ -11,7 +11,7 @@ namespace Pingfan.Kit.WebServer.Middlewares.Websockets;
 /// WebSocket上下文默认实现
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public class WebSocketDefault : IDisposable
+public class WebSocketContextDefault : IDisposable
 {
     private readonly IHttpResponse _httpResponse;
 
@@ -48,7 +48,7 @@ public class WebSocketDefault : IDisposable
     /// <summary>
     /// 构造函数
     /// </summary>
-    public WebSocketDefault(
+    public WebSocketContextDefault(
         HttpListenerWebSocketContext httpListenerWebSocketContext,
         IHttpResponse httpResponse,
         Encoding encoding)
@@ -56,6 +56,7 @@ public class WebSocketDefault : IDisposable
         HttpListenerWebSocketContext = httpListenerWebSocketContext;
         _httpResponse = httpResponse;
         Encoding = encoding;
+        
     }
 
     /// <summary>

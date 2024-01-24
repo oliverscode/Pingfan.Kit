@@ -15,7 +15,7 @@ public class WebSocketHandlerDefault
     /// <summary>
     /// 在线列表
     /// </summary>
-    public ThreadSafeList<WebSocketDefault> Online { get; } = new();
+    public ThreadSafeList<WebSocketContextDefault> Online { get; } = new();
 
     /// <summary>
     /// 检查协议是否合法
@@ -28,7 +28,7 @@ public class WebSocketHandlerDefault
     /// <summary>
     /// 连接已经打开
     /// </summary>
-    public virtual void OnOpened(WebSocketDefault context)
+    public virtual void OnOpened(WebSocketContextDefault context)
     {
         this.Online.Add(context);
     }
@@ -36,21 +36,21 @@ public class WebSocketHandlerDefault
     /// <summary>
     /// 收到数据
     /// </summary>
-    public virtual void OnMessage(WebSocketDefault context, string message)
+    public virtual void OnMessage(WebSocketContextDefault context, string message)
     {
     }
 
     /// <summary>
     /// 收到数据
     /// </summary>
-    public virtual void OnBinary(WebSocketDefault context, byte[] data)
+    public virtual void OnBinary(WebSocketContextDefault context, byte[] data)
     {
     }
 
     /// <summary>
     /// 连接关闭
     /// </summary>
-    public virtual void OnClosed(WebSocketDefault context)
+    public virtual void OnClosed(WebSocketContextDefault context)
     {
         this.Online.Remove(context);
     }
@@ -58,7 +58,7 @@ public class WebSocketHandlerDefault
     /// <summary>
     /// 发送数据
     /// </summary>
-    public void Send(WebSocketDefault context, string message)
+    public void Send(WebSocketContextDefault context, string message)
     {
         context.Send(message);
     }
@@ -66,7 +66,7 @@ public class WebSocketHandlerDefault
     /// <summary>
     /// 发送数据
     /// </summary>
-    public void Send(WebSocketDefault context, object data)
+    public void Send(WebSocketContextDefault context, object data)
     {
         context.Send(data);
     }
@@ -74,7 +74,7 @@ public class WebSocketHandlerDefault
     /// <summary>
     /// 发送数据
     /// </summary>
-    public void Send(WebSocketDefault context, byte[] data)
+    public void Send(WebSocketContextDefault context, byte[] data)
     {
         context.Send(data);
     }
