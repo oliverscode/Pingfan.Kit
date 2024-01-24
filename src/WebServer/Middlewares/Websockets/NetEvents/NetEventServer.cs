@@ -7,12 +7,12 @@ namespace Pingfan.Kit.WebServer.Middlewares.Websockets.NetEvents;
 /// <summary>
 /// 网络事件
 /// </summary>
-public class NetEventServer : WebSocketHandlerDefault
+public class NetEventServer : IWebSocketHandler
 {
     private readonly ThreadSafeDictionary<WebSocketContextDefault, List<string>> _list = new();
 
     /// <inheritdoc />
-    public override void OnMessage(WebSocketContextDefault context, string message)
+    public void OnMessage(WebSocketContextDefault context, string message)
     {
         if (_list.TryGetValue(context, out var actions) == false)
         {
@@ -45,11 +45,19 @@ public class NetEventServer : WebSocketHandlerDefault
         }
     }
 
+    public void OnBinary(WebSocketContextDefault context, byte[] data)
+    {
+    }
+
+
+    public bool OnCheck(string? protocol)
+    {
+        return true;
+    }
 
     /// <inheritdoc />
-    public override void OnOpened(WebSocketContextDefault context)
+    public void OnOpened(WebSocketContextDefault context)
     {
-        base.OnOpened(context);
         if (_list.TryAdd(context, new List<string>()) == false)
         {
             context.Close();
@@ -58,9 +66,8 @@ public class NetEventServer : WebSocketHandlerDefault
     }
 
     /// <inheritdoc />
-    public override void OnClosed(WebSocketContextDefault context)
+    public void OnClosed(WebSocketContextDefault context)
     {
-        base.OnClosed(context);
         _list.TryRemove(context, out _);
     }
 

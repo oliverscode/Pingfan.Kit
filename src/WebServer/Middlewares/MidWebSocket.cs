@@ -16,7 +16,7 @@ namespace Pingfan.Kit.WebServer.Middlewares;
 /// </summary>
 public class MidWebSocket : IMiddleware
 {
-    private readonly Dictionary<string, WebSocketHandlerDefault> _handlers =
+    private readonly Dictionary<string, IWebSocketHandler> _handlers =
         new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
@@ -91,7 +91,7 @@ public class MidWebSocket : IMiddleware
     /// </summary>
     /// <param name="path"></param>
     /// <typeparam name="T"></typeparam>
-    public void Add<T>(string path = "/") where T : WebSocketHandlerDefault
+    public void Add<T>(string path = "/") where T : IWebSocketHandler
     {
         var type = typeof(T);
         Add(path, type);
@@ -105,7 +105,7 @@ public class MidWebSocket : IMiddleware
     public void Add(string path, Type type)
     {
         // 创建对象
-        var instance = (WebSocketHandlerDefault)Activator.CreateInstance(type)!;
+        var instance = (IWebSocketHandler)Activator.CreateInstance(type)!;
         _handlers.Add(path, instance);
     }
 }
