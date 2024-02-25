@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+
 // ReSharper disable FunctionNeverReturns
 
 namespace Pingfan.Kit
@@ -13,8 +14,8 @@ namespace Pingfan.Kit
         /// <summary>
         /// 错误事件
         /// </summary>
-        public static event Action<Exception>? OnError; 
-        
+        public static event Action<Exception>? OnError;
+
         /// <summary>
         /// 死循环运行一个方法
         /// </summary>
@@ -42,7 +43,7 @@ namespace Pingfan.Kit
                     {
                         method();
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         OnError?.Invoke(e);
                     }
@@ -77,7 +78,7 @@ namespace Pingfan.Kit
                     {
                         await method();
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         OnError?.Invoke(e);
                     }

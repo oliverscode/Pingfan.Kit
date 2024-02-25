@@ -54,12 +54,17 @@ namespace Pingfan.Kit
         /// 是否为NULL或者空字符串
         /// </summary>
         public static bool IsNullOrEmpty(this string? s1) => string.IsNullOrEmpty(s1);
+        
+        /// <summary>
+        /// 不为NULL或者空字符串
+        /// </summary>
+        public static bool NotNull(this string? s1) => !string.IsNullOrEmpty(s1);
 
         /// <summary>
         /// 是否为NULL或者空白字符串
         /// </summary>
         public static bool IsNullOrWhiteSpace(this string? s1) => string.IsNullOrWhiteSpace(s1);
-
+        
         /// <summary>
         /// 是否为数字, 包含浮点数
         /// </summary>

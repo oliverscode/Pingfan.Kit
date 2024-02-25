@@ -13,17 +13,25 @@ namespace Pingfan.Kit
         /// 未处理的异常
         /// </summary>
         public static Action<Exception> OnError { get; set; } = (e) => { Log.Fatal(e.ToString()); };
-        
+
         /// <summary>
         /// 根容器
         /// </summary>
         public static IContainer Container { get; private set; } = new Container();
+        
 
         /// <summary>
         /// 初始化, 捕获全局异常, 如果有异常会记录日志并退出程序, 同时支持命令行参数进行安装, 卸载, 启动, 停止, 重启, 状态
         /// </summary>
-        public static void Init()
+        public static void Init(string? title = null)
         {
+            if (title != null)
+            {
+                Console.Title = title;
+                // 获取当前启动程序集名字
+                var assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name;
+            }
+
             // 捕获当前程序的全局异常
             CatchGlobalException();
 
@@ -77,7 +85,6 @@ namespace Pingfan.Kit
         }
 
 
-
         private static void CatchGlobalException()
         {
             AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
@@ -110,6 +117,7 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Run()
         {
+            Log.Debug("App is Running...");
             Loop.Wait();
         }
     }
