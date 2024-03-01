@@ -77,10 +77,13 @@ namespace Pingfan.Kit
         /// 计算CRC32哈希值
         /// </summary>
         /// <param name="data">要计算哈希的字符串</param>
+        /// <param name="defaultEncoding">默认UTF-8编码</param>
         /// <returns>返回CRC32哈希值</returns>
-        public static string Crc32(string data)
+        public static string Crc32(string data, Encoding? defaultEncoding = null)
         {
-            var buffer = Encoding.ASCII.GetBytes(data);
+            defaultEncoding ??= Encoding.UTF8;
+            
+            var buffer = defaultEncoding.GetBytes(data);
             int len = buffer.Length;
             ulong value = 0xffffffff;
             for (int i = 0; i < len; i++)
@@ -95,13 +98,13 @@ namespace Pingfan.Kit
         /// 计算SHA256哈希值
         /// </summary>
         /// <param name="data">要计算哈希的字符串</param>
+        /// <param name="defaultEncoding">默认UTF-8编码</param>
         /// <returns>返回SHA256哈希值</returns>
-        public static string Sha256(string data)
+        public static string Sha256(string data, Encoding? defaultEncoding = null)
         {
-            using (var sha256 = SHA256.Create())
-            {
-                return Sha256(Encoding.ASCII.GetBytes(data), sha256);
-            }
+            defaultEncoding ??= Encoding.UTF8;
+            using var sha256 = SHA256.Create();
+            return Sha256(defaultEncoding.GetBytes(data), sha256);
         }
 
         /// <summary>
@@ -111,10 +114,8 @@ namespace Pingfan.Kit
         /// <returns>返回SHA256哈希值</returns>
         public static string Sha256(Stream stream)
         {
-            using (var sha256 = SHA256.Create())
-            {
-                return Sha256(stream, sha256);
-            }
+            using var sha256 = SHA256.Create();
+            return Sha256(stream, sha256);
         }
 
         /// <summary>
@@ -149,10 +150,8 @@ namespace Pingfan.Kit
         /// <returns>返回MD5哈希值</returns>
         public static string Md5(string data)
         {
-            using (var md5 = MD5.Create())
-            {
-                return Md5(Encoding.ASCII.GetBytes(data), md5);
-            }
+            using var md5 = MD5.Create();
+            return Md5(Encoding.ASCII.GetBytes(data), md5);
         }
 
         /// <summary>
@@ -162,10 +161,8 @@ namespace Pingfan.Kit
         /// <returns>返回MD5哈希值</returns>
         public static string Md5(Stream stream)
         {
-            using (var md5 = MD5.Create())
-            {
-                return Md5(stream, md5);
-            }
+            using var md5 = MD5.Create();
+            return Md5(stream, md5);
         }
 
         /// <summary>
@@ -175,10 +172,8 @@ namespace Pingfan.Kit
         /// <returns>返回MD5哈希值</returns>
         public static string Md5(byte[] data)
         {
-            using (var md5 = MD5.Create())
-            {
-                return Md5(data, md5);
-            }
+            using var md5 = MD5.Create();
+            return Md5(data, md5);
         }
 
         private static string Md5(byte[] data, HashAlgorithm md5)
@@ -211,12 +206,10 @@ namespace Pingfan.Kit
         /// <returns>签名结果</returns>
         public static string Signature(params object[] args)
         {
-            var toEncryptArray = Encoding.ASCII.GetBytes(string.Join("", args));
-            using (var sha256 = SHA256.Create())
-            {
-                var resultArray = sha256.ComputeHash(toEncryptArray);
-                return ToHexString(resultArray);
-            }
+            var toEncryptArray = Encoding.UTF8.GetBytes(string.Join(",", args));
+            using var sha256 = SHA256.Create();
+            var resultArray = sha256.ComputeHash(toEncryptArray);
+            return ToHexString(resultArray);
         }
     }
 }
