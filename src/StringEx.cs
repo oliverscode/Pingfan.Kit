@@ -54,7 +54,7 @@ namespace Pingfan.Kit
         /// 是否为NULL或者空字符串
         /// </summary>
         public static bool IsNullOrEmpty(this string? s1) => string.IsNullOrEmpty(s1);
-        
+
         /// <summary>
         /// 不为NULL或者空字符串
         /// </summary>
@@ -64,7 +64,7 @@ namespace Pingfan.Kit
         /// 是否为NULL或者空白字符串
         /// </summary>
         public static bool IsNullOrWhiteSpace(this string? s1) => string.IsNullOrWhiteSpace(s1);
-        
+
         /// <summary>
         /// 是否为数字, 包含浮点数
         /// </summary>
@@ -314,6 +314,14 @@ namespace Pingfan.Kit
         public static bool IsMatch(this string input, string pattern, RegexOptions options = RegexOptions.None)
         {
             return Regex.IsMatch(input, pattern, options);
+        }
+
+        /// <summary>
+        /// 条件成立时, 返回字符串, 否则返回空字符串
+        /// </summary>
+        public static string If(this string str, bool condition)
+        {
+            return condition ? str : string.Empty;
         }
 
         /// <summary>
