@@ -13,7 +13,7 @@ public class WebServerConfig
     public int Port { get; set; } = 5000;
     
     /// <summary>
-    /// 默认服务器名
+    /// 默认服务器名, 默认为空
     /// </summary>
     public string DefaultServerName { get; set; } = "";
     

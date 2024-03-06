@@ -223,7 +223,7 @@ namespace Pingfan.Kit
         /// 以当前登录系统的用户角色权限启动指定的进程
         /// </summary>
         /// <param name="childProcName">指定的进程(全路径)</param>
-        public static void CreateProcess(string childProcName)
+        public static void CreateUserProcess(string childProcName)
         {
             var ppSessionInfo = IntPtr.Zero;
             uint sessionCount = 0;

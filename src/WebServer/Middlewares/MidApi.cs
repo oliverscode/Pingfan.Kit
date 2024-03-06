@@ -14,6 +14,7 @@ namespace Pingfan.Kit.WebServer.Middlewares;
 
 /// <summary>
 /// Api中间件, 会自动注入ControllerName和ActionName
+/// API的方法支持参数绑定, 支持基本类型, 支持继承IMidRequestModel的类
 /// </summary>
 public class MidApi : IMiddleware
 {
