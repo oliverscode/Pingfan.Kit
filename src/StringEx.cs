@@ -327,7 +327,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 条件成立时, 返回字符串, 否则返回空字符串
         /// </summary>
-        public static string If(this string str, string str2)
+        public static string If(this string str, string? str2)
         {
             return str2.IsNullOrWhiteSpace() == false ? str : string.Empty;
         }

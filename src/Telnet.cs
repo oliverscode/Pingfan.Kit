@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Pingfan.Kit;
@@ -103,7 +102,7 @@ public class Telnet
     /// <summary>
     /// 查找一个局域网内的端口可以用的ip, 用于局域网内的服务发现
     /// </summary>
-    /// <param name="port">服务端口, 支持TCP, UDP</param>
+    /// <param name="port">服务端口, 仅支持TCP</param>
     /// <param name="timeout">超时时间, 单位毫秒</param>
     /// <param name="testUrl">路由跟踪测试的URL, 默认qq.com</param>
     /// <returns></returns>
@@ -116,12 +115,13 @@ public class Telnet
         // var result = Cmd.RunWithOutput("tracert -d -w 10 -h 3 qq.com");
         var result = Cmd.RunWithOutput($"tracert -d -w {timeout} -h 3 {testUrl}");
 
-        var ips = result.Matches(@"\d\s+(<?\d+) ms.+?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})");
+        var ips = result.Matches(@"\s+?(<?\d+) ms.+?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})");
         var localIps = ips.Where(p => p.Count == 2)
             .Select(p => p[1])
             .Where(IsLocalIpAddress)
             .Distinct()
             .ToList();
+        
 
         IPEndPoint? answer = null;
 

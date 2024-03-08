@@ -332,9 +332,7 @@ namespace Pingfan.Kit
                     {
                         OnError?.Invoke(e);
                     }
-
-                    if (token.IsCancellationRequested)
-                        return;
+                    
                     await Task.Delay(1000, token.Token);
                 }
             }, token.Token);
