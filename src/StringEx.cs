@@ -325,9 +325,17 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
+        /// 条件成立时, 返回字符串, 否则返回空字符串
+        /// </summary>
+        public static string If(this string str, string str2)
+        {
+            return str2.IsNullOrWhiteSpace() == false ? str : string.Empty;
+        }
+
+        /// <summary>
         /// 正则匹配一个字符串
         /// </summary>
-        public static List<string> Match(this string input, string pattern, RegexOptions options = RegexOptions.None)
+        public static IList<string> Match(this string input, string pattern, RegexOptions options = RegexOptions.None)
         {
             var list = new List<string>();
             var m = Regex.Match(input, pattern, options);

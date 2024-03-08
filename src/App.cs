@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Pingfan.Kit.Inject;
 
@@ -18,7 +21,7 @@ namespace Pingfan.Kit
         /// 根容器
         /// </summary>
         public static IContainer Container { get; private set; } = new Container();
-        
+
 
         /// <summary>
         /// 初始化, 捕获全局异常, 如果有异常会记录日志并退出程序, 同时支持命令行参数进行安装, 卸载, 启动, 停止, 重启, 状态
@@ -113,10 +116,50 @@ namespace Pingfan.Kit
 
 
         /// <summary>
-        /// 启动APP
+        /// 启动APP, 并且加载plugins目录下的所有dll, dll可以是标准的dotnet程序集, 也可以是类库, 会自动调用Main或者PluginStart方法
+        /// 但必须是静态且公开的方法
         /// </summary>
         public static void Run()
         {
+            // 判断当前目录下是否有plugins目录, 如果有则加载
+            var pluginsDir = PathEx.CombineCurrentDirectory("plugins");
+            if (Directory.Exists(pluginsDir))
+            {
+                var files = Directory.GetFiles(pluginsDir, "*.dll");
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        var assembly = Assembly.LoadFile(file);
+                        // 获取assembly的入口并且调用
+                        var types = assembly.GetTypes();
+                        foreach (var type in types)
+                        {
+                            var mainMethod = type.GetMethod("Main", BindingFlags.Public | BindingFlags.Static);
+                            if (mainMethod != null)
+                            {
+                                Task.Run(() => { mainMethod.Invoke(null, null); });
+                                goto Start;
+                            }
+                            
+                            // 如果没有Main方法, 则调用PluginStart方法
+                            var pluginStartMethod = type.GetMethod("PluginStart", BindingFlags.Public | BindingFlags.Static);
+                            if (pluginStartMethod != null)
+                            {
+                                Task.Run(() => { pluginStartMethod.Invoke(null, null); });
+                                goto Start;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+                }
+            }
+
+            Start:
+
             Log.Debug("App is Running...");
             Loop.Wait();
         }
