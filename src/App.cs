@@ -22,6 +22,11 @@ namespace Pingfan.Kit
         /// </summary>
         public static IContainer Container { get; private set; } = new Container();
 
+        /// <summary>
+        /// App的名字
+        /// </summary>
+        public static string AppName { get; set; } = "App";
+
 
         /// <summary>
         /// 初始化, 捕获全局异常, 如果有异常会记录日志并退出程序, 同时支持命令行参数进行安装, 卸载, 启动, 停止, 重启, 状态
@@ -33,6 +38,7 @@ namespace Pingfan.Kit
                 Console.Title = title;
                 // 获取当前启动程序集名字
                 var assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name;
+                AppName = assemblyName ?? "App";
             }
 
             // 捕获当前程序的全局异常
@@ -141,9 +147,10 @@ namespace Pingfan.Kit
                                 Task.Run(() => { mainMethod.Invoke(null, null); });
                                 goto Start;
                             }
-                            
+
                             // 如果没有Main方法, 则调用PluginStart方法
-                            var pluginStartMethod = type.GetMethod("PluginStart", BindingFlags.Public | BindingFlags.Static);
+                            var pluginStartMethod =
+                                type.GetMethod("PluginStart", BindingFlags.Public | BindingFlags.Static);
                             if (pluginStartMethod != null)
                             {
                                 Task.Run(() => { pluginStartMethod.Invoke(null, null); });
@@ -160,7 +167,7 @@ namespace Pingfan.Kit
 
             Start:
 
-            Log.Debug("App is Running...");
+            Log.Debug($"{AppName} is Running...");
             Loop.Wait();
         }
     }
