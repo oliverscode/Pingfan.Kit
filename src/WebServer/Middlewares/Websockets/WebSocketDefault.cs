@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -14,6 +15,11 @@ namespace Pingfan.Kit.WebServer.Middlewares.Websockets;
 public class WebSocketContextDefault : IDisposable
 {
     private readonly IHttpResponse _httpResponse;
+
+    /// <summary>
+    /// 自定义数据
+    /// </summary>
+    public Dictionary<string, object> Items { get; } = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// 默认编码
@@ -56,7 +62,6 @@ public class WebSocketContextDefault : IDisposable
         HttpListenerWebSocketContext = httpListenerWebSocketContext;
         _httpResponse = httpResponse;
         Encoding = encoding;
-        
     }
 
     /// <summary>
