@@ -37,12 +37,10 @@ public static class MidCrossEx
     /// <summary>
     /// 使用Cross中间件
     /// </summary>
-    /// <param name="webServer"></param>
-    /// <param name="action"></param>
-    public static WebServer UseCross(this WebServer webServer, Action<MidCross>? action)
+    public static WebServer UseCross(this WebServer webServer)
     {
         var mid = webServer.Container.New<MidCross>();
-        action?.Invoke(mid);
+        // action?.Invoke(mid);
         webServer.Use(mid);
         return webServer;
     }

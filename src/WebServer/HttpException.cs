@@ -24,8 +24,17 @@ public class HttpArgumentException : Exception
     /// </summary>
     public string Name { get; }
 
+
     /// <inheritdoc />
     public HttpArgumentException(string message, Type type, string name) : base(message)
+    {
+        Type = type;
+        Name = name;
+    }
+
+    /// <inheritdoc />
+    public HttpArgumentException(string message, Type type, string name, Exception innerException) : base(message,
+        innerException)
     {
         Type = type;
         Name = name;

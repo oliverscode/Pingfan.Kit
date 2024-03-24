@@ -148,10 +148,11 @@ public class MidApi : IMiddleware
                     requestModel =
                         (IMidRequestModel)JsonSerializer.Deserialize(ctx.Request.Body, parameterInfo.ParameterType)!;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    throw new HttpArgumentException($"{parameterInfo.Name}参数不正确", parameterInfo.ParameterType,
-                        parameterInfo.Name!);
+                    var err = new HttpArgumentException($"{parameterInfo.Name}参数不正确", parameterInfo.ParameterType,
+                        parameterInfo.Name!, e);
+                    throw err;
                 }
 
                 requestModel.Check();
