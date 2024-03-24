@@ -29,3 +29,21 @@ public class MidCross : IMiddleware
         }
     }
 }
+/// <summary>
+/// 扩展
+/// </summary>
+public static class MidCrossEx
+{
+    /// <summary>
+    /// 使用Cross中间件
+    /// </summary>
+    /// <param name="webServer"></param>
+    /// <param name="action"></param>
+    public static WebServer UseCross(this WebServer webServer, Action<MidCross>? action)
+    {
+        var mid = webServer.Container.New<MidCross>();
+        action?.Invoke(mid);
+        webServer.Use(mid);
+        return webServer;
+    }
+}

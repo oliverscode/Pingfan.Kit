@@ -140,7 +140,7 @@ public class MidApi : IMiddleware
 
             // 是否parameterInfo.ParameterType是否继承IMidRequestModel
             if (parameterInfo.ParameterType.IsClass &&
-                parameterInfo.ParameterType.IsAssignableFrom(typeof(IMidRequestModel)))
+                parameterInfo.ParameterType.GetInterfaces().Any(t => t == typeof(IMidRequestModel)))
             {
                 IMidRequestModel? requestModel = null;
                 try
