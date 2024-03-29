@@ -105,9 +105,11 @@ namespace Pingfan.Kit
         /// <summary>
         /// 从集合中随机返回一个元素。
         /// </summary>
-        public static T RandomOne<T>(this IEnumerable<T> collection)
+        public static T? RandomOne<T>(this IEnumerable<T> collection)
         {
             var list = collection as IList<T> ?? collection.ToList();
+            if (list.Count == 0)
+                return default;
             var index = RandomEx.Next(0, list.Count);
             return list[index];
         }

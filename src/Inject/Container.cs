@@ -274,7 +274,7 @@ namespace Pingfan.Kit.Inject
                         {
                             var name = injectPop.Name ?? attr?.Name;
                             var defaultValue = injectPop.DefaultValue ?? attr?.DefaultValue;
-                      
+
                             var propertyValue = Get(new InjectPop(propertyType, name, injectPop.Deep, defaultValue));
                             property.SetValue(push.Instance, propertyValue);
                         }
@@ -293,7 +293,6 @@ namespace Pingfan.Kit.Inject
             if (Parent != null)
             {
                 return ((Container)Parent!).Get(injectPop);
-               
             }
 
             if (injectPop.DefaultValue != null)
@@ -428,9 +427,12 @@ namespace Pingfan.Kit.Inject
                 Children.Clear();
 
 
-                // 从父类中移除自己
+                // 从父类中移除所有为空的子类
                 if (Parent != null)
+                {
                     Parent.Children.Remove(this);
+                    Parent.Children.RemoveAll(x => x == null);
+                }
 
 
                 // 释放所有的实例
@@ -460,7 +462,5 @@ namespace Pingfan.Kit.Inject
 
             return null;
         }
-
-
     }
 }

@@ -23,6 +23,12 @@ public class MidApi : IMiddleware
     /// </summary>
     private readonly List<ControllerItem> _controllers = new List<ControllerItem>();
 
+
+    /// <summary>
+    /// 当参数发生错误时
+    /// </summary>
+    public event Action<IHttpContext, Exception>? OnArgumentError;
+
     // [Inject]
     // public IContainer Container { get; set; } = null!;
 
@@ -147,15 +153,15 @@ public class MidApi : IMiddleware
                 {
                     requestModel =
                         (IMidRequestModel)JsonSerializer.Deserialize(ctx.Request.Body, parameterInfo.ParameterType)!;
+                    requestModel.Check();
                 }
                 catch (Exception e)
                 {
-                    var err = new HttpArgumentException($"{parameterInfo.Name}参数不正确", parameterInfo.ParameterType,
-                        parameterInfo.Name!, e);
-                    throw err;
+                    OnArgumentError?.Invoke(ctx, e);
+                    ctx.Response.End();
+                    return;
                 }
 
-                requestModel.Check();
                 args[i] = requestModel;
             }
         }
