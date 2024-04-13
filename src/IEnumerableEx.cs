@@ -58,12 +58,15 @@ namespace Pingfan.Kit
         /// </summary>
         public static async Task Each<T>(this IEnumerable<T> list, Action<T, Progress> callBack, int threadCount = 0)
         {
-            var queue = new ConcurrentQueue<T>(list);
+            var collection = list as T[] ?? list.ToArray();
+            var queue = new ConcurrentQueue<T>(collection);
             threadCount = threadCount <= 0 ? Environment.ProcessorCount * 2 : threadCount;
             threadCount = threadCount > queue.Count ? queue.Count : threadCount;
 
-            var pe = new Progress();
-            pe.Total = list.Count();
+            var pe = new Progress
+            {
+                Total = collection.Length
+            };
             var tasks = Enumerable.Range(0, threadCount)
                 .Select(_ => Task.Run(() =>
                 {
@@ -83,12 +86,15 @@ namespace Pingfan.Kit
         public static async Task EachAsync<T>(this IEnumerable<T> list, Func<T, Progress, Task> callBack,
             int threadCount = 0)
         {
-            var queue = new ConcurrentQueue<T>(list);
+            var collection = list as T[] ?? list.ToArray();
+            var queue = new ConcurrentQueue<T>(collection);
             threadCount = threadCount <= 0 ? Environment.ProcessorCount * 2 : threadCount;
             threadCount = threadCount > queue.Count ? queue.Count : threadCount;
 
-            var pe = new Progress();
-            pe.Total = list.Count();
+            var pe = new Progress
+            {
+                Total = collection.Length
+            };
             var tasks = Enumerable.Range(0, threadCount)
                 .Select(_ => Task.Run(async () =>
                 {

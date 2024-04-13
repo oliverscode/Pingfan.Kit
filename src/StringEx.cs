@@ -292,7 +292,7 @@ namespace Pingfan.Kit
         public static string BetweenLast(this string str, string start, string end,
             StringComparison stringComparison = StringComparison.Ordinal)
         {
-            var startIndex = str!.LastIndexOf(start, stringComparison);
+            var startIndex = str.LastIndexOf(start, stringComparison);
             if (startIndex < 0)
             {
                 return string.Empty;
@@ -411,6 +411,22 @@ namespace Pingfan.Kit
         public static string[] Split(this string str, params char[] args)
         {
             return str.Split(args, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        /// <summary>
+        /// 替换多个字符串成指定的字符串
+        /// </summary>
+        public static string ReplaceEx(this string str, string newValue, params string[] oldValues)
+        {
+            return oldValues.Aggregate(str, (current, old) => current.Replace(old, newValue));
+        }
+        
+        /// <summary>
+        /// 替换多个字符成指定的字符
+        /// </summary>
+        public static string ReplaceEx(this string str, char newValue, params char[] oldValues)
+        {
+            return oldValues.Aggregate(str, (current, old) => current.Replace(old, newValue));
         }
     }
 }
