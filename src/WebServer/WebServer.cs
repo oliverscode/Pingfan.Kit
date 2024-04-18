@@ -9,23 +9,24 @@ using Pingfan.Kit.WebServer.Interfaces;
 namespace Pingfan.Kit.WebServer;
 
 /// <summary>
-/// Web服务器
+/// Web服务器, 只能通过App.UseWebServer来使用
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public class WebServer : IContainerReady
+public sealed class WebServer : IContainerReady
 {
     private readonly HttpListener _httpListener = new();
     private readonly List<IMiddleware> _middlewares = new();
 
     private static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-    
+
 
     /// <summary>
     /// 容器
     /// </summary>
-    [Inject] public IContainer Container { get; set; } = null!;
-    
-    
+    [Inject]
+    public IContainer Container { get; set; } = null!;
+
+
     /// <summary>
     /// 配置
     /// </summary>

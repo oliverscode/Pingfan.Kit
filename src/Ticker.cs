@@ -7,7 +7,7 @@ namespace Pingfan.Kit
     /// <summary>
     /// 定时器封装
     /// </summary>
-    public static class Timer
+    public static class Ticker
     {
         /// <summary>
         /// 错误事件

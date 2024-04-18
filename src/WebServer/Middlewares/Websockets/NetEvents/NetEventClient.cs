@@ -30,7 +30,7 @@ public class NetEventClient
     public NetEventClient(string url)
     {
         this.Url = url;
-        Timer.Loop(1500, () =>
+        Ticker.Loop(1500, () =>
         {
             // 判断是否已经关闭, 关闭则重连
             if (_websocket.State == WebSocketState.Closed)

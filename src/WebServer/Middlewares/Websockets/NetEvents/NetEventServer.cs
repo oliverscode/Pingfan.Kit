@@ -19,7 +19,7 @@ public class NetEventServer : IWebSocketHandler
             return;
         }
 
-        var data = message.FromJsonString<NetEventProtocol>();
+        var data = message.FromString<NetEventProtocol>();
         if (data == null)
         {
             return;

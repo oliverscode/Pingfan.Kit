@@ -49,8 +49,13 @@ public class MidApi : IMiddleware
         var item = _controllers.FirstOrDefault(p => string.Equals(p.Path, path, StringComparison.OrdinalIgnoreCase));
         if (item == null)
         {
+            ctx.Response.StatusCode = 404;
             next();
             return;
+        }
+        else
+        {
+            ctx.Response.StatusCode = 200;
         }
 
         container.Register<string>(item.InstanceType.Name, "ControllerName");

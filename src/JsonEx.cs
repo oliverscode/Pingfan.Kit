@@ -46,7 +46,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 一段JSON字符串转换为对象
         /// </summary>
-        public static T? FromString<T>(string json, T? defaultValue = default!)
+        public static T? FromString<T>(string json, T? defaultValue = default)
         {
             try
             {
@@ -55,6 +55,21 @@ namespace Pingfan.Kit
             catch
             {
                 return defaultValue;
+            }
+        }
+        
+        /// <summary>
+        /// 一段JSON字符串转换为对象
+        /// </summary>
+        public static JsonElement? FromString(string json)
+        {
+            try
+            {
+                return FromString<JsonElement>(json);
+            }
+            catch
+            {
+                return null;
             }
         }
     }
@@ -75,7 +90,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 把JSON字符串转换为对象
         /// </summary>
-        public static T? FromJsonString<T>(this string json, T? defaultValue = default)
+        public static T? FromString<T>(this string json, T? defaultValue = default)
         {
             return Json.FromString<T>(json, defaultValue);
         }

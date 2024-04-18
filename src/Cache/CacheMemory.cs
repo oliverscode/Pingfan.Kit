@@ -24,7 +24,7 @@ namespace Pingfan.Kit.Cache
         /// </summary>
         public CacheMemory()
         {
-            Timer.LoopWithTry(30 * 1000, AutoCleanExpiredCache);
+            Ticker.LoopWithTry(30 * 1000, AutoCleanExpiredCache);
         }
 
 

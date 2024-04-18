@@ -46,7 +46,7 @@ namespace Pingfan.Kit
 
             }
 
-            var tokenSource = Timer.Loop(delay, () =>
+            var tokenSource = Ticker.Loop(delay, () =>
             {
                 action.DynamicInvoke(args);
                 List.TryRemove(key, out _);

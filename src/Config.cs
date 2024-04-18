@@ -40,6 +40,7 @@ namespace Pingfan.Kit
             lock (Locker)
             {
                 key = Regex.Escape(key);
+                ClearCache();
                 var lines = ReadLinesCache();
                 var sb = new StringBuilder();
                 var success = false;
