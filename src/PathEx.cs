@@ -85,6 +85,12 @@ namespace Pingfan.Kit
         public static void CreateDirectoryIfNotExists(string path)
         {
             var dir = Path.GetDirectoryName(path);
+            // 如果path不是目录, 就返回
+            if (string.IsNullOrEmpty(dir))
+            {
+                return;
+            }
+
             if (Directory.Exists(dir) == false)
             {
                 Directory.CreateDirectory(dir ?? throw new InvalidOperationException());
