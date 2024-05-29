@@ -25,7 +25,6 @@ namespace Pingfan.Kit
     /// </summary>
     public sealed class Http
     {
-        private static readonly HttpHelper _httpHelper = new HttpHelper();
 
         /// <summary>
         /// Get请求
@@ -34,11 +33,8 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static string Get(string url)
         {
-            var httpItem = new HttpItem
-            {
-                URL = url
-            };
-            return _httpHelper.GetHtml(httpItem).Html;
+            var httpclient = new WebClient();
+            return httpclient.DownloadString(url);
         }
 
         /// <summary>
@@ -49,17 +45,16 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static string Post(string url, string postData)
         {
-            var httpItem = new HttpItem
-            {
-                URL = url,
-                Method = "POST",
-                Postdata = postData,
-                ContentType = "application/x-www-form-urlencoded",
-            };
-            return _httpHelper.GetHtml(httpItem).Html;
+            var webClient = new WebClient();
+            var data = Encoding.UTF8.GetBytes(postData);
+            webClient.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+            var result = webClient.UploadData(url, "POST", data);
+            return Encoding.UTF8.GetString(result);
         }
     }
 
+  
+    
     /// <summary>
     /// Http连接操作帮助类
     /// </summary>
