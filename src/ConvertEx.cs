@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 #pragma warning disable SYSLIB0011
@@ -19,10 +20,19 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static byte[] ToBytes(object obj)
         {
-            using var ms = new MemoryStream();
-            var formatter = GetFormatter();
-            formatter.Serialize(ms, obj);
-            return ms.GetBuffer();
+            // using var ms = new MemoryStream();
+            // var formatter = GetFormatter();
+            // formatter.Serialize(ms, obj);
+            // return ms.GetBuffer();
+            
+            var size = Marshal.SizeOf(obj);
+            var bytes = new byte[size];
+            var ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(obj, ptr, false);
+            Marshal.Copy(ptr, bytes, 0, size);
+            Marshal.FreeHGlobal(ptr);
+
+            return bytes;
         }
 
         /// <summary>
@@ -32,9 +42,13 @@ namespace Pingfan.Kit
         /// <returns></returns>
         public static object ToObject(byte[] bytes)
         {
-            using var ms = new MemoryStream(bytes);
-            var formatter = GetFormatter();
-            return formatter.Deserialize(ms);
+            var buffer = new byte[bytes.Length];
+            var ptr = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(buffer, 0, ptr, bytes.Length);
+            var obj = (object)Marshal.PtrToStructure(ptr, typeof(object));
+            Marshal.FreeHGlobal(ptr);
+
+            return obj;
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace Pingfan.Kit
             // 判断是否是管理员
             if (!ProcessEx.IsAdmin)
             {
-                Log.Fatal("Please run as administrator");
+                Log.Fatal("Please run as administrator or root");
             }
         }
 

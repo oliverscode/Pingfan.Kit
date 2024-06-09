@@ -11,7 +11,7 @@ public class ThreadSafeTable<T> : ThreadSafeList<ThreadSafeList<T>>
     }
 
     /// <inheritdoc />
-    public ThreadSafeTable(int capacity) : base()
+    public ThreadSafeTable(int capacity) : base(capacity)
     {
     }
 }

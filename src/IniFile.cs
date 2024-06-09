@@ -65,7 +65,7 @@ namespace Pingfan.Kit
         /// 获取所有配置值
         /// </summary>
         /// <returns></returns>
-        public string[] GetSectionNames()
+        public string[] GetSections()
         {
             lock (_data)
             {
@@ -168,10 +168,9 @@ namespace Pingfan.Kit
 
         private class Section
         {
-            public Dictionary<string, Entry> Entries { get; } =
-                new Dictionary<string, Entry>(StringComparer.OrdinalIgnoreCase);
+            public Dictionary<string, Entry> Entries { get; } = new(StringComparer.OrdinalIgnoreCase);
 
-            public List<string> Comments { get; } = new List<string>();
+            public List<string> Comments { get; } = new();
         }
 
         private class Entry

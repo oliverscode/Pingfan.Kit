@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
-using System.Text;
 using System.Text.Json;
 
 namespace Pingfan.Kit;
@@ -24,12 +21,12 @@ public class Ai
     /// <summary>
     /// 大语言模型, 默认gpt3.5模型
     /// </summary>
-    public string Model = "gpt-3.5-turbo";
+    public string Model { get; set; } = "gpt-3.5-turbo";
 
     /// <summary>
     /// 最大记住你最近的多少条对话
     /// </summary>
-    public int MaxChatLength = 10;
+    public int MaxChatLength { get; set; } = 10;
 
     // public event Action<char> OnAnswer;
 
@@ -41,20 +38,23 @@ public class Ai
 
     public Ai(string apiKey)
     {
-        _apiKey = apiKey;
+        _apiKey = apiKey!;
     }
 
     private string Send(string message)
     {
         using var client = new WebClient();
         // 设置请求头
-        client.Headers[HttpRequestHeader.ContentType] = "application/json";
-        client.Headers[HttpRequestHeader.Authorization] = $"Bearer {_apiKey}";
+        client.Headers.Add("Content-Type", "application/json");
+        client.Headers.Add("Authorization", $"Bearer {_apiKey}");
+
 
         _sendMessage = new { role = "user", content = message };
 
-        var messages = new List<object>();
-        messages.Add(new { role = "system", content = SystemMessage });
+        var messages = new List<object>
+        {
+            new { role = "system", content = SystemMessage }
+        };
 
         // 如果对话历史超过 MaxChatLength * 2, 就不要前面的对话, 但是记录还是得保留
         var history = new List<object>();
@@ -67,10 +67,12 @@ public class Ai
             history.AddRange(_conversationHistory);
         }
 
-        messages.AddRange(_conversationHistory);
+        messages.AddRange(history);
         messages.Add(_sendMessage);
         var data = new { model = Model, messages };
-        var response = client.UploadString(ApiUrl, "POST", Json.ToString(data));
+
+        // 获取结果
+        var response = client.UploadString(ApiUrl, "POST", JsonSerializer.Serialize(data));
         var json = JsonDocument.Parse(response);
         var root = json.RootElement;
         var choices = root.GetProperty("choices");
@@ -85,18 +87,20 @@ public class Ai
         return replyContent!;
     }
 
-
+    /// <summary>
+    /// 对话
+    /// </summary>
     public string Talk(string message)
     {
         return Send(message);
 
         // 更新对话历史，以便下一次请求
         /*{
-  "id": "chatcmpl-9TMl5mrTVll80o7uj1u8keccmfNiU",
-  "object": "chat.completion",
-  "created": 1716786023,
-  "model": "gpt-3.5-turbo-0125",
-  "choices": [
+    "id": "chatcmpl-9TMl5mrTVll80o7uj1u8keccmfNiU",
+    "object": "chat.completion",
+    "created": 1716786023,
+    "model": "gpt-3.5-turbo-0125",
+    "choices": [
     {
       "index": 0,
       "message": {
@@ -106,14 +110,14 @@ public class Ai
       "logprobs": null,
       "finish_reason": "stop"
     }
-  ],
-  "usage": {
+    ],
+    "usage": {
     "prompt_tokens": 29,
     "completion_tokens": 51,
     "total_tokens": 80
-  },
-  "system_fingerprint": null
-}
-*/
+    },
+    "system_fingerprint": null
+    }
+    */
     }
 }

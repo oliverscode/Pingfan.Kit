@@ -60,5 +60,17 @@ namespace Pingfan.Kit
                 }
             }
         }
+        
+        
+        /// <summary>
+        /// 判断当前目录是否存在
+        /// </summary>
+        public static bool CurrentExists(string path)
+        {
+            var dir = PathEx.CombineCurrentDirectory(path);
+            return Directory.Exists(dir);
+        }
+        
+        
     }
 }

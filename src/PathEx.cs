@@ -96,5 +96,23 @@ namespace Pingfan.Kit
                 Directory.CreateDirectory(dir ?? throw new InvalidOperationException());
             }
         }
+        
+        /// <summary>
+        /// 如果当前目录不存在就创建这个目录
+        /// </summary>
+        public static void CreateCurrentDirectoryIfNotExists(string path)
+        {
+            var dir = PathEx.CombineCurrentDirectory(path);
+            // 如果path不是目录, 就返回
+            if (string.IsNullOrEmpty(dir))
+            {
+                return;
+            }
+
+            if (Directory.Exists(dir) == false)
+            {
+                Directory.CreateDirectory(dir ?? throw new InvalidOperationException());
+            }
+        }
     }
 }

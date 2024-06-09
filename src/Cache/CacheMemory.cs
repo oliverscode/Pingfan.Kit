@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 namespace Pingfan.Kit.Cache
 {
     /// <summary>
-    /// 进程缓存类
+    /// 内存缓存类
     /// </summary>
     public class CacheMemory : ICache
     {
-        private readonly ConcurrentDictionary<string, CachedItem> _cacheMap =
-            new ConcurrentDictionary<string, CachedItem>(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, CachedItem> _cacheMap = new(StringComparer.OrdinalIgnoreCase);
 
         private class CachedItem
         {

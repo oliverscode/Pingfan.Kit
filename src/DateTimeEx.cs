@@ -8,7 +8,7 @@ namespace Pingfan.Kit
     public static class DateTimeEx
     {
         /// <summary>
-        /// 当前时区转换成unix时间戳
+        /// 当前时区转换成unix秒时间戳
         /// </summary>
         public static long ToUnixTimeSeconds(this DateTime datetime)
         {
@@ -17,7 +17,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 当前时区转换成unix时间戳
+        /// 当前时区转换成unix毫秒时间戳
         /// </summary>
         public static long ToUnixTimeMilliseconds(this DateTime datetime)
         {
@@ -26,7 +26,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 当前时区unix时间戳转换成DateTime
+        /// 当前时区unix秒时间戳转换成DateTime
         /// </summary>
         public static DateTime FromUnixTimeSeconds(this long timestamp)
         {
@@ -34,7 +34,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 当前时区unix时间戳转换成DateTime
+        /// 当前时区unix毫秒时间戳转换成DateTime
         /// </summary>
         public static DateTime FromUnixTimeMilliseconds(this long timestamp)
         {

@@ -123,7 +123,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 对集合进行乱序处理。
         /// </summary>
-        public static IEnumerable<T> RandomSort<T>(this IEnumerable<T> list)
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> list)
         {
             return list.OrderBy(_ => Guid.NewGuid());
         }

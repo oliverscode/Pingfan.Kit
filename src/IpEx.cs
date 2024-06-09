@@ -36,28 +36,16 @@ namespace Pingfan.Kit
         {
             var urls = new[]
             {
+                "http://2024.ip138.com/",
                 "http://ifconfig.me/ip",
                 "http://ip-api.com/json/",
                 "http://icanhazip.com",
             };
-            var http = new HttpHelper();
-            
-            foreach (var url in urls)
-            {
-                var item = new HttpItem
-                {
-                    URL = url,
-                    Timeout = 2000
-                };
-                var html = http.GetHtml(item).Html;
-                var ip = html.Match(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}").FirstOrDefault();
-                if (!string.IsNullOrEmpty(ip))
-                {
-                    return ip;
-                }
-            }
-            
-            return null;
+
+            return urls.Select(Http.Get)
+                .Select(html => html.Match(@"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}")
+                    .FirstOrDefault())
+                .FirstOrDefault(ip => !string.IsNullOrEmpty(ip));
         }
 
         /// <summary>

@@ -10,7 +10,7 @@ namespace Pingfan.Kit
     /// </summary>
     public class ParallelProcessor<T> : IDisposable
     {
-        private readonly BlockingCollection<T> _queue = new BlockingCollection<T>(new ConcurrentQueue<T>());
+        private readonly BlockingCollection<T> _queue = new(new ConcurrentQueue<T>());
         private readonly Action<T>? _syncMethod;
         private readonly Func<T, Task>? _asyncMethod;
         private readonly int _threadCount;
