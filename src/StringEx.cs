@@ -14,7 +14,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 忽略大小写判断是否相同
         /// </summary>
-        public static bool EqualsIgnoreCase(this string s1, string s2)
+        public static bool EqualsIgnoreCase(this string? s1, string s2)
         {
             return string.Equals(s1, s2, StringComparison.OrdinalIgnoreCase);
         }
@@ -24,7 +24,7 @@ namespace Pingfan.Kit
         /// </summary>
         /// <param name="s1"></param>
         /// <param name="s2"></param>
-        public static double Similarity(this string s1, string s2)
+        public static double Similarity(this string? s1, string s2)
         {
             var shortStr = s1.Length > s2.Length ? s2 : s1;
             var longStr = s1.Length > s2.Length ? s1 : s2;
@@ -45,7 +45,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 判断是否包含另外一个字符串
         /// </summary>
-        public static bool ContainsIgnoreCase(this string s1, string s2)
+        public static bool ContainsIgnoreCase(this string? s1, string s2)
         {
             return s1.IndexOf(s2, StringComparison.OrdinalIgnoreCase) >= 0;
         }
@@ -68,12 +68,12 @@ namespace Pingfan.Kit
         /// <summary>
         /// 是否为数字, 包含浮点数
         /// </summary>
-        public static bool IsNumber(this string s1) => Regex.IsMatch(s1, @"^[-+]?[0-9]*\.?[0-9]+$");
+        public static bool IsNumber(this string? s1) => Regex.IsMatch(s1, @"^[-+]?[0-9]*\.?[0-9]+$");
 
         /// <summary>
         /// 是否为整数, 包含负数, 以及大数
         /// </summary>
-        public static bool IsInt(this string s1) => Regex.IsMatch(s1, @"^[-+]?[0-9]+$");
+        public static bool IsInt(this string? s1) => Regex.IsMatch(s1, @"^[-+]?[0-9]+$");
 
         /// <summary>
         /// 格式化一个字符串
@@ -83,7 +83,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 转成整数, 如果转换失败, 返回默认值
         /// </summary>
-        public static int ToInt(this string str, int defaultValue = 0)
+        public static int ToInt(this string? str, int defaultValue = 0)
         {
             if (string.IsNullOrEmpty(str)) return defaultValue;
 
@@ -104,7 +104,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 转成无符号整数, 如果转换失败, 返回默认值
         /// </summary>
-        public static uint ToUInt(this string str, uint defaultValue = 0)
+        public static uint ToUInt(this string? str, uint defaultValue = 0)
         {
             if (string.IsNullOrEmpty(str)) return defaultValue;
 
@@ -124,7 +124,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 转成长整数, 如果转换失败, 返回默认值
         /// </summary>
-        public static long ToLong(this string str, long defaultValue = 0)
+        public static long ToLong(this string? str, long defaultValue = 0)
         {
             if (string.IsNullOrEmpty(str)) return defaultValue;
 
@@ -144,7 +144,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 转成无符号长整数, 如果转换失败, 返回默认值
         /// </summary>
-        public static ulong ToULong(this string str, ulong defaultValue = 0)
+        public static ulong ToULong(this string? str, ulong defaultValue = 0)
         {
             if (string.IsNullOrEmpty(str)) return defaultValue;
 
@@ -164,7 +164,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 转成单精度浮点数, 如果转换失败, 返回默认值
         /// </summary>
-        public static float ToFloat(this string str, float defaultValue = 0)
+        public static float ToFloat(this string? str, float defaultValue = 0)
         {
             if (string.IsNullOrEmpty(str)) return defaultValue;
 
@@ -179,7 +179,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 转成双精度浮点数, 如果转换失败, 返回默认值
         /// </summary>
-        public static double ToDouble(this string str, double defaultValue = 0)
+        public static double ToDouble(this string? str, double defaultValue = 0)
         {
             if (string.IsNullOrEmpty(str)) return defaultValue;
             if (double.TryParse(str, out var result))
@@ -193,7 +193,7 @@ namespace Pingfan.Kit
         /// <summary>
         /// 转成decimal, 如果转换失败, 返回默认值
         /// </summary>
-        public static decimal ToDecimal(this string str, decimal defaultValue = 0)
+        public static decimal ToDecimal(this string? str, decimal defaultValue = 0)
         {
             if (string.IsNullOrEmpty(str)) return defaultValue;
 
@@ -208,13 +208,13 @@ namespace Pingfan.Kit
         /// <summary>
         /// 先转成int, 再判断是否为0
         /// </summary>
-        public static bool ToBool(this string str) => str.ToInt() != 0;
+        public static bool ToBool(this string? str) => str.ToInt() != 0;
 
 
         /// <summary>
         /// 转成时间, 如果转换失败, 返回默认值
         /// </summary>
-        public static DateTime ToDatetime(this string str, DateTime defaultValue = default)
+        public static DateTime ToDatetime(this string? str, DateTime defaultValue = default)
         {
             if (string.IsNullOrEmpty(str)) return defaultValue;
             if (DateTime.TryParse(str, out var result))
@@ -316,20 +316,14 @@ namespace Pingfan.Kit
             return Regex.IsMatch(input, pattern, options);
         }
 
-        /// <summary>
-        /// 条件成立时, 返回字符串, 否则返回空字符串
-        /// </summary>
-        public static string If(this string str, bool condition)
-        {
-            return condition ? str : string.Empty;
-        }
+      
 
         /// <summary>
         /// 条件成立时, 返回字符串, 否则返回空字符串
         /// </summary>
-        public static string If(this string str, string? str2)
+        public static string Or(this string? str, string str2)
         {
-            return str2.IsNullOrWhiteSpace() == false ? str : string.Empty;
+            return string.IsNullOrEmpty(str)  ? str2 : str!;
         }
 
         /// <summary>

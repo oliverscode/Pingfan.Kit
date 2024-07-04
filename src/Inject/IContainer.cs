@@ -181,6 +181,14 @@ namespace Pingfan.Kit.Inject
         /// 注入实例, 并且再此获取这个值
         /// </summary>
         object New(Type type);
+        
+        /// <summary>
+        /// 判断是否存在, 存在直接获取, 如果不存在就注入
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        T IfNew<T>() where T : class;
+        
 
         /// <summary>
         /// 注入属性

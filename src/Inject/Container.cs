@@ -367,8 +367,21 @@ namespace Pingfan.Kit.Inject
         {
             if (type.IsInterface)
                 throw new Exception("无法创建接口");
-            Register(type);
-            return Get(type);
+
+            lock (Lock)
+            {
+                Register(type);
+                return Get(type);
+            }
+        }
+        
+        /// <inheritdoc />
+        public T IfNew<T>() where T : class
+        {
+            lock (Lock)
+            {
+                return Has<T>() ? Get<T>() : New<T>();
+            }
         }
 
 

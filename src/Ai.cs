@@ -16,7 +16,7 @@ public class Ai
     /// <summary>
     /// 预设的系统消息
     /// </summary>
-    public string SystemMessage { get; set; } = "请用简单的语言回答,不要说一下客套话,仅仅回答问题就好";
+    public string SystemMessage { get; set; } = "请用简单的语言回答,不要解释,更不要客套话,仅仅回答问题就好";
 
     /// <summary>
     /// 大语言模型, 默认gpt3.5模型
@@ -72,7 +72,10 @@ public class Ai
         var data = new { model = Model, messages };
 
         // 获取结果
-        var response = client.UploadString(ApiUrl, "POST", JsonSerializer.Serialize(data));
+        var response = client.UploadString(ApiUrl, "POST", JsonSerializer.Serialize(data, new JsonSerializerOptions
+        {
+            WriteIndented = true
+        }));
         var json = JsonDocument.Parse(response);
         var root = json.RootElement;
         var choices = root.GetProperty("choices");
