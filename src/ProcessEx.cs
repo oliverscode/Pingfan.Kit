@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+
 // ReSharper disable RedundantAssignment
 // ReSharper disable InlineOutVariableDeclaration
 #pragma warning disable CS8605 // Unboxing a possibly null value.
@@ -88,8 +89,6 @@ namespace Pingfan.Kit
             }
         }
 
-
-        // 宏判断是否是windows系统
 
         #region 创建用户进程
 
@@ -209,7 +208,7 @@ namespace Pingfan.Kit
         /// <param name="lpProcessInformation">最后返回的进程信息</param>
         /// <returns>是否调用成功</returns>
         [DllImport("ADVAPI32.DLL", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern bool CreateProcessAsUser(IntPtr hToken, string lpApplicationName, string lpCommandLine,
+        private static extern bool CreateProcessAsUser(IntPtr hToken, string lpApplicationName, string? lpCommandLine,
             IntPtr lpProcessAttributes, IntPtr lpThreadAttributes,
             bool bInheritHandles, uint dwCreationFlags, string lpEnvironment, string lpCurrentDirectory,
             ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);
@@ -222,9 +221,15 @@ namespace Pingfan.Kit
         /// <summary>
         /// 以当前登录系统的用户角色权限启动指定的进程
         /// </summary>
-        /// <param name="childProcName">指定的进程(全路径)</param>
-        public static void CreateUserProcess(string childProcName)
+        /// <param name="path">指定的进程(全路径)</param>
+        /// <param name="args">参数</param>
+        public static void CreateUserProcess(string path, string? args = null)
         {
+            // 如果不是windows系统, 直接返回
+            if (!IsWindows)
+                return;
+
+
             var ppSessionInfo = IntPtr.Zero;
             uint sessionCount = 0;
             if (WTSEnumerateSessions(
@@ -248,8 +253,8 @@ namespace Pingfan.Kit
                             tStartUpInfo.cb = Marshal.SizeOf(typeof(STARTUPINFO));
                             var childProcStarted = CreateProcessAsUser(
                                 hToken, // Token of the logged-on user. 
-                                childProcName, // Name of the process to be started. 
-                                null, // Any command line arguments to be passed. 
+                                path, // Name of the process to be started. 
+                                args, // Any command line arguments to be passed. 
                                 IntPtr.Zero, // Default Process' attributes. 
                                 IntPtr.Zero, // Default Thread's attributes. 
                                 false, // Does NOT inherit parent's handles. 
