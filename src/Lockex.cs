@@ -14,7 +14,7 @@ namespace Pingfan.Kit
         /// 保存锁的并发字典，键为string类型，值为SemaphoreSlim类型
         /// </summary>
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> Lockers =
-            new ConcurrentDictionary<string, SemaphoreSlim>(StringComparer.OrdinalIgnoreCase);
+            new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// 以key为锁名, 不需区分大小写，执行action, 其实就是lock的语法糖
@@ -26,6 +26,23 @@ namespace Pingfan.Kit
             try
             {
                 action();
+            }
+            finally
+            {
+                locker.Release();
+            }
+        }
+
+        /// <summary>
+        /// 以key为锁名, 不需区分大小写，执行action, 其实就是lock的语法糖
+        /// </summary>
+        public static T Run<T>(string key, Func<T> action)
+        {
+            var locker = Get(key);
+            locker.Wait();
+            try
+            {
+                return action();
             }
             finally
             {
@@ -49,8 +66,25 @@ namespace Pingfan.Kit
                 locker.Release();
             }
         }
-        
-        
+
+        /// <summary>
+        /// 以key为锁名, 不需区分大小写，执行action, 其实就是lock的语法糖
+        /// </summary>
+        public static async Task<T> RunAsync<T>(string key, Func<Task<T>> action)
+        {
+            var locker = Get(key);
+            await locker.WaitAsync();
+            try
+            {
+                return await action();
+            }
+            finally
+            {
+                locker.Release();
+            }
+        }
+
+
         /// <summary>
         /// 本程序域为锁名, 不需区分大小写，执行action, 其实就是lock的语法糖
         /// </summary>

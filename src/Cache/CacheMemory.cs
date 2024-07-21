@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -10,7 +12,141 @@ namespace Pingfan.Kit.Cache
     /// </summary>
     public class CacheMemory : ICache
     {
-        private readonly ConcurrentDictionary<string, CachedItem> _cacheMap = new(StringComparer.OrdinalIgnoreCase);
+        private readonly string _projectName;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public CacheMemory(string projectName)
+        {
+            _projectName = projectName;
+        }
+
+        /// <inheritdoc />
+        public bool Has(string key)
+        {
+            key = GetKey(_projectName, key);
+            if (Read(key, out var expire, out _) == false)
+                return false;
+            return !IsExpired(expire);
+        }
+
+
+        /// <inheritdoc />
+        public T? Get<T>(string key) where T : class
+        {
+            TryGet<T>(key, out var item);
+            return item;
+        }
+
+        /// <inheritdoc />
+        public void Set<T>(string key, T? data, float seconds)
+        {
+            key = GetKey(_projectName, key);
+            var expire = DateTime.UtcNow.AddSeconds(seconds);
+            Write(key, true, true, expire, data);
+        }
+
+
+        /// <inheritdoc />
+        public bool TryGet<T>(string key, out T? result) where T : class
+        {
+            result = null;
+            key = GetKey(_projectName, key);
+            var t = Read(key, out _, out var data);
+            result = data as T;
+            return t;
+        }
+
+        /// <inheritdoc />
+        public T? GetOrSet<T>(string key, Func<T?> valueFactory, float seconds = 1)
+            where T : class
+        {
+            if (TryGet<T>(key, out var result))
+                return result;
+            var data = valueFactory();
+            Set(key, data, seconds);
+            return data;
+        }
+
+
+        /// <inheritdoc />
+        public async Task<T?> GetOrSetAsync<T>(string key, Func<Task<T?>> valueFactory, float seconds = 1)
+            where T : class
+        {
+            if (TryGet<T>(key, out var result))
+                return result;
+            var data = await valueFactory();
+            Set(key, data, seconds);
+            return data;
+        }
+
+
+        /// <inheritdoc />
+        public bool SetExpire(string key, float seconds = 1)
+        {
+            key = GetKey(_projectName, key);
+            var expire = DateTime.UtcNow.AddSeconds(seconds);
+            return Write(key, true, false, expire, null);
+        }
+
+
+        /// <inheritdoc />
+        public bool Remove(string key)
+        {
+            key = GetKey(_projectName, key);
+            return Delete(key);
+        }
+
+
+        /// <inheritdoc />
+        public void Clear()
+        {
+            var key = GetKey(_projectName, null);
+            ClearKey(key);
+        }
+
+
+        #region 帮助方法
+
+        static CacheMemory()
+        {
+            Ticker.LoopWithTry(30 * 1000, CleanExpiredCache);
+        }
+
+        private static void CleanExpiredCache()
+        {
+            foreach (var kv in CacheMap)
+            {
+                try
+                {
+                    ClearMemory(kv.Key, kv.Value);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+        }
+
+        private static void ClearMemory(string key, CachedItem item)
+        {
+            if (IsExpired(item.ExpireDateTime))
+            {
+                Delete(key);
+            }
+        }
+
+
+        /// <summary>
+        /// 判断时间戳是否过期, True已过期, False未过期
+        /// </summary>
+        /// <returns></returns>
+        private static bool IsExpired(DateTime timestamp)
+        {
+            return timestamp <= DateTime.Now;
+        }
+
 
         private class CachedItem
         {
@@ -18,182 +154,153 @@ namespace Pingfan.Kit.Cache
             public object? Data;
         }
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public CacheMemory()
+        private static string GetKey(string name, string? key)
         {
-            Ticker.LoopWithTry(30 * 1000, AutoCleanExpiredCache);
+            return $"{name}_{key}";
         }
 
+        private static readonly object SourceLocker = new();
+        private static readonly Dictionary<string, object> Locks = new();
 
-        /// <inheritdoc />
-        public T? Get<T>(string key, T? defaultValue = default) 
+        private static readonly ConcurrentDictionary<string, CachedItem> CacheMap = new();
+
+        private static bool Read(string key,
+            out DateTime expire,
+            out object? data)
         {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            return _tryGet<T>(key, out var item) ? item : defaultValue;
-        }
-
-
-        /// <inheritdoc />
-        public bool TryGet<T>(string key, out T? result, T? defaultValue = default) 
-        {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-
-            if (_tryGet<T>(key, out var item))
-            {
-                result = item;
-                return true;
-            }
-
-            result = defaultValue;
-            return false;
-        }
-
-        /// <inheritdoc />
-        public T? GetOrSet<T>(string key, Func<T?> valueFactory, float seconds = 1) 
-        {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            if (valueFactory == null) throw new ArgumentNullException(nameof(valueFactory));
-
-            if (!_tryGet<T>(key, out var item))
-            {
-                var data = valueFactory();
-                Set(key, data, seconds);
-                return data;
-            }
-
-            return item;
-        }
-
-
-        /// <inheritdoc />
-        public async Task<T?> GetOrSetAsync<T>(string key, Func<Task<T?>> valueFactory, float seconds = 1)
-            
-        {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            if (valueFactory == null) throw new ArgumentNullException(nameof(valueFactory));
-
-            if (!_tryGet<T>(key, out var item))
-            {
-                var data = await valueFactory();
-                Set(key, data, seconds);
-                return data;
-            }
-
-            return item;
-        }
-
-
-        /// <inheritdoc />
-        public bool Has(string key)
-        {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            return _cacheMap.ContainsKey(key);
-        }
-
-
-        /// <inheritdoc />
-        public void Set<T>(string key, T? data, float seconds) 
-        {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-            var expirationDate = DateTime.UtcNow.AddSeconds(seconds);
-            var cacheItem = new CachedItem { Data = data, ExpireDateTime = expirationDate };
-            _cacheMap.AddOrUpdate(key, cacheItem, (k, v) => cacheItem);
-        }
-
-
-        /// <inheritdoc />
-        public bool Set<T>(string key, T? data) 
-        {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-
-            if (_cacheMap.TryGetValue(key, out var value))
-            {
-                value.Data = data;
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <inheritdoc />
-        public bool SetExpire(string key, float seconds = 1)
-        {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-
-            if (_cacheMap.TryGetValue(key, out var item))
-            {
-                item.ExpireDateTime = DateTime.UtcNow.AddSeconds(seconds);
-                return true;
-            }
-
-            return false;
-        }
-
-
-        /// <inheritdoc />
-        public bool TryRemove<T>(string key, out T? result, T? defaultValue = default) 
-        {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
-
-            if (_cacheMap.TryRemove(key, out var item))
-            {
-                result = (T?)item.Data;
-                return true;
-            }
-
-            result = defaultValue;
-            return false;
-        }
-
-
-        /// <inheritdoc />
-        public void Clear()
-        {
-            _cacheMap.Clear();
-        }
-
-
-        /// <inheritdoc />
-        public void Clear(string exp)
-        {
-            var regex = new Regex(exp, RegexOptions.IgnoreCase);
-
-            foreach (var key in _cacheMap.Keys)
-            {
-                if (regex.IsMatch(key))
-                {
-                    _cacheMap.TryRemove(key, out _);
-                }
-            }
-        }
-
-
-        private void AutoCleanExpiredCache()
-        {
-            var currentTime = DateTime.UtcNow;
-
-            foreach (var kvp in _cacheMap)
-            {
-                if (kvp.Value.ExpireDateTime <= currentTime)
-                {
-                    _cacheMap.TryRemove(kvp.Key, out _);
-                }
-            }
-        }
-
-
-        private bool _tryGet<T>(string key, out T? data) 
-        {
+            expire = default;
             data = default;
-            if (_cacheMap.TryGetValue(key, out var item) && item.ExpireDateTime > DateTime.UtcNow)
+            
+            object lockObj;
+            lock (SourceLocker)
             {
-                data = (T?)item.Data;
-                return true;
+                if (!Locks.TryGetValue(key, out lockObj))
+                {
+                    lockObj = new object();
+                    Locks[key] = lockObj;
+                }
             }
 
-            return false;
+            try
+            {
+                lock (lockObj)
+                {
+                    if (!CacheMap.TryGetValue(key, out var value))
+                        return false;
+                    expire = value.ExpireDateTime;
+                    data = value.Data;
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
+
+        private static bool Write(string key,
+            bool isTimeStamp,
+            bool isContext,
+            DateTime expire,
+            object? data)
+        {
+            object lockObj;
+            lock (SourceLocker)
+            {
+                if (!Locks.TryGetValue(key, out lockObj))
+                {
+                    lockObj = new object();
+                    Locks[key] = lockObj;
+                }
+            }
+
+            try
+            {
+                lock (lockObj)
+                {
+                    if (!CacheMap.ContainsKey(key))
+                    {
+                        CacheMap[key] = new CachedItem();
+                    }
+
+                    var sourceItem = CacheMap[key];
+                    if (isTimeStamp)
+                        sourceItem.ExpireDateTime = expire;
+                    if (isContext)
+                        sourceItem.Data = data;
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool Delete(string key)
+        {
+            object lockObj;
+            lock (SourceLocker)
+            {
+                if (!Locks.TryGetValue(key, out lockObj))
+                {
+                    lockObj = new object();
+                    Locks[key] = lockObj;
+                }
+            }
+
+            try
+            {
+                lock (lockObj)
+                {
+                    return CacheMap.TryRemove(key, out _);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool ClearKey(string key)
+        {
+            object lockObj;
+            lock (SourceLocker)
+            {
+                if (!Locks.TryGetValue(key, out lockObj))
+                {
+                    lockObj = new object();
+                    Locks[key] = lockObj;
+                }
+            }
+
+            try
+            {
+                lock (lockObj)
+                {
+                    var success = true;
+                    foreach (var kv in CacheMap)
+                    {
+                        if (kv.Key.StartsWith(key))
+                        {
+                            if (CacheMap.TryRemove(kv.Key, out _) == false)
+                            {
+                                success = false;
+                            }
+                        }
+                    }
+
+                    return success;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        #endregion
     }
 }

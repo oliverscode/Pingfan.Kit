@@ -17,7 +17,7 @@ namespace Pingfan.Kit
         private static readonly object Locker = new object();
         private static readonly ReaderWriterLockSlim CacheLock = new ReaderWriterLockSlim();
         private const string CachePrefixKey = "PingFan.Config.Cache";
-        private static readonly ICache CacheMemory = new CacheMemory();
+        private static readonly ICache CacheMemory = new CacheMemory(CachePrefixKey);
 
         /// <summary>
         /// 当前配置文件绝对目录
@@ -172,15 +172,7 @@ namespace Pingfan.Kit
 
         private static void ClearCache()
         {
-            CacheLock.EnterWriteLock();
-            try
-            {
-                CacheMemory.Clear(CachePrefixKey);
-            }
-            finally
-            {
-                CacheLock.ExitWriteLock();
-            }
+            CacheMemory.Clear();
         }
 
         /// <summary>
@@ -189,7 +181,6 @@ namespace Pingfan.Kit
         /// <returns>配置文件是否删除成功</returns>
         public static bool Clear()
         {
-            ClearCache();
             return FileEx.Delete(MainConfigFilePath);
         }
     }

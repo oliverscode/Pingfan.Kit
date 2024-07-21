@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,6 +34,13 @@ namespace Pingfan.Kit
         /// </summary>
         public static void Init(string? title = null)
         {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+                                                   | SecurityProtocolType.Tls11
+                                                   | SecurityProtocolType.Tls12
+                                                   | SecurityProtocolType.Tls13;
+            
+
+
             if (title != null)
             {
                 Console.Title = title;
@@ -40,6 +48,7 @@ namespace Pingfan.Kit
                 var assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name;
                 AppName = assemblyName ?? "App";
             }
+
 
             // 捕获当前程序的全局异常
             CatchGlobalException();
@@ -58,7 +67,6 @@ namespace Pingfan.Kit
             if (args.Contains(" install") || args.ContainsIgnoreCase(" enable"))
             {
                 Log.Info(ServiceManager.Install());
-
                 Environment.Exit(0);
                 return;
             }
