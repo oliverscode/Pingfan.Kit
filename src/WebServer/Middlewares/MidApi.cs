@@ -228,7 +228,7 @@ public class MidApi : IMiddleware
     /// 添加一组控制器
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public void Add<T>() where T : class
+    public void Add<T>() where T : new()
     {
         Add<T>(null);
     }
@@ -238,7 +238,7 @@ public class MidApi : IMiddleware
     /// </summary>
     /// <param name="urlPrefix">/urlPrefix/控制器/方法名</param>
     /// <typeparam name="T"></typeparam>
-    public void Add<T>(string? urlPrefix) where T : class
+    public void Add<T>(string? urlPrefix) where T : new()
     {
         var type = typeof(T);
         Add(urlPrefix, type);

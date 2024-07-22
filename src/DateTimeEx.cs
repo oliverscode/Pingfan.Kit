@@ -8,16 +8,17 @@ namespace Pingfan.Kit
     public static class DateTimeEx
     {
         /// <summary>
-        /// 当前时区转换成unix秒时间戳
+        /// 当前时区转换成unix秒时间戳, 会忽略本地时区
         /// </summary>
         public static long ToUnixTimeSeconds(this DateTime datetime)
         {
+        
             long unixTime = ((DateTimeOffset) datetime).ToUnixTimeSeconds();
             return unixTime;
         }
 
         /// <summary>
-        /// 当前时区转换成unix毫秒时间戳
+        /// 当前时区转换成unix毫秒时间戳, 会忽略本地时区
         /// </summary>
         public static long ToUnixTimeMilliseconds(this DateTime datetime)
         {
@@ -26,7 +27,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 当前时区unix秒时间戳转换成DateTime
+        /// 把秒级unix时间戳转成本地时间
         /// </summary>
         public static DateTime FromUnixTimeSeconds(this long timestamp)
         {
@@ -34,7 +35,7 @@ namespace Pingfan.Kit
         }
 
         /// <summary>
-        /// 当前时区unix毫秒时间戳转换成DateTime
+        /// 把秒级unix毫秒时间戳转成本地时间
         /// </summary>
         public static DateTime FromUnixTimeMilliseconds(this long timestamp)
         {

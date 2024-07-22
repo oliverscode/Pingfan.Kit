@@ -9,7 +9,7 @@ namespace Pingfan.Kit
     public static class DirectoryEx
     {
         /// <summary>
-        /// 遍历文件夹, 同时不卡顿, 自动忽略权限不足的文件夹
+        /// 遍历文件夹不卡顿, 自动忽略权限不足的文件夹, 返回相对路径
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<string> GetFiles(

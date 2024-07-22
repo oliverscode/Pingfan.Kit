@@ -20,6 +20,7 @@ public class CacheFile : ICache
     public CacheFile(string projectName)
     {
         _projectName = projectName;
+        PathEx.CreateCurrentDirectoryIfNotExists(CacheFileDir);
     }
 
     /// <inheritdoc />
@@ -32,7 +33,7 @@ public class CacheFile : ICache
     }
 
     /// <inheritdoc />
-    public T? Get<T>(string key) where T : class
+    public T Get<T>(string key)
     {
         TryGet<T>(key, out var result);
         return result;
@@ -97,9 +98,9 @@ public class CacheFile : ICache
     }
 
     /// <inheritdoc />
-    public bool TryGet<T>(string key, out T? result) where T : class
+    public bool TryGet<T>(string key, out T result)
     {
-        result = null;
+        result = default;
         var path = GetKeyPath(_projectName, key);
         if (Read(path, true, true, out var timestamp, out var context) == false)
             return false;
@@ -109,68 +110,68 @@ public class CacheFile : ICache
         // 对类型单独处理
         var type = typeof(T);
         if (type == typeof(int?))
-            result = BitConverter.ToInt32(context!, 0) as T;
+            result = (T)(object)BitConverter.ToInt32(context!, 0);
         else if (type == typeof(uint?))
-            result = BitConverter.ToUInt32(context!, 0) as T;
+            result = (T)(object)BitConverter.ToUInt32(context!, 0);
 
         else if (type == typeof(short?))
-            result = BitConverter.ToInt16(context!, 0) as T;
+            result = (T)(object)BitConverter.ToInt16(context!, 0);
         else if (type == typeof(ushort?))
-            result = BitConverter.ToUInt16(context!, 0) as T;
+            result = (T)(object)BitConverter.ToUInt16(context!, 0);
 
 
         else if (type == typeof(long?))
-            result = BitConverter.ToInt64(context!, 0) as T;
+            result = (T)(object)BitConverter.ToInt64(context!, 0);
         else if (type == typeof(ulong?))
-            result = BitConverter.ToUInt64(context!, 0) as T;
+            result = (T)(object)BitConverter.ToUInt64(context!, 0);
 
 
         else if (type == typeof(byte?))
-            result = context![0] as T;
+            result = (T)(object)context![0];
         else if (type == typeof(sbyte?))
-            result = context![0] as T;
+            result = (T)(object)context![0];
 
         else if (type == typeof(char?))
-            result = context![0] as T;
+            result = (T)(object)context![0];
 
         else if (type == typeof(byte[]))
-            result = context as T;
+            result = (T)(object)context!;
 
         else if (type == typeof(float?))
-            result = BitConverter.ToSingle(context!, 0) as T;
+            result = (T)(object)BitConverter.ToSingle(context!, 0);
         else if (type == typeof(double?))
-            result = BitConverter.ToDouble(context!, 0) as T;
+            result = (T)(object)BitConverter.ToDouble(context!, 0);
 
         else if (type == typeof(bool?))
-            result = BitConverter.ToBoolean(context!, 0) as T;
+            result = (T)(object)BitConverter.ToBoolean(context!, 0);
 
 
         else if (type == typeof(string))
-            result = Encoding.UTF8.GetString(context!) as T;
+            result = (T)(object)Encoding.UTF8.GetString(context!);
         else if (type == typeof(DateTime?))
-            result = DateTime.FromBinary(BitConverter.ToInt64(context!, 0)) as T;
+            result = (T)(object)DateTime.FromBinary(BitConverter.ToInt64(context!, 0));
         else if (type == typeof(Guid?))
-            result = new Guid(context!) as T;
+            result = (T)(object)new Guid(context!);
         else if (type == typeof(TimeSpan?))
-            result = TimeSpan.FromTicks(BitConverter.ToInt64(context!, 0)) as T;
+            result = (T)(object)TimeSpan.FromTicks(BitConverter.ToInt64(context!, 0));
 
         else if (type == typeof(decimal?))
         {
             var bits = new int[context!.Length / 4];
             Buffer.BlockCopy(context, 0, bits, 0, context.Length);
-            result = new decimal(bits) as T;
+            result = (T)(object)new decimal(bits);
         }
 
         else
         {
-            result = Json.FromString<T>(Encoding.UTF8.GetString(context!));
+            result = Json.FromString<T>(Encoding.UTF8.GetString(context!))!;
         }
 
         return true;
     }
 
     /// <inheritdoc />
-    public T? GetOrSet<T>(string key, Func<T?> valueFactory, float seconds = 1) where T : class
+    public T? GetOrSet<T>(string key, Func<T?> valueFactory, float seconds = 1)
     {
         if (TryGet<T>(key, out var result))
             return result;
@@ -181,8 +182,7 @@ public class CacheFile : ICache
     }
 
     /// <inheritdoc />
-    public async Task<T?> GetOrSetAsync<T>(string key, Func<Task<T?>> valueFactory, float seconds = 1)
-        where T : class
+    public async Task<T> GetOrSetAsync<T>(string key, Func<Task<T>> valueFactory, float seconds = 1)
     {
         if (TryGet<T>(key, out var result))
             return result;
@@ -303,17 +303,17 @@ public class CacheFile : ICache
                 using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
                 if (isTimeStamp)
                 {
-                    var buffer = new byte[14];
-                    var read = fileStream.Read(buffer, 0, 14);
-                    if (read != 14)
+                    var buffer = new byte[8];
+                    var read = fileStream.Read(buffer, 0, 8);
+                    if (read != 8)
                         return false;
                     timestamp = BitConverter.ToInt64(buffer, 0);
                 }
 
                 if (isContext)
                 {
-                    var buffer = new byte[fileStream.Length - 14];
-                    fileStream.Seek(14, SeekOrigin.Begin);
+                    var buffer = new byte[fileStream.Length - 8];
+                    // fileStream.Seek(8, SeekOrigin.Begin);
                     var read = fileStream.Read(buffer, 0, buffer.Length);
                     if (read != buffer.Length)
                         return false;
@@ -361,7 +361,10 @@ public class CacheFile : ICache
 
                 if (isContext && context != null)
                 {
+                    // fileStream.Seek(8, SeekOrigin.Begin);
                     fileStream.Write(context, 0, context.Length);
+                    // 后面截取
+                    fileStream.SetLength(fileStream.Length);
                 }
             }
 
@@ -427,7 +430,9 @@ public class CacheFile : ICache
                 var files = DirectoryEx.GetFiles(CacheFileDir);
                 foreach (var file in files)
                 {
-                    if (file.StartsWith(path))
+                    var fileName = Path.GetFileName(file);
+                    var pathName = Path.GetFileName(path);
+                    if (fileName.StartsWith(pathName))
                     {
                         if (Delete(file) == false)
                         {

@@ -33,14 +33,14 @@ namespace Pingfan.Kit.Cache
 
 
         /// <inheritdoc />
-        public T? Get<T>(string key) where T : class
+        public T Get<T>(string key)
         {
             TryGet<T>(key, out var item);
             return item;
         }
 
         /// <inheritdoc />
-        public void Set<T>(string key, T? data, float seconds)
+        public void Set<T>(string key, T data, float seconds)
         {
             key = GetKey(_projectName, key);
             var expire = DateTime.UtcNow.AddSeconds(seconds);
@@ -49,18 +49,17 @@ namespace Pingfan.Kit.Cache
 
 
         /// <inheritdoc />
-        public bool TryGet<T>(string key, out T? result) where T : class
+        public bool TryGet<T>(string key, out T result)
         {
-            result = null;
+            result = default!;
             key = GetKey(_projectName, key);
             var t = Read(key, out _, out var data);
-            result = data as T;
+            result = (T)(object)data!;
             return t;
         }
 
         /// <inheritdoc />
-        public T? GetOrSet<T>(string key, Func<T?> valueFactory, float seconds = 1)
-            where T : class
+        public T GetOrSet<T>(string key, Func<T> valueFactory, float seconds = 1)
         {
             if (TryGet<T>(key, out var result))
                 return result;
@@ -71,8 +70,7 @@ namespace Pingfan.Kit.Cache
 
 
         /// <inheritdoc />
-        public async Task<T?> GetOrSetAsync<T>(string key, Func<Task<T?>> valueFactory, float seconds = 1)
-            where T : class
+        public async Task<T> GetOrSetAsync<T>(string key, Func<Task<T>> valueFactory, float seconds = 1)
         {
             if (TryGet<T>(key, out var result))
                 return result;
@@ -144,7 +142,7 @@ namespace Pingfan.Kit.Cache
         /// <returns></returns>
         private static bool IsExpired(DateTime timestamp)
         {
-            return timestamp <= DateTime.Now;
+            return timestamp <= DateTime.UtcNow;
         }
 
 
@@ -170,7 +168,7 @@ namespace Pingfan.Kit.Cache
         {
             expire = default;
             data = default;
-            
+
             object lockObj;
             lock (SourceLocker)
             {
